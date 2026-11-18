@@ -6,7 +6,6 @@ const sorpresa = document.querySelector('#sorpresa');
 const contenido = document.querySelector('#contenido');
 const cerrar = sorpresa.querySelector('.cerrar');
 const abrir = document.querySelector('#abrir');
-const mensaje = document.querySelector('#mensaje');
 const cuaderno = document.querySelector('#cuaderno');
 const abrirCuaderno = document.querySelector('#abrir-cuaderno');
 const tarjetasCuaderno = document.querySelector('#tarjetas-cuaderno');
@@ -75,11 +74,6 @@ function crearPuertas() {
 
 function actualizarPuertas() {
   const fecha = hoy();
-  const pendiente = avance.resueltos.length + 1;
-  mensaje.textContent = fecha < ER.fechaPuerta(1) ? 'La primera puerta se abre el 1 de diciembre.'
-    : pendiente > 24 ? 'Has completado los 24 capítulos.'
-    : ER.estado(pendiente, fecha, avance) === 'futura' ? `Tienes la llave del día ${pendiente}. Podrás usarla el ${pendiente} de diciembre.`
-    : `La ventana del día ${pendiente} está lista para abrirse.`;
 
   const etiquetas = {
     futura: 'Aún no ha llegado su fecha',

@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="./editor.css">
   <script defer src="./escape-room.js"></script>
   <script defer src="./calendario-publicado.js"></script>
+  <script defer src="./recursos-reto.js"></script>
+  <script defer src="./campana-prueba.js"></script>
   <script defer src="./vista-reto.js"></script>
   <script defer src="./editor.js"></script>
 </head>
@@ -21,6 +23,15 @@
     </header>
     <p id="solo-local" hidden>Abre el archivo editor.html desde la carpeta del calendario en tu equipo.</p>
     <div id="editor-local" hidden>
+      <section class="panel-editor">
+        <h2 id="espacio-activo">Mis borradores</h2>
+        <div class="acciones-editor">
+          <button class="control-reto principal" type="button" id="cargar-campana">Cargar escape room de prueba</button>
+          <button class="control-reto" type="button" id="volver-borradores" hidden>Volver a mis borradores</button>
+          <button class="control-reto" type="button" id="copiar-dia-uno" hidden>Usar una copia de mi día 1</button>
+        </div>
+        <label id="selector-copias" hidden>Respaldos importados <select id="copias"></select></label>
+      </section>
       <nav class="dias-editor" aria-label="Elegir capítulo">
         <div id="dias-editor"></div>
         <p id="resumen-capitulos"></p>
@@ -53,12 +64,15 @@
           </div>
           <details class="detalle-editor">
             <summary>Material de apoyo</summary>
+            <label>Dibujo del reto <select name="recursoTipo"></select></label>
+            <label id="campo-recurso">Datos del dibujo <textarea name="recursoDatos" rows="4" aria-describedby="ayuda-recurso"></textarea><span class="ayuda" id="ayuda-recurso"></span></label>
             <label>Texto de apoyo <textarea name="apoyo" rows="3"></textarea></label>
             <div class="columnas">
               <label>Ruta de la imagen <input name="imagen" placeholder="./medios/foto.jpg"></label>
               <label>Descripción de la imagen <input name="alt"></label>
             </div>
             <label>Ruta del audio <input name="audio" placeholder="./medios/nota.mp3"></label>
+            <label>Transcripción desplegable <textarea name="transcripcion" rows="2"></textarea></label>
             <p class="ayuda">Copia tus archivos en una carpeta junto a index.html. Escribe rutas relativas como las del ejemplo.</p>
           </details>
           <details class="detalle-editor">
@@ -69,6 +83,8 @@
               <label>Título de la evidencia que se gana <input name="evidenciaTitulo"></label>
               <label>Qué dice la evidencia <textarea name="evidenciaTexto" rows="2"></textarea></label>
             </div>
+            <label>Dibujo del cuaderno <select name="evidenciaDibujo"></select></label>
+            <label id="campo-evidencia">Datos del dibujo del cuaderno <textarea name="evidenciaDatos" rows="3" aria-describedby="ayuda-evidencia"></textarea><span class="ayuda" id="ayuda-evidencia"></span></label>
             <fieldset class="dependencias">
               <legend>Evidencias que se consultan en este reto</legend>
               <div id="lista-evidencias"></div>
@@ -89,7 +105,7 @@
         <p>Abre la casa con una fecha simulada y un cuaderno de prueba.</p>
         <form id="formulario-prueba" class="acciones-editor">
           <label>Fecha simulada <input id="fecha-prueba" type="date" value="2026-12-01" required></label>
-          <button class="control-reto principal" type="submit">Probar</button>
+          <button class="control-reto principal" type="submit">Jugar campaña</button>
           <button class="control-reto" type="button" id="reiniciar-prueba">Reiniciar progreso de prueba</button>
         </form>
         <iframe id="casa-prueba" title="Calendario en modo de prueba" hidden></iframe>
@@ -100,7 +116,7 @@
         <p>El respaldo guarda textos y rutas. Lleva contigo la carpeta de archivos multimedia.</p>
         <div class="acciones-editor">
           <button class="control-reto" type="button" id="exportar">Exportar respaldo</button>
-          <button class="control-reto" type="button" id="importar">Importar respaldo</button>
+          <button class="control-reto" type="button" id="importar">Importar respaldo como copia</button>
           <input id="archivo-respaldo" type="file" accept=".json,application/json" hidden>
           <button class="control-reto principal" type="button" id="preparar">Preparar versión para Cintia</button>
         </div>

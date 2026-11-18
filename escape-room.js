@@ -17,7 +17,8 @@
 
   function capitulo(entrada = {}) {
     const campos = ['titulo', 'instrucciones', 'pregunta', 'apoyo', 'imagen', 'alt', 'audio',
-      'acierto', 'premio', 'evidenciaTitulo', 'evidenciaTexto', 'combinacion'];
+      'acierto', 'premio', 'evidenciaTitulo', 'evidenciaTexto', 'combinacion',
+      'recursoTipo', 'recursoDatos', 'transcripcion', 'evidenciaDibujo', 'evidenciaDatos'];
     return {
       ...Object.fromEntries(campos.map(campo => [campo, texto(entrada[campo])])),
       tipo: Object.hasOwn(tipos, entrada.tipo) ? entrada.tipo : 'escrita',
@@ -51,7 +52,8 @@
     return dias.flatMap(dia => {
       const reto = datos.capitulos[dia - 1];
       if (!reto.evidenciaTitulo.trim() || !reto.evidenciaTexto.trim()) return [];
-      return [{ id: idEvidencia(dia), dia, titulo: reto.evidenciaTitulo, texto: reto.evidenciaTexto }];
+      return [{ id: idEvidencia(dia), dia, titulo: reto.evidenciaTitulo, texto: reto.evidenciaTexto,
+        dibujo: reto.evidenciaDibujo, datos: reto.evidenciaDatos }];
     });
   }
 
@@ -91,6 +93,11 @@
       if (reto[campo].trim() && !rutaMultimedia(reto[campo])) avisos.push(`revisa la ruta de ${campo}`);
     }
     if (reto.imagen.trim() && !reto.alt.trim()) avisos.push('describe la imagen para quien no pueda verla');
+    for (const dibujo of [reto.recursoTipo, reto.evidenciaDibujo]) {
+      if (dibujo && !Object.hasOwn(window.EscapeRoom.recursos?.tipos ?? {}, dibujo)) {
+        avisos.push('selecciona un tipo de dibujo válido');
+      }
+    }
     const disponibles = new Set(evidencias(datos).map(item => item.id));
     for (const id of reto.dependencias) {
       const origen = /^(?:evidencia-)([1-9]|1\d|2[0-4])$/.exec(id)?.[1];

@@ -8,9 +8,9 @@
     return;
   }
 
-  const claveBorrador = 'adviento-editor-2026-borrador';
-  const clavePrueba = 'adviento-editor-2026-prueba';
-  const claveDia = 'adviento-editor-2026-dia';
+  const prefijo = 'adviento-editor-2026-';
+  const claveEspacio = prefijo + 'espacio';
+  const claveCopias = prefijo + 'copias';
   const formulario = porId('formulario-editor');
   const campos = formulario.elements;
   const vista = porId('vista-previa');
@@ -18,27 +18,30 @@
   const fecha = porId('fecha-prueba');
   const origen = location.protocol === 'file:' ? '*' : location.origin;
   const arrays = ['respuestas', 'opciones', 'orden', 'pistas'];
-  const camposTexto = Object.keys(ER.capitulo()).filter(campo =>
-    typeof ER.capitulo()[campo] === 'string');
+  const plantilla = ER.capitulo();
+  const camposTexto = Object.keys(plantilla).filter(campo => typeof plantilla[campo] === 'string');
   const desdeLineas = valor => valor.split(/\r?\n/).map(linea => linea.trim()).filter(Boolean);
 
-  let datos = leerBorrador();
-  let dia = Number(leer(claveDia));
-  let prueba = leer(clavePrueba);
+  const restauradas = leer(claveCopias);
+  const copias = Array.isArray(restauradas) ? restauradas.filter(copia =>
+    typeof copia?.id === 'string' && /^copia-[a-z0-9-]+$/.test(copia.id) && typeof copia.nombre === 'string') : [];
+  const nombres = new Map([['original', 'Mis borradores'], ['campana', 'Escape room de prueba'],
+    ...copias.map(copia => [copia.id, copia.nombre])]);
+  const abiertos = new Map();
+  let espacio = leer(claveEspacio);
+  if (!nombres.has(espacio)) espacio = 'original';
+  const clave = (tipo, id = espacio) => prefijo + tipo + (id === 'original' ? '' : '-' + id);
+  let datos, dia, prueba, hayCambios, hayRespaldo;
   let sesionPrueba;
-  let hayCambios = false;
-  let hayRespaldo = false;
-  if (!ER.dias.includes(dia)) dia = 1;
-  if (/^\d{4}-\d{2}-\d{2}$/.test(prueba?.fecha)) fecha.value = prueba.fecha;
-  prueba = { fecha: fecha.value, avance: ER.progreso(prueba?.avance) };
 
   function leer(clave) {
     try { return JSON.parse(localStorage.getItem(clave)); } catch { return undefined; }
   }
 
-  function leerBorrador() {
-    try { return ER.calendario(leer(claveBorrador)); }
+  function leerBorrador(id = espacio) {
+    try { return ER.calendario(leer(clave('borrador', id))); }
     catch {
+      if (id === 'campana') return ER.calendario(window.CAMPANA_PRUEBA);
       const demo = ER.calendario(window.CALENDARIO_PUBLICADO);
       if (demo.partida === 'demo-2026') {
         for (const dia of ER.dias.slice(3, 23)) demo.capitulos[dia - 1].listo = false;
@@ -56,6 +59,46 @@
 
   function anunciar(texto) {
     porId('estado-editor').textContent = texto;
+  }
+
+  function cerrarPrueba() {
+    sesionPrueba = undefined;
+    marco.hidden = true;
+    marco.removeAttribute('src');
+  }
+
+  function elegirEspacio(id) {
+    if (datos && espacio !== id) {
+      guardarDia();
+      abiertos.set(espacio, { datos, dia, prueba, hayCambios, hayRespaldo });
+      cerrarPrueba();
+    }
+    espacio = id;
+    const estado = abiertos.get(id);
+    datos = estado?.datos ?? leerBorrador();
+    const seleccionado = Number(estado?.dia ?? leer(clave('dia')));
+    dia = ER.dias.includes(seleccionado) ? seleccionado : 1;
+    const anterior = estado?.prueba ?? leer(clave('prueba'));
+    const fechaAnterior = anterior?.fecha;
+    fecha.value = /^\d{4}-\d{2}-\d{2}$/.test(fechaAnterior) ? fechaAnterior : '2026-12-01';
+    prueba = { fecha: fecha.value, avance: ER.progreso(anterior?.avance) };
+    hayCambios = estado?.hayCambios ?? false;
+    hayRespaldo = estado?.hayRespaldo ?? false;
+    guardar(claveEspacio, espacio);
+
+    porId('espacio-activo').textContent = nombres.get(id);
+    porId('cargar-campana').hidden = id === 'campana';
+    porId('volver-borradores').hidden = id === 'original';
+    const original = (abiertos.get('original')?.datos ?? leerBorrador('original')).capitulos[0];
+    const demo = ER.capitulo(window.CALENDARIO_PUBLICADO.capitulos[0]);
+    porId('copiar-dia-uno').hidden = id !== 'campana' || !(original.titulo || original.imagen)
+      || JSON.stringify(original) === JSON.stringify(demo);
+    const selector = porId('copias');
+    selector.replaceChildren(new Option('Elige un respaldo', ''),
+      ...copias.map(copia => new Option(copia.nombre, copia.id)));
+    selector.value = copias.some(copia => copia.id === id) ? id : '';
+    porId('selector-copias').hidden = !copias.length;
+    mostrarDia();
   }
 
   function guardarDia() {
@@ -131,6 +174,14 @@
     for (const panel of formulario.querySelectorAll('[data-tipo]')) {
       panel.hidden = panel.dataset.tipo !== campos.tipo.value;
     }
+    for (const [selector, campo, idAyuda] of [
+      ['recursoTipo', 'campo-recurso', 'ayuda-recurso'],
+      ['evidenciaDibujo', 'campo-evidencia', 'ayuda-evidencia']
+    ]) {
+      const tipo = campos.namedItem(selector).value;
+      porId(campo).hidden = !tipo;
+      porId(idAyuda).textContent = ER.recursos.tipos[tipo]?.[1] ?? '';
+    }
 
     let listos = 0;
     const avisos = [];
@@ -181,7 +232,7 @@
     boton.addEventListener('click', () => {
       guardarDia();
       dia = numero;
-      guardar(claveDia, dia);
+      guardar(clave('dia'), dia);
       mostrarDia();
     });
     porId('dias-editor').append(boton);
@@ -201,10 +252,34 @@
   formulario.addEventListener('submit', evento => {
     evento.preventDefault();
     guardarDia();
-    const guardado = guardar(claveBorrador, datos);
+    const guardado = guardar(clave('borrador'), datos);
     hayCambios = !guardado;
     anunciar(guardado ? `Borrador guardado. Puedes continuar desde el día ${dia}.`
       : 'El navegador bloqueó el guardado. Exporta un respaldo para conservar los cambios.');
+  });
+
+  porId('cargar-campana').addEventListener('click', () => {
+    elegirEspacio('campana');
+    anunciar('Campaña de prueba cargada en un espacio separado.');
+  });
+  porId('volver-borradores').addEventListener('click', () => {
+    elegirEspacio('original');
+    anunciar('Has vuelto a tus borradores.');
+  });
+  porId('copias').addEventListener('change', evento => {
+    if (nombres.has(evento.target.value)) elegirEspacio(evento.target.value);
+  });
+  porId('copiar-dia-uno').addEventListener('click', () => {
+    guardarDia();
+    const original = (abiertos.get('original')?.datos ?? leerBorrador('original')).capitulos[0];
+    datos.capitulos[0] = structuredClone(original);
+    dia = 1;
+    guardar(clave('dia'), dia);
+    hayCambios = true;
+    hayRespaldo = false;
+    cerrarPrueba();
+    mostrarDia();
+    anunciar('Tu día 1 se copió en la campaña de prueba. Guarda el borrador para conservar la copia.');
   });
 
   porId('previsualizar').addEventListener('click', () => {
@@ -214,6 +289,9 @@
     porId('titulo-vista').textContent = reto.titulo || 'Capítulo sin título';
     const pruebaVista = porId('contenido-vista');
     const ganadas = ER.evidencias(datos).filter(evidencia => evidencia.dia < dia);
+    if (reto.dependencias.length && ganadas.some(item => reto.dependencias.includes(item.id))) {
+      porId('dia-vista').textContent += ' · evidencias de ejemplo';
+    }
     ER.vista.renderizar(pruebaVista, reto, {
       ganadas,
       comprobar: respuesta => {
@@ -235,14 +313,14 @@
 
   fecha.addEventListener('change', () => {
     prueba.fecha = fecha.value;
-    guardar(clavePrueba, prueba);
+    guardar(clave('prueba'), prueba);
   });
 
   porId('formulario-prueba').addEventListener('submit', evento => {
     evento.preventDefault();
     guardarDia();
     prueba.fecha = fecha.value;
-    guardar(clavePrueba, prueba);
+    guardar(clave('prueba'), prueba);
     sesionPrueba = { datos: structuredClone(datos), fecha: prueba.fecha };
     marco.src = './index.html?prueba';
     marco.hidden = false;
@@ -251,10 +329,8 @@
 
   porId('reiniciar-prueba').addEventListener('click', () => {
     prueba.avance = ER.progreso();
-    guardar(clavePrueba, prueba);
-    sesionPrueba = undefined;
-    marco.hidden = true;
-    marco.removeAttribute('src');
+    guardar(clave('prueba'), prueba);
+    cerrarPrueba();
     anunciar('Progreso de prueba reiniciado.');
   });
 
@@ -267,7 +343,7 @@
       }, origen);
     } else if (evento.data?.tipo === 'escape-progreso') {
       prueba.avance = ER.progreso(evento.data.avance);
-      if (!guardar(clavePrueba, prueba)) anunciar('El navegador no pudo guardar el progreso de prueba.');
+      if (!guardar(clave('prueba'), prueba)) anunciar('El navegador no pudo guardar el progreso de prueba.');
     }
   });
 
@@ -283,15 +359,16 @@
   archivo.addEventListener('change', async () => {
     if (!archivo.files.length) return;
     try {
-      if (hayCambios && !hayRespaldo) {
-        anunciar('Guarda o exporta los cambios pendientes antes de importar un respaldo.');
-        return;
-      }
-      datos = ER.calendario(JSON.parse(await archivo.files[0].text()));
-      hayCambios = true;
-      hayRespaldo = false;
-      mostrarDia();
-      anunciar('Respaldo importado. Pulsa «Guardar borrador» para conservarlo en este navegador.');
+      const copia = ER.calendario(JSON.parse(await archivo.files[0].text()));
+      const id = 'copia-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+      const nombre = 'Copia · ' + archivo.files[0].name;
+      const registro = { id, nombre };
+      const guardado = guardar(clave('borrador', id), copia) && guardar(claveCopias, [...copias, registro]);
+      copias.push(registro);
+      nombres.set(id, nombre);
+      abiertos.set(id, { datos: copia, dia: 1, hayCambios: !guardado });
+      elegirEspacio(id);
+      anunciar(guardado ? 'Respaldo importado como copia separada.' : 'Copia disponible en esta pestaña. Exporta un respaldo para conservarla.');
     } catch (error) {
       anunciar(`No se pudo importar el respaldo. ${error.message}`);
     } finally {
@@ -316,6 +393,12 @@
   });
 
   for (const [valor, etiqueta] of Object.entries(ER.tipos)) campos.tipo.add(new Option(etiqueta, valor));
+  for (const [valor, [etiqueta]] of Object.entries(ER.recursos.tipos)) {
+    campos.recursoTipo.add(new Option(etiqueta, valor));
+    if (!['cajas', 'interruptores', 'objetos', 'ruta', 'teclado', 'palabra', 'plantilla', 'caja'].includes(valor)) {
+      campos.evidenciaDibujo.add(new Option(etiqueta, valor));
+    }
+  }
   porId('editor-local').hidden = false;
-  mostrarDia();
+  elegirEspacio(espacio);
 }();

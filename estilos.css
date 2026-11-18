@@ -190,8 +190,6 @@ h1, h2 { font-family: var(--serif); font-weight: 400; }
 }
 
 .introduccion { max-width: 34rem; margin: 0 auto 1.6rem; padding-inline: .45rem; }
-.introduccion .fecha { color: var(--ambar); }
-.introduccion .fecha span { margin-inline-end: .45rem; font-size: .98rem; }
 
 .introduccion h1 {
   margin: .42rem 0 .8rem;
@@ -202,37 +200,6 @@ h1, h2 { font-family: var(--serif); font-weight: 400; }
 
 .introduccion h1:focus { outline: none; }
 .introduccion em { color: #edc58f; font-weight: 400; }
-#mensaje { max-width: 27ch; color: #e0d9ca; font-size: .92rem; }
-
-.leyenda {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .45rem .95rem;
-  margin: 1rem 0 0;
-  padding: 0;
-  list-style: none;
-  color: #e7dccb;
-  font-size: .72rem;
-}
-
-.leyenda li { display: flex; align-items: center; gap: .38rem; }
-
-.marca {
-  display: grid;
-  place-items: center;
-  width: .94rem;
-  height: .94rem;
-  border: 1px solid #aa8e66;
-  border-radius: 2px;
-  color: #fff1d3;
-  font-size: .67rem;
-  line-height: 1;
-}
-
-.marca.destacada { background: #efa959; color: #342215; }
-.marca.destacada::after { content: "✦"; }
-.marca.abierta { background: #765538; }
-.marca.futura { border-style: dashed; background: #18272b; }
 
 .escena {
   isolation: isolate;
@@ -586,13 +553,13 @@ dialog summary { cursor: pointer; font-weight: 650; }
     display: grid;
     grid-template-columns: minmax(16rem, .79fr) minmax(0, 1.4fr);
     align-items: start;
-    gap: clamp(1rem, 4vw, 4.5rem);
+    column-gap: clamp(1rem, 4vw, 4.5rem);
     padding-top: 3.1rem;
   }
   .introduccion { margin: clamp(3.2rem, 13vh, 8rem) 0 0; }
   .introduccion h1 { font-size: clamp(3.85rem, 7vw, 6.3rem); }
   .introduccion em { font-size: .85em; white-space: nowrap; }
-  .leyenda { display: grid; gap: .55rem; margin-top: 1.6rem; }
+  #abrir-cuaderno { grid-column: 2; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -600,9 +567,7 @@ dialog summary { cursor: pointer; font-weight: 650; }
 }
 
 /* Retos, llaves y cuaderno */
-#abrir-cuaderno { margin-top: 1rem; min-height: 44px; }
-.marca.resuelta { background: #315647; }
-.marca.sin-llave { background: #303b48; }
+#abrir-cuaderno { margin-inline: auto; min-height: 44px; }
 .ventana[data-estado="sin-llave"] {
   --hoja: #423d40;
   --cristal: #3e3b49;

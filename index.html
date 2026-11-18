@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diciembre para Cintia</title>
+  <link rel="stylesheet" href="./estilos.css">
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <main>
+    <section id="portada">
+      <div class="sobre" aria-hidden="true">✦</div>
+      <p class="fecha">Diciembre 2026</p>
+      <h1>Para Cintia</h1>
+      <button id="abrir" class="boton" type="button">Abrir el sobre</button>
+    </section>
+
+    <section id="calendario" hidden>
+      <p class="fecha">Del 1 al 24 de diciembre</p>
+      <h1>Tu calendario</h1>
+      <p id="mensaje"></p>
+      <div id="puertas" class="puertas"></div>
+    </section>
+  </main>
+
+  <dialog id="sorpresa" aria-labelledby="titulo">
+    <form method="dialog">
+      <button class="cerrar" aria-label="Cerrar sorpresa">×</button>
+    </form>
+    <p id="dia" class="fecha"></p>
+    <h2 id="titulo"></h2>
+    <div id="contenido"></div>
+  </dialog>
+</body>
+</html>

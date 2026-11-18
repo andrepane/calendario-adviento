@@ -1,0 +1,82 @@
+body.pagina-editor { background: linear-gradient(140deg, #213743, #122029 65%); }
+
+.editor {
+  width: min(66rem, 100%);
+  margin: 0 auto;
+  padding: clamp(.85rem, 4vw, 2.5rem);
+}
+
+.cabecera-editor { margin-bottom: 1.3rem; }
+.cabecera-editor .fecha { color: var(--ambar); }
+.cabecera-editor h1 { font-size: clamp(3rem, 9vw, 5rem); line-height: 1; margin: .35rem 0 .5rem; }
+.cabecera-editor p { color: #e9d9c2; }
+.dias-editor { margin-bottom: .9rem; }
+#dias-editor { display: grid; grid-template-columns: repeat(auto-fit, minmax(44px, 1fr)); gap: .3rem; }
+#dias-editor button {
+  position: relative;
+  min-height: 44px;
+  border: 1px solid #826f57;
+  border-radius: 3px;
+  background: #233640;
+}
+#dias-editor button[data-estado="borrador"] { background: #594835; }
+#dias-editor button[data-estado="listo"] { background: #2d5043; }
+#dias-editor button[aria-current="true"] { background: #f6d59f; color: #21372f; font-weight: 700; }
+#dias-editor button span { margin-left: .14rem; font-size: .72rem; }
+#resumen-capitulos { margin: .4rem 0; font-size: .83rem; }
+.panel-editor {
+  padding: clamp(.8rem, 3vw, 1.5rem);
+  margin-bottom: .9rem;
+  border: 1px solid #bc9c73;
+  border-radius: 4px;
+  background: linear-gradient(120deg, #fcf0d9, #ecdcc0);
+  color: #283429;
+  color-scheme: light;
+}
+.panel-editor h2 { font-size: 2.35rem; line-height: 1; margin-bottom: .45rem; }
+.encabezado-panel, .acciones-editor { display: flex; flex-wrap: wrap; align-items: end; gap: .5rem .85rem; }
+.encabezado-panel { justify-content: space-between; }
+#formulario-editor { display: grid; gap: .8rem; }
+#formulario-editor label, #formulario-prueba label { display: block; font-weight: 650; }
+.editor input:not([type="checkbox"], [type="radio"], [type="file"]), .editor textarea, .editor select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  margin-top: .25rem;
+  padding: .45rem .55rem;
+  border: 1px solid #a28868;
+  border-radius: 3px;
+  background: #fff8e9;
+  color: #282d26;
+  font: inherit;
+  font-weight: 400;
+}
+.editor input[type="checkbox"] { accent-color: #345747; }
+.editor textarea { resize: vertical; }
+.columnas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: .65rem; }
+.detalle-editor, .dependencias {
+  min-width: 0;
+  margin: .5rem 0 0;
+  padding: .55rem .65rem;
+  border: 1px solid #bda17d;
+}
+.detalle-editor summary { cursor: pointer; padding: .4rem 0; font-weight: 700; }
+.detalle-editor > label, .detalle-editor > .columnas { margin-top: .55rem; }
+.ayuda { font-size: .85rem; margin: .3rem 0; }
+.dependencias label, .marcar-listo { min-height: 44px; padding: .5rem 0; }
+.avisos { color: #742e28; margin-block: .3rem; padding-left: 1.3rem; }
+.avisos:empty { display: none; }
+.acciones-editor { margin-block: .7rem .2rem; }
+.estado-editor {
+  position: sticky;
+  bottom: .5rem;
+  padding: .65rem .8rem;
+  border: 1px solid #e4b778;
+  border-radius: 3px;
+  background: #192a32;
+  z-index: 3;
+}
+.estado-editor:empty { display: none; }
+#casa-prueba { margin-top: .75rem; width: 100%; height: min(75svh, 51rem); min-height: 420px; border: 1px solid #826f57; border-radius: 4px; background: #152330; }
+#contenido-vista { display: grid; gap: .75rem; }

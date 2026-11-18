@@ -598,3 +598,80 @@ dialog summary { cursor: pointer; font-weight: 650; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0s !important; transition-duration: 0s !important; transition-delay: 0s !important; }
 }
+
+/* Retos, llaves y cuaderno */
+#abrir-cuaderno { margin-top: 1rem; min-height: 44px; }
+.marca.resuelta { background: #315647; }
+.marca.sin-llave { background: #303b48; }
+.ventana[data-estado="sin-llave"] {
+  --hoja: #423d40;
+  --cristal: #3e3b49;
+  --cristal-borde: #252834;
+  cursor: default;
+}
+.ventana[data-estado="resuelta"] { --cristal: #87623d; --cristal-borde: #475441; }
+.ventana[data-estado="resuelta"] .numero { background: #294539; }
+.ventana[data-estado="abierta"] { --cristal: #d3a165; --cristal-borde: #875237; }
+
+.control-reto {
+  min-height: 44px;
+  min-width: 44px;
+  padding: .45rem .75rem;
+  border: 1px solid #987b5c;
+  border-radius: 3px;
+  background: #faefd9;
+  color: #3c3329;
+  font-weight: 600;
+}
+.control-reto.principal { background: #2b473a; color: #fff3d7; border-color: #2b473a; }
+.control-reto:disabled, .control-reto[aria-disabled="true"] { opacity: .58; cursor: default; }
+.form-reto { display: grid; gap: .55rem; justify-items: start; }
+.form-reto > label, .opciones-reto, .piezas-reto { width: 100%; }
+.form-reto label { font-weight: 600; }
+.form-reto input[type="text"] {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: .3rem;
+  padding: .45rem .6rem;
+  border: 1px solid #987b5c;
+  border-radius: 3px;
+  background: #fff8e9;
+  color: #2b3029;
+  font: inherit;
+}
+.opciones-reto { min-width: 0; margin: 0; padding: .35rem .55rem; border: 1px solid #b49472; }
+.opciones-reto legend { padding-inline: .25rem; font-weight: 600; }
+.opciones-reto label { display: flex; align-items: center; gap: .55rem; min-height: 44px; cursor: pointer; }
+.opciones-reto input { accent-color: #284839; }
+.piezas-reto { display: grid; gap: .4rem; padding-left: 1.3rem; margin: .2rem 0; }
+.piezas-reto li { padding: .35rem; border: 1px solid #bd9b74; background: #fff3dc; }
+.piezas-reto li span { display: block; margin-bottom: .3rem; }
+.piezas-reto button { margin-right: .25rem; }
+.foto-reto { display: block; max-width: 100%; max-height: 55svh; object-fit: contain; }
+.apoyo-reto, .pistas-reto, .resultado-reto, .evidencia {
+  padding: .7rem .85rem;
+  border: 1px solid #bc9b77;
+  background: #d9bb8d32;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.resultado-reto { background: #c8d4b566; border-color: #778d6b; }
+.resultado-reto > * + * { margin-top: .6rem; }
+.pistas-reto ol:empty, .feedback-reto:empty { display: none; }
+.pistas-reto ol { padding-left: 1.25rem; }
+.pistas-reto ol li + li { margin-top: .4rem; }
+.pistas-reto .control-reto { margin-top: .5rem; }
+.pistas-reto h3, .resultado-reto h3, .evidencia h3 { margin: 0; font-size: 1.1rem; }
+.pregunta-reto { font-weight: 700; }
+.feedback-reto { color: #773b38; }
+#tarjetas-cuaderno { display: grid; gap: .65rem; }
+details .evidencia { margin-top: .5rem; }
+.solo-lector {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

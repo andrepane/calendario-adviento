@@ -1,56 +1,4 @@
-const MODO_DEMO = true;
-const ANIO = 2026;
-
-const sorpresas = {
-  1: {
-    titulo: 'Madrugar para esto',
-    texto: 'Tú dijiste «va a estar nublado». Yo dije «seguro que no». Esta foto es de los tres minutos en los que los dos tuvimos razón.',
-    foto: './fotos/amanecer.jpg',
-    descripcionFoto: 'Un valle entre nubes al amanecer'
-  },
-  2: {
-    titulo: 'Vale por una cena',
-    texto: 'El viernes cocino yo. ¿Carbonara o pizza? Tú eliges. También friego, que luego dices que los vales tienen letra pequeña.'
-  },
-  3: {
-    titulo: '¿Quién dijo esto?',
-    texto: '«No tengo hambre, pero te robo una patata».',
-    respuesta: 'Yo. Y fueron siete. Las contaste.'
-  },
-  24: {
-    titulo: 'Cosas que me guardo',
-    texto: 'Cintia,\n\nEste año me guardo el café de aquel sitio al que entramos porque llovía. Y el paseo que iba a durar diez minutos. Y las veces que nos quedamos en la cocina charlando con todo ya recogido.\n\nEl año que viene hacemos más de eso. Y pedimos dos croissants, por favor.',
-    fotos: [
-      { src: './fotos/cafe.jpg', alt: 'Dos cafés y un croissant junto a una ventana lluviosa' },
-      { src: './fotos/paseo.jpg', alt: 'Una calle nevada iluminada por una farola' }
-    ],
-    pista: 'Mira donde guardamos las tazas que nunca usamos.'
-  }
-};
-
-const mensajesDemo = [
-  'La próxima vez que digamos «salimos en cinco minutos», pongo un cronómetro.',
-  'Hoy eliges peli. Prometo no buscar cuánto dura antes de decir que sí.',
-  'Te he dejado la última galleta. Esto sí que merece una puerta.',
-  'Tenemos pendiente un café de esos que se alargan hasta la hora de comer.',
-  'Vale por un paseo sin tener que decidir adónde vamos.',
-  'He hecho una lista de la compra. Sí, he apuntado también el chocolate.',
-  '¿Hacemos desayuno de domingo aunque no sea domingo?',
-  'Hoy pongo yo la música. Puedes vetar una canción. Solo una.',
-  'Me acordé de nuestra teoría de que las sobras de pizza mejoran al día siguiente.',
-  'Un día de estos volvemos a pedir ese postre que íbamos a compartir.',
-  'Hoy te cambio el lado frío del sofá por el mío.',
-  '¿Pedimos algo para cenar y usamos los platos buenos?',
-  'Hoy el paseo acaba donde vendan algo caliente para beber.',
-  'Si me ves mirando recetas, sí, la de la cena sigue en pie.',
-  'Vale por una siesta con el móvil en silencio.',
-  'He puesto el agua a calentar. Ya puedes ir cogiendo la taza grande.',
-  'Hoy hacemos esa foto que siempre decimos que hay que imprimir.',
-  'Adivina quién ha comprado mandarinas como si vinieran quince personas.',
-  'Te toca ponerle nombre a nuestra playlist de cocina.',
-  'Hoy podemos desayunar turrón. Técnicamente sigue siendo diciembre.'
-];
-
+const ER = window.EscapeRoom;
 const portada = document.querySelector('#portada');
 const calendario = document.querySelector('#calendario');
 const puertas = document.querySelector('#puertas');
@@ -59,41 +7,61 @@ const contenido = document.querySelector('#contenido');
 const cerrar = sorpresa.querySelector('.cerrar');
 const abrir = document.querySelector('#abrir');
 const mensaje = document.querySelector('#mensaje');
-const leyendaDestacada = document.querySelector('#leyenda-destacada');
+const cuaderno = document.querySelector('#cuaderno');
+const abrirCuaderno = document.querySelector('#abrir-cuaderno');
+const tarjetasCuaderno = document.querySelector('#tarjetas-cuaderno');
 const movimientoReducido = window.matchMedia('(prefers-reduced-motion: reduce)');
-const relojMadrid = new Intl.DateTimeFormat('sv-SE', {
-  timeZone: 'Europe/Madrid',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit'
-});
-const claveProgreso = `adviento-cintia-${ANIO}-${MODO_DEMO ? 'demo' : 'real'}`;
-const abiertas = leerProgreso();
+const enPrueba = ER.local() && window.parent !== window
+  && new URLSearchParams(location.search).has('prueba');
+const origenLocal = location.protocol === 'file:' ? '*' : location.origin;
+
+let datos = ER.calendario(window.CALENDARIO_PUBLICADO);
+const claveProgreso = `adviento-escape-2026-${datos.partida}`;
+let avance = enPrueba ? ER.progreso() : leerProgreso();
+let fechaSimulada;
 let ventanaActiva;
+let siguiente;
 let temporizador;
 
 function leerProgreso() {
   try {
-    const dias = JSON.parse(localStorage.getItem(claveProgreso));
-    return new Set(Array.isArray(dias) ? dias.filter(dia => Number.isInteger(dia) && dia >= 1 && dia <= 24) : []);
+    return ER.progreso(JSON.parse(localStorage.getItem(claveProgreso)));
   } catch {
-    return new Set();
+    return ER.progreso();
   }
 }
 
-function fechaPuerta(dia) {
-  return `${ANIO}-12-${String(dia).padStart(2, '0')}`;
+function guardarProgreso() {
+  if (enPrueba) {
+    window.parent.postMessage({ tipo: 'escape-progreso', avance }, origenLocal);
+    return;
+  }
+  try {
+    // Combina avances de pestañas abiertas antes de guardar.
+    const guardado = leerProgreso();
+    const pistas = Object.fromEntries(ER.dias.map(dia => [
+      dia, Math.max(avance.pistas[dia] ?? 0, guardado.pistas[dia] ?? 0)
+    ]));
+    avance = ER.progreso({
+      abiertos: [...guardado.abiertos, ...avance.abiertos],
+      resueltos: [...guardado.resueltos, ...avance.resueltos],
+      pistas
+    });
+    localStorage.setItem(claveProgreso, JSON.stringify(avance));
+  } catch {
+    // El progreso sigue disponible durante esta visita.
+  }
 }
 
-function disponible(dia, hoy) {
-  return MODO_DEMO || fechaPuerta(dia) <= hoy;
-}
+const hoy = () => fechaSimulada ?? ER.hoy();
+const ganadas = () => ER.evidencias(datos).filter(item => avance.resueltos.includes(item.dia));
 
 function crearPuertas() {
-  for (let dia = 1; dia <= 24; dia++) {
+  for (const dia of ER.dias) {
     const boton = document.createElement('button');
     boton.type = 'button';
     boton.className = dia === 24 ? 'ventana portal' : 'ventana';
+    boton.setAttribute('aria-haspopup', 'dialog');
     boton.innerHTML = `
       <span class="hueco" aria-hidden="true"></span>
       <span class="hojas" aria-hidden="true"><span></span>${dia === 24 ? '<span></span>' : ''}</span>
@@ -106,128 +74,104 @@ function crearPuertas() {
 }
 
 function actualizarPuertas() {
-  const hoy = relojMadrid.format(new Date());
-  const diaDeHoy = hoy.startsWith(`${ANIO}-12-`) && hoy <= fechaPuerta(24)
-    ? Number(hoy.slice(-2))
-    : 0;
-  const siguienteDemo = MODO_DEMO
-    ? Array.from({ length: 24 }, (_, i) => i + 1).find(dia => !abiertas.has(dia))
-    : undefined;
-  const destacada = diaDeHoy || siguienteDemo;
+  const fecha = hoy();
+  const pendiente = avance.resueltos.length + 1;
+  mensaje.textContent = fecha < ER.fechaPuerta(1) ? 'La primera puerta se abre el 1 de diciembre.'
+    : pendiente > 24 ? 'Has completado los 24 capítulos.'
+    : ER.estado(pendiente, fecha, avance) === 'futura' ? `Tienes la llave del día ${pendiente}. Podrás usarla el ${pendiente} de diciembre.`
+    : `La ventana del día ${pendiente} está lista para abrirse.`;
 
-  leyendaDestacada.textContent = MODO_DEMO && !diaDeHoy ? 'Siguiente en la demo' : 'Hoy';
-  mensaje.textContent = MODO_DEMO ? 'En la demo puedes abrir las 24 puertas.'
-    : hoy < fechaPuerta(1) ? 'La primera puerta se abre el 1 de diciembre.'
-    : 'Toca una puerta iluminada para ver tu sorpresa.';
-
-  for (const [indice, boton] of Array.from(puertas.children).entries()) {
-    const dia = indice + 1;
-    const futura = !disponible(dia, hoy);
-    const abierta = !futura && abiertas.has(dia);
-    const destaca = !futura && !abierta && dia === destacada;
-    const etiquetas = [
-      dia === 24 ? 'Portal del 24 de diciembre' : `${dia} de diciembre`,
-      futura ? 'Aún cerrada' : abierta ? 'Ya abierta' : 'Disponible'
-    ];
-    if (dia === diaDeHoy) etiquetas.push('Hoy');
-
-    boton.disabled = futura;
-    boton.dataset.estado = futura ? 'futura' : abierta ? 'abierta' : destaca ? 'destacada' : 'disponible';
-    boton.querySelector('.estado').textContent = futura ? '—' : abierta ? '✓' : destaca ? '✦' : '';
-    boton.setAttribute('aria-label', etiquetas.join(', '));
-  }
-}
-
-function anadirParrafo(padre, texto) {
-  const parrafo = document.createElement('p');
-  parrafo.textContent = texto;
-  padre.append(parrafo);
-}
-
-function prepararTarjeta(dia) {
-  const entrada = sorpresas[dia] ?? {
-    titulo: 'Para hoy',
-    texto: MODO_DEMO ? mensajesDemo[dia - 4] : 'Un ratito para nosotros. ¿Nos hacemos un café?'
+  const etiquetas = {
+    futura: 'Aún no ha llegado su fecha',
+    'sin-llave': 'Requiere la llave del reto anterior',
+    disponible: 'Reto disponible',
+    resuelta: 'Reto resuelto'
   };
+  const marcas = { futura: '—', 'sin-llave': '◇', disponible: '✦', resuelta: '✓' };
 
+  for (const dia of ER.dias) {
+    const boton = puertas.children[dia - 1];
+    const estado = ER.estado(dia, fecha, avance);
+    const abierta = estado === 'disponible' && avance.abiertos.includes(dia);
+    boton.disabled = estado === 'futura' || estado === 'sin-llave';
+    boton.dataset.estado = abierta ? 'abierta' : estado === 'disponible' ? 'destacada' : estado;
+    boton.querySelector('.estado').textContent = abierta ? '↺' : marcas[estado];
+    const nombre = dia === 24 ? 'Portal del 24 de diciembre' : `${dia} de diciembre`;
+    boton.setAttribute('aria-label', `${nombre}, ${etiquetas[estado]}${abierta ? ', ya abierta' : ''}`);
+  }
+  abrirCuaderno.textContent = `Cuaderno · ${ganadas().length}`;
+}
+
+function prepararTarjeta(dia, recienResuelto = false) {
+  const reto = datos.capitulos[dia - 1];
   document.querySelector('#dia').textContent = `${dia} de diciembre`;
-  document.querySelector('#titulo').textContent = entrada.titulo;
-  contenido.replaceChildren();
-  if (entrada.texto) anadirParrafo(contenido, entrada.texto);
-
-  const fotos = [
-    ...(entrada.foto ? [{ src: entrada.foto, alt: entrada.descripcionFoto }] : []),
-    ...(entrada.fotos ?? [])
-  ];
-  if (fotos.length) {
-    const galeria = document.createElement('div');
-    galeria.className = 'galeria';
-    for (const { src, alt } of fotos) {
-      const foto = document.createElement('img');
-      foto.src = src;
-      foto.alt = alt ?? '';
-      foto.decoding = 'async';
-      galeria.append(foto);
-    }
-    contenido.append(galeria);
+  document.querySelector('#titulo').textContent = reto.titulo || 'Capítulo por preparar';
+  const resuelto = avance.resueltos.includes(dia);
+  const evidencia = ganadas();
+  const proximo = dia + 1;
+  const fechaLlegada = dia < 24 && hoy() >= ER.fechaPuerta(proximo);
+  const errores = ER.errores(datos, dia);
+  if (errores.length && !resuelto) {
+    const aviso = document.createElement('p');
+    aviso.textContent = enPrueba ? `Día ${dia}: ${errores.join('; ')}.` : 'Este capítulo se está preparando.';
+    contenido.replaceChildren(aviso);
+    return;
   }
 
-  for (const tipo of ['audio', 'video']) {
-    if (!entrada[tipo]) continue;
-    const reproductor = document.createElement(tipo);
-    reproductor.src = entrada[tipo];
-    reproductor.controls = true;
-    reproductor.preload = 'none';
-    if (tipo === 'video') reproductor.playsInline = true;
-    contenido.append(reproductor);
-  }
-
-  if (entrada.enlace) {
-    const enlace = document.createElement('a');
-    enlace.href = entrada.enlace;
-    enlace.textContent = entrada.textoEnlace ?? 'Abrir enlace';
-    contenido.append(enlace);
-  }
-
-  if (entrada.respuesta) {
-    const desplegable = document.createElement('details');
-    const cabecera = document.createElement('summary');
-    cabecera.textContent = 'Ver respuesta';
-    desplegable.append(cabecera);
-    anadirParrafo(desplegable, entrada.respuesta);
-    contenido.append(desplegable);
-  }
-
-  if (entrada.pista) {
-    const pista = document.createElement('aside');
-    pista.className = 'pista';
-    const titulo = document.createElement('strong');
-    titulo.textContent = 'Última pista';
-    pista.append(titulo);
-    anadirParrafo(pista, entrada.pista);
-    contenido.append(pista);
-  }
+  ER.vista.renderizar(contenido, reto, {
+    ganadas: evidencia,
+    resuelto,
+    evidenciaNueva: evidencia.find(item => item.dia === dia),
+    pistasVistas: avance.pistas[dia],
+    guardarPistas: cantidad => {
+      avance.pistas[dia] = cantidad;
+      guardarProgreso();
+    },
+    comprobar: respuesta => {
+      if (!enPrueba) {
+        const guardado = leerProgreso();
+        avance = ER.progreso({
+          abiertos: [...avance.abiertos, ...guardado.abiertos],
+          resueltos: [...avance.resueltos, ...guardado.resueltos],
+          pistas: avance.pistas
+        });
+      }
+      if (avance.resueltos.includes(dia)) {
+        prepararTarjeta(dia, true);
+        return true;
+      }
+      if (ER.estado(dia, hoy(), avance) !== 'disponible' || !ER.acertada(reto, respuesta)) return false;
+      avance.resueltos.push(dia);
+      guardarProgreso();
+      actualizarPuertas();
+      prepararTarjeta(dia, true);
+      return true;
+    },
+    mensajeLlave: dia < 24 && (fechaLlegada ? `Has ganado la llave del día ${proximo}.`
+      : `Has ganado la llave del día ${proximo}. Podrás usarla el ${proximo} de diciembre.`),
+    irSiguiente: fechaLlegada ? () => {
+      siguiente = proximo;
+      sorpresa.close();
+    } : undefined
+  });
+  if (recienResuelto) contenido.querySelector('.resultado-reto').focus();
 }
 
 function mostrarSorpresa(dia, boton) {
   if (sorpresa.open || ventanaActiva) return;
-  const hoy = relojMadrid.format(new Date());
-  if (!disponible(dia, hoy)) {
+  if (!['disponible', 'resuelta'].includes(ER.estado(dia, hoy(), avance))) {
     actualizarPuertas();
     return;
   }
 
+  if (!avance.abiertos.includes(dia)) {
+    avance.abiertos.push(dia);
+    guardarProgreso();
+  }
   prepararTarjeta(dia);
   ventanaActiva = boton;
   boton.classList.add('girada');
   sorpresa.classList.toggle('tarjeta-final', dia === 24);
-
-  abiertas.add(dia);
-  try {
-    localStorage.setItem(claveProgreso, JSON.stringify([...abiertas]));
-  } catch {
-    // El progreso sigue disponible en memoria si el navegador bloquea el almacenamiento.
-  }
 
   const mostrar = () => {
     const rect = boton.getBoundingClientRect();
@@ -249,8 +193,7 @@ function programarActualizacion() {
   window.clearTimeout(temporizador);
   if (document.hidden) return;
   actualizarPuertas();
-  // Divisores de 60 para actualizar también al cambiar el día en Madrid.
-  temporizador = window.setTimeout(programarActualizacion, 15000 - Date.now() % 15000);
+  if (!enPrueba) temporizador = window.setTimeout(programarActualizacion, 15000 - Date.now() % 15000);
 }
 
 crearPuertas();
@@ -273,29 +216,69 @@ abrir.addEventListener('click', () => {
   else window.setTimeout(mostrar, 620);
 });
 
-document.addEventListener('visibilitychange', () => {
-  if (!calendario.hidden) programarActualizacion();
+abrirCuaderno.addEventListener('click', () => {
+  tarjetasCuaderno.replaceChildren();
+  const evidencias = ganadas();
+  ER.vista.tarjetas(evidencias, tarjetasCuaderno);
+  if (!evidencias.length) tarjetasCuaderno.textContent = 'Aquí aparecerán las evidencias que consigas al resolver retos.';
+  cuaderno.showModal();
+  document.documentElement.classList.add('modal-abierto');
+  cuaderno.scrollTop = 0;
 });
-window.addEventListener('pageshow', () => {
-  if (!calendario.hidden) programarActualizacion();
+
+cuaderno.addEventListener('close', () => {
+  document.documentElement.classList.remove('modal-abierto');
+  abrirCuaderno.focus({ preventScroll: true });
 });
+
+for (const evento of ['visibilitychange', 'pageshow']) {
+  (evento === 'pageshow' ? window : document).addEventListener(evento, () => {
+    if (!calendario.hidden) programarActualizacion();
+  });
+}
+
 window.addEventListener('storage', evento => {
-  if (evento.key !== claveProgreso && evento.key !== null) return;
-  abiertas.clear();
-  for (const dia of leerProgreso()) abiertas.add(dia);
+  if (enPrueba || (evento.key !== claveProgreso && evento.key !== null)) return;
+  avance = leerProgreso();
   actualizarPuertas();
 });
 
-document.querySelector('#inicio-tarjeta').addEventListener('focus', () => {
-  const controles = contenido.querySelectorAll('a[href], summary, audio[controls], video[controls]');
-  (controles[controles.length - 1] ?? cerrar).focus();
-});
-document.querySelector('#fin-tarjeta').addEventListener('focus', () => cerrar.focus());
+for (const dialogo of [sorpresa, cuaderno]) {
+  const primero = dialogo.querySelector('.cerrar');
+  const limites = dialogo.querySelectorAll('.limite-foco');
+  limites[0].addEventListener('focus', () => {
+    const controles = [...dialogo.querySelectorAll('button:enabled, input:enabled, summary, audio[controls]')]
+      .filter(control => control.getClientRects().length);
+    (controles.at(-1) ?? primero).focus();
+  });
+  limites[1].addEventListener('focus', () => primero.focus());
+}
 
 sorpresa.addEventListener('close', () => {
   document.documentElement.classList.remove('modal-abierto');
-  ventanaActiva.classList.remove('girada');
-  ventanaActiva.focus({ preventScroll: true });
+  ventanaActiva?.classList.remove('girada');
+  ventanaActiva?.focus({ preventScroll: true });
   ventanaActiva = undefined;
   contenido.replaceChildren();
+  if (!siguiente) return;
+  const dia = siguiente;
+  siguiente = undefined;
+  const boton = puertas.children[dia - 1];
+  boton.scrollIntoView({ block: 'nearest' });
+  boton.focus({ preventScroll: true });
+  mostrarSorpresa(dia, boton);
 });
+
+if (enPrueba) {
+  abrir.disabled = true;
+  window.addEventListener('message', evento => {
+    if (evento.source !== window.parent || evento.origin !== (origenLocal === '*' ? 'null' : origenLocal)
+        || evento.data?.tipo !== 'escape-iniciar' || !/^\d{4}-\d{2}-\d{2}$/.test(evento.data.fecha)) return;
+    datos = ER.calendario(evento.data.datos);
+    fechaSimulada = evento.data.fecha;
+    avance = ER.progreso(evento.data.avance);
+    abrir.disabled = false;
+    actualizarPuertas();
+  });
+  window.parent.postMessage({ tipo: 'escape-listo' }, origenLocal);
+}

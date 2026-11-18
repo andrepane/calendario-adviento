@@ -6,6 +6,9 @@
   <meta name="theme-color" content="#111d29">
   <title>Diciembre para Cintia</title>
   <link rel="stylesheet" href="./estilos.css">
+  <script defer src="./escape-room.js"></script>
+  <script defer src="./calendario-publicado.js"></script>
+  <script defer src="./vista-reto.js"></script>
   <script defer src="./app.js"></script>
 </head>
 <body>
@@ -31,10 +34,13 @@
         <h1 id="titulo-calendario" tabindex="-1">Diciembre<br><em>para Cintia.</em></h1>
         <p id="mensaje"></p>
         <ul class="leyenda" aria-label="Estados de las puertas">
-          <li><span class="marca destacada" aria-hidden="true"></span><span id="leyenda-destacada"></span></li>
-          <li><span class="marca abierta" aria-hidden="true">✓</span> Ya abierta</li>
-          <li><span class="marca futura" aria-hidden="true">—</span> Aún cerrada</li>
+          <li><span class="marca destacada" aria-hidden="true"></span> Reto disponible</li>
+          <li><span class="marca abierta" aria-hidden="true">↺</span> Abierta sin resolver</li>
+          <li><span class="marca resuelta" aria-hidden="true">✓</span> Reto resuelto</li>
+          <li><span class="marca futura" aria-hidden="true">—</span> Falta la fecha</li>
+          <li><span class="marca sin-llave" aria-hidden="true">◇</span> Falta la llave</li>
         </ul>
+        <button class="boton" id="abrir-cuaderno" type="button" aria-haspopup="dialog">Cuaderno</button>
       </header>
 
       <div class="escena">
@@ -65,6 +71,17 @@
     <h2 id="titulo"></h2>
     <div id="contenido"></div>
     <span class="limite-foco" id="fin-tarjeta" tabindex="0"></span>
+  </dialog>
+
+  <dialog id="cuaderno" aria-labelledby="titulo-cuaderno">
+    <span class="limite-foco" tabindex="0"></span>
+    <form class="barra-tarjeta" method="dialog">
+      <span class="fecha">Evidencias ganadas</span>
+      <button class="cerrar" aria-label="Cerrar cuaderno" autofocus>×</button>
+    </form>
+    <h2 id="titulo-cuaderno">Cuaderno</h2>
+    <div id="tarjetas-cuaderno"></div>
+    <span class="limite-foco" tabindex="0"></span>
   </dialog>
 </body>
 </html>

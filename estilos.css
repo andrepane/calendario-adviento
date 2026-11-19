@@ -888,3 +888,25 @@ details .evidencia { margin-top: .5rem; }
 .tapa-compartimento svg { width:3rem; height:3rem; }
 @keyframes levantar-tapa { to {transform:rotateX(105deg);opacity:.2;} }
 @media(prefers-reduced-motion:reduce){.nucleo-engranaje{transition:none;}.tapa-compartimento{animation:none;transform:rotateX(105deg);opacity:.2;}}
+
+/* Pasillos y puertas del laberinto corregido */
+.laberinto-anillos { background:#29372e; border-color:#8d7755; }
+.fondo-anillo { stroke:#344237; }
+.fondo-anillo.anillo-seleccionado { stroke:#4b605b; }
+.pasillo-anillo { fill:none; stroke:#f3dfb4; stroke-width:18; stroke-linecap:round; stroke-linejoin:round; }
+.nodo-anillo { fill:#f3dfb4; }
+.anillo-ocupado .pasillo-anillo { stroke:#f5cc80; }
+.anillo-ocupado .nodo-anillo { fill:#f5cc80; }
+.pared-circular { fill:none; stroke:#29372e; stroke-width:6; }
+.paso-abierto { fill:none; stroke:#e7d5a8; stroke-width:18; stroke-linecap:round; }
+.centro-laberinto { fill:#d7bd81; }
+.bolita-anillos { fill:#a6422d; stroke:#fff5df; stroke-width:2; }
+.control-anillo >button:first-child { flex:1; text-align:left; }
+.control-anillo >button[aria-pressed="true"] { background:#375947; color:#fff0d2; }
+.estado-anillos { font-weight:650; padding:.6rem; border:1px solid #b59971; }
+.conexiones-anillos { margin:0; padding-left:1.25rem; font-size:.84rem; }
+.demo-anillos { padding:.7rem; border:1px solid #9e8059; background:#ead7b4; }
+.demo-anillos h3 { margin:0 0 .4rem; }
+.demo-anillos button { margin:.35rem .25rem .2rem 0; }
+.ruta-demo { max-height:12rem; overflow:auto; padding-left:1.6rem; font-size:.87rem; }
+.ruta-demo .paso-ejecutado { color:#53664c; text-decoration:line-through; }

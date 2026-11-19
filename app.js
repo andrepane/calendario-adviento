@@ -44,7 +44,8 @@ function guardarProgreso() {
     avance = ER.progreso({
       abiertos: [...guardado.abiertos, ...avance.abiertos],
       resueltos: [...guardado.resueltos, ...avance.resueltos],
-      pistas
+      pistas,
+      interacciones: { ...guardado.interacciones, ...avance.interacciones }
     });
     localStorage.setItem(claveProgreso, JSON.stringify(avance));
   } catch {
@@ -117,6 +118,11 @@ function prepararTarjeta(dia, recienResuelto = false) {
     resuelto,
     evidenciaNueva: evidencia.find(item => item.dia === dia),
     pistasVistas: avance.pistas[dia],
+    interaccion: avance.interacciones[dia],
+    guardarInteraccion: estado => {
+      avance.interacciones[dia] = estado;
+      guardarProgreso();
+    },
     guardarPistas: cantidad => {
       avance.pistas[dia] = cantidad;
       guardarProgreso();
@@ -127,7 +133,8 @@ function prepararTarjeta(dia, recienResuelto = false) {
         avance = ER.progreso({
           abiertos: [...avance.abiertos, ...guardado.abiertos],
           resueltos: [...avance.resueltos, ...guardado.resueltos],
-          pistas: avance.pistas
+          pistas: avance.pistas,
+          interacciones: avance.interacciones
         });
       }
       if (avance.resueltos.includes(dia)) {
@@ -241,7 +248,7 @@ for (const dialogo of [sorpresa, cuaderno]) {
   const primero = dialogo.querySelector('.cerrar');
   const limites = dialogo.querySelectorAll('.limite-foco');
   limites[0].addEventListener('focus', () => {
-    const controles = [...dialogo.querySelectorAll('button:enabled, input:enabled, summary, audio[controls]')]
+    const controles = [...dialogo.querySelectorAll('button:enabled, input:enabled, select:enabled, textarea:enabled, summary, audio[controls]')]
       .filter(control => control.getClientRects().length);
     (controles.at(-1) ?? primero).focus();
   });
@@ -253,6 +260,7 @@ sorpresa.addEventListener('close', () => {
   ventanaActiva?.classList.remove('girada');
   ventanaActiva?.focus({ preventScroll: true });
   ventanaActiva = undefined;
+  ER.vista.limpiar(contenido);
   contenido.replaceChildren();
   if (!siguiente) return;
   const dia = siguiente;

@@ -2,6 +2,11 @@
   'use strict';
 
   const ER = window.EscapeRoom;
+  const limpiezas = new WeakMap();
+  function limpiar(padre) {
+    limpiezas.get(padre)?.();
+    limpiezas.delete(padre);
+  }
 
   function elemento(etiqueta, texto, clase) {
     const nodo = document.createElement(etiqueta);
@@ -22,6 +27,8 @@
       const tarjeta = elemento('article', '', 'evidencia');
       tarjeta.append(elemento('span', `Día ${item.dia}`, 'fecha'),
         elemento('h3', item.titulo), elemento('p', item.texto));
+      const dibujo = ER.recursos.dibujar(item.dibujo, item.datos ?? '');
+      if (dibujo) tarjeta.append(dibujo);
       padre.append(tarjeta);
     }
   }
@@ -35,6 +42,20 @@
     entrada.required = true;
     etiqueta.append(entrada);
     padre.append(etiqueta);
+    const cambios = [];
+    const acciones = {
+      valor: () => entrada.value,
+      poner: valor => {
+        entrada.value = valor;
+        entrada.dispatchEvent(new Event('input'));
+      },
+      agregar: valor => acciones.poner(entrada.value + valor),
+      borrar: () => acciones.poner(entrada.value.slice(0, -1)),
+      alCambiar: funcion => cambios.push(funcion)
+    };
+    entrada.addEventListener('input', () => cambios.forEach(funcion => funcion()));
+    const dibujo = ER.recursos.dibujar(reto.recursoTipo, reto.recursoDatos, acciones);
+    if (dibujo) padre.prepend(dibujo);
     return () => entrada.value;
   }
 
@@ -50,6 +71,9 @@
       entrada.value = indice;
       entrada.required = true;
       etiqueta.append(entrada, elemento('span', opcion));
+      if (reto.recursoTipo === 'cajas' || reto.recursoTipo === 'interruptores') {
+        etiqueta.prepend(ER.recursos.svg(reto.recursoTipo === 'cajas' ? 'cajaSencilla' : 'interruptor'));
+      }
       grupo.append(etiqueta);
     }
     padre.append(grupo);
@@ -88,6 +112,10 @@
         subir.disabled = indice === 0;
         bajar.disabled = indice === piezas.length - 1;
         fila.append(elemento('span', pieza), subir, bajar);
+        if (reto.recursoTipo === 'objetos') {
+          const dibujo = ER.recursos.svg(pieza === 'Nochevieja' ? 'reloj' : pieza.toLocaleLowerCase('es'));
+          if (dibujo) fila.prepend(dibujo);
+        }
         lista.append(fila);
       }
     }
@@ -97,6 +125,7 @@
   }
 
   function renderizar(padre, reto, opciones = {}) {
+    limpiar(padre);
     const { ganadas = [], resuelto = false } = opciones;
     padre.replaceChildren();
     if (reto.instrucciones) padre.append(elemento('p', reto.instrucciones));
@@ -117,6 +146,11 @@
       reproductor.setAttribute('aria-label', 'Audio de apoyo');
       padre.append(reproductor);
     }
+    if (reto.transcripcion) {
+      const transcripcion = elemento('details');
+      transcripcion.append(elemento('summary', 'Leer transcripción'), elemento('p', reto.transcripcion));
+      padre.append(transcripcion);
+    }
 
     if (reto.dependencias.length) {
       const consulta = elemento('details');
@@ -126,12 +160,19 @@
       padre.append(consulta);
     }
 
+    let ayudaEspecial;
     const estado = elemento('p', '', 'feedback-reto');
     estado.setAttribute('role', 'status');
     if (resuelto) {
       const resultado = elemento('section', '', 'resultado-reto');
       resultado.tabIndex = -1;
       resultado.append(elemento('h3', 'Reto resuelto'));
+      if (reto.recursoTipo === 'caja') {
+        const portal = elemento('div', '', 'portal-premio');
+        portal.setAttribute('aria-hidden', 'true');
+        portal.append(elemento('span'), elemento('span'));
+        resultado.prepend(portal);
+      }
       if (reto.acierto) resultado.append(elemento('p', reto.acierto));
       if (opciones.evidenciaNueva) tarjetas([opciones.evidenciaNueva], resultado);
       if (opciones.mensajeLlave) resultado.append(elemento('p', opciones.mensajeLlave));
@@ -141,8 +182,22 @@
     } else {
       const formulario = elemento('form', '', 'form-reto');
       if (reto.pregunta) formulario.append(elemento('p', reto.pregunta, 'pregunta-reto'));
-      const obtener = reto.tipo === 'opciones' ? elegir(reto, formulario)
-        : reto.tipo === 'ordenar' ? ordenar(reto, formulario) : escribir(reto, formulario);
+      let obtener;
+      if (ER.especiales?.esEspecial(reto.tipo)) {
+        const errores = ER.especiales.errores(reto);
+        if (errores.length) {
+          formulario.append(elemento('p', 'Revisa la configuración en el editor. ' + errores.join('. ')));
+          padre.append(formulario);
+          return;
+        }
+        const juego = ER.especiales.mostrar(formulario, reto, opciones);
+        obtener = juego.obtener;
+        ayudaEspecial = juego.ayuda;
+        limpiezas.set(padre, juego.limpiar);
+      } else {
+        obtener = reto.tipo === 'opciones' ? elegir(reto, formulario)
+          : reto.tipo === 'ordenar' ? ordenar(reto, formulario) : escribir(reto, formulario);
+      }
       const comprobar = elemento('button', 'Comprobar', 'control-reto principal');
       comprobar.type = 'submit';
       formulario.append(comprobar, estado);
@@ -164,20 +219,29 @@
     aviso.setAttribute('role', 'status');
     let vistas = resuelto ? reto.pistas.length : Math.min(opciones.pistasVistas ?? 0, reto.pistas.length);
     for (const pista of reto.pistas.slice(0, vistas)) lista.append(elemento('li', pista));
-    const revelar = boton('Ver una pista', () => {
+    const revelar = boton('Dame una pista', () => {
       if (vistas >= reto.pistas.length) return;
       lista.append(elemento('li', reto.pistas[vistas]));
       aviso.textContent = `Pista ${vistas + 1}: ${reto.pistas[vistas]}`;
       vistas++;
       opciones.guardarPistas?.(vistas);
-      revelar.textContent = vistas < reto.pistas.length ? 'Ver otra pista' : 'Has visto todas las pistas';
+      revelar.textContent = vistas < reto.pistas.length ? 'Dame otra pista' : 'Has visto todas las pistas';
       revelar.setAttribute('aria-disabled', String(vistas >= reto.pistas.length));
     });
     // Mantiene el foco al revelar la última pista.
     bloque.append(elemento('h3', 'Pistas'), lista, aviso);
     if (vistas < reto.pistas.length) bloque.append(revelar);
+    if (ayudaEspecial) {
+      const solicitar = boton('Solicitar ayuda avanzada', () => {
+        const ayuda = ayudaEspecial();
+        bloque.append(ayuda);
+        solicitar.remove();
+        ayuda.querySelector?.('button')?.focus();
+      });
+      bloque.append(solicitar);
+    }
     padre.append(bloque);
   }
 
-  ER.vista = { renderizar, tarjetas };
+  ER.vista = { renderizar, tarjetas, limpiar };
 }();

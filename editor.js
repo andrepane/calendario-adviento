@@ -8,9 +8,9 @@
     return;
   }
 
-  const claveBorrador = 'adviento-editor-2026-borrador';
-  const clavePrueba = 'adviento-editor-2026-prueba';
-  const claveDia = 'adviento-editor-2026-dia';
+  const prefijo = 'adviento-editor-2026-';
+  const claveEspacio = prefijo + 'espacio';
+  const claveCopias = prefijo + 'copias';
   const formulario = porId('formulario-editor');
   const campos = formulario.elements;
   const vista = porId('vista-previa');
@@ -18,27 +18,46 @@
   const fecha = porId('fecha-prueba');
   const origen = location.protocol === 'file:' ? '*' : location.origin;
   const arrays = ['respuestas', 'opciones', 'orden', 'pistas'];
-  const camposTexto = Object.keys(ER.capitulo()).filter(campo =>
-    typeof ER.capitulo()[campo] === 'string');
+  const plantilla = ER.capitulo();
+  const camposTexto = Object.keys(plantilla).filter(campo => typeof plantilla[campo] === 'string');
   const desdeLineas = valor => valor.split(/\r?\n/).map(linea => linea.trim()).filter(Boolean);
 
-  let datos = leerBorrador();
-  let dia = Number(leer(claveDia));
-  let prueba = leer(clavePrueba);
+  const restauradas = leer(claveCopias);
+  const copias = Array.isArray(restauradas) ? restauradas.filter(copia =>
+    typeof copia?.id === 'string' && /^copia-[a-z0-9-]+$/.test(copia.id) && typeof copia.nombre === 'string') : [];
+  const nombres = new Map([['original', 'Mis borradores'], ['campana', 'Escape room de prueba'],
+    ['campana3946', 'Campaña 3946 · versión 2'],
+    ...copias.map(copia => [copia.id, copia.nombre])]);
+  const abiertos = new Map();
+  let espacio = leer(claveEspacio);
+  if (!nombres.has(espacio)) espacio = 'original';
+  const clave = (tipo, id = espacio) => prefijo + tipo + (id === 'original' ? '' : '-' + id);
+  let datos, dia, prueba, hayCambios, hayRespaldo;
   let sesionPrueba;
-  let hayCambios = false;
-  let hayRespaldo = false;
-  if (!ER.dias.includes(dia)) dia = 1;
-  if (/^\d{4}-\d{2}-\d{2}$/.test(prueba?.fecha)) fecha.value = prueba.fecha;
-  prueba = { fecha: fecha.value, avance: ER.progreso(prueba?.avance) };
 
   function leer(clave) {
     try { return JSON.parse(localStorage.getItem(clave)); } catch { return undefined; }
   }
 
-  function leerBorrador() {
-    try { return ER.calendario(leer(claveBorrador)); }
+  function leerBorrador(id = espacio) {
+    try { return ER.calendario(leer(clave('borrador', id))); }
     catch {
+      if (id === 'campana3946') {
+        const nueva = ER.calendario(window.CAMPANA_3946);
+        for (const anterior of ['original', 'campana']) {
+          const previa = abiertos.get(anterior)?.datos ?? leer(clave('borrador', anterior));
+          if (!previa) continue;
+          const personal = ER.calendario(previa).capitulos[0];
+          const ejemplo = ER.capitulo(anterior === 'campana'
+            ? window.CAMPANA_PRUEBA.capitulos[0] : window.CALENDARIO_PUBLICADO.capitulos[0]);
+          if (JSON.stringify(personal) !== JSON.stringify(ejemplo)) {
+            nueva.capitulos[0] = structuredClone(personal);
+            break;
+          }
+        }
+        return nueva;
+      }
+      if (id === 'campana') return ER.calendario(window.CAMPANA_PRUEBA);
       const demo = ER.calendario(window.CALENDARIO_PUBLICADO);
       if (demo.partida === 'demo-2026') {
         for (const dia of ER.dias.slice(3, 23)) demo.capitulos[dia - 1].listo = false;
@@ -56,6 +75,47 @@
 
   function anunciar(texto) {
     porId('estado-editor').textContent = texto;
+  }
+
+  function cerrarPrueba() {
+    sesionPrueba = undefined;
+    marco.hidden = true;
+    marco.removeAttribute('src');
+  }
+
+  function elegirEspacio(id) {
+    if (datos && espacio !== id) {
+      guardarDia();
+      abiertos.set(espacio, { datos, dia, prueba, hayCambios, hayRespaldo });
+      cerrarPrueba();
+    }
+    espacio = id;
+    const estado = abiertos.get(id);
+    datos = estado?.datos ?? leerBorrador();
+    const seleccionado = Number(estado?.dia ?? leer(clave('dia')));
+    dia = ER.dias.includes(seleccionado) ? seleccionado : 1;
+    const anterior = estado?.prueba ?? leer(clave('prueba'));
+    const fechaAnterior = anterior?.fecha;
+    fecha.value = /^\d{4}-\d{2}-\d{2}$/.test(fechaAnterior) ? fechaAnterior : '2026-12-01';
+    prueba = { fecha: fecha.value, avance: ER.progreso(anterior?.avance) };
+    hayCambios = estado?.hayCambios ?? false;
+    hayRespaldo = estado?.hayRespaldo ?? false;
+    guardar(claveEspacio, espacio);
+
+    porId('espacio-activo').textContent = nombres.get(id);
+    porId('cargar-campana').hidden = id === 'campana';
+    porId('cargar-3946').hidden = id === 'campana3946';
+    porId('volver-borradores').hidden = id === 'original';
+    const original = (abiertos.get('original')?.datos ?? leerBorrador('original')).capitulos[0];
+    const demo = ER.capitulo(window.CALENDARIO_PUBLICADO.capitulos[0]);
+    porId('copiar-dia-uno').hidden = !['campana', 'campana3946'].includes(id) || !(original.titulo || original.imagen)
+      || JSON.stringify(original) === JSON.stringify(demo);
+    const selector = porId('copias');
+    selector.replaceChildren(new Option('Elige un respaldo', ''),
+      ...copias.map(copia => new Option(copia.nombre, copia.id)));
+    selector.value = copias.some(copia => copia.id === id) ? id : '';
+    porId('selector-copias').hidden = !copias.length;
+    mostrarDia();
   }
 
   function guardarDia() {
@@ -105,12 +165,92 @@
     porId('campo-premio').hidden = dia !== 24;
     for (const campo of camposTexto) campos.namedItem(campo).value = reto[campo];
     for (const campo of arrays) campos.namedItem(campo).value = reto[campo].join('\n');
+    porId('respuestas-especiales').value = reto.respuestas.join('\n');
     campos.listo.checked = reto.listo;
     campos.correcta.replaceChildren(new Option('Elige la respuesta', '-1'),
       ...reto.opciones.map((opcion, i) => new Option(opcion, String(i))));
     campos.correcta.value = String(reto.opciones[reto.correcta] ? reto.correcta : -1);
     listaDependencias(reto);
+    mostrarParametros();
     actualizarVistaEditor();
+  }
+
+  function mostrarParametros() {
+    const panel = porId('parametros-juego');
+    panel.replaceChildren();
+    let config;
+    try { config = JSON.parse(campos.configuracion.value); } catch { return; }
+    if (!config || typeof config !== 'object' || Array.isArray(config)) return;
+    function control(nombre, valor, tipo, modificar) {
+      const etiqueta = document.createElement('label');
+      etiqueta.textContent = nombre;
+      const entrada = document.createElement(tipo === 'textarea' ? 'textarea' : 'input');
+      if (tipo !== 'textarea') entrada.type = tipo;
+      else entrada.rows = 6;
+      entrada.value = valor ?? '';
+      entrada.addEventListener('input', () => {
+        modificar(entrada.value);
+        campos.configuracion.value = JSON.stringify(config, null, 2);
+      });
+      etiqueta.append(entrada);
+      panel.append(etiqueta);
+      return entrada;
+    }
+    if (campos.tipo.value === 'ahorcado') {
+      control('Palabra del ahorcado', config.palabra, 'text', valor => { config.palabra = valor.toUpperCase(); });
+      const fallos = control('Fallos permitidos', config.fallos, 'number', valor => { config.fallos = Number(valor); });
+      fallos.min = 1;
+      fallos.max = 20;
+      const inicial = control('Posición revelada al empezar (0 es la primera)', config.inicial, 'number', valor => { config.inicial = Number(valor); });
+      inicial.min = 0;
+    }
+    if (campos.tipo.value === 'fragmentos') {
+      const duracion = control('Duración de cada fotograma (ms)', config.duracion, 'number', valor => { config.duracion = Number(valor); });
+      duracion.min = 100;
+      duracion.max = 30000;
+      const pausa = control('Pausa entre fotogramas (ms)', config.pausa, 'number', valor => { config.pausa = Number(valor); });
+      pausa.min = 100;
+      pausa.max = 10000;
+    }
+    if (campos.tipo.value === 'nonograma') {
+      const filas = Array.isArray(config.solucion) ? config.solucion : [];
+      const resumen = document.createElement('p');
+      function actualizarResumen() {
+        if (!config.solucion?.length || !config.solucion.every(f => /^[01]+$/.test(f))
+            || new Set(config.solucion.map(f=>f.length)).size !== 1) {
+          resumen.textContent = 'La solución debe ser rectangular y usar 0 y 1.';
+          return;
+        }
+        const pistas = ER.especiales.pistasNonograma(config.solucion);
+        resumen.textContent = 'Pistas de filas: ' + pistas.filas.map(p => p.join(' ') || '0').join(' / ')
+          + '. Columnas: ' + pistas.columnas.map(p => p.join(' ') || '0').join(' / ') + '.';
+      }
+      const solucion = control('Solución del nonograma, una fila por línea (1 pintada, 0 vacía)',
+        filas.join('\n'), 'textarea', valor => {
+          config.solucion = valor.split(/\r?\n/).filter(Boolean);
+          actualizarResumen();
+        });
+      const alto = control('Número de filas', filas.length, 'number', () => {});
+      const ancho = control('Número de columnas', filas[0]?.length ?? 5, 'number', () => {});
+      for (const dimension of [alto, ancho]) { dimension.min = 2; dimension.max = 12; }
+      const redimensionar = document.createElement('button');
+      redimensionar.type = 'button';
+      redimensionar.className = 'control-reto';
+      redimensionar.textContent = 'Aplicar dimensiones y generar pistas';
+      redimensionar.addEventListener('click', () => {
+        const h = Number(alto.value), w = Number(ancho.value);
+        if (!Number.isInteger(h) || h < 2 || h > 12 || !Number.isInteger(w) || w < 2 || w > 12) {
+          anunciar('El nonograma permite de 2 a 12 filas y columnas.');
+          return;
+        }
+        config.solucion = Array.from({length:h},(_,y) => (config.solucion[y] ?? '').padEnd(w,'0').slice(0,w));
+        solucion.value = config.solucion.join('\n');
+        campos.configuracion.value = JSON.stringify(config,null,2);
+        campos.configuracion.dispatchEvent(new Event('input',{bubbles:true}));
+      });
+      panel.append(redimensionar,resumen);
+      actualizarResumen();
+    }
   }
 
   function estado(reto, errores) {
@@ -128,8 +268,17 @@
   }
 
   function actualizarVistaEditor() {
+    porId('configuracion-especial').hidden = !ER.especiales.esEspecial(campos.tipo.value);
     for (const panel of formulario.querySelectorAll('[data-tipo]')) {
       panel.hidden = panel.dataset.tipo !== campos.tipo.value;
+    }
+    for (const [selector, campo, idAyuda] of [
+      ['recursoTipo', 'campo-recurso', 'ayuda-recurso'],
+      ['evidenciaDibujo', 'campo-evidencia', 'ayuda-evidencia']
+    ]) {
+      const tipo = campos.namedItem(selector).value;
+      porId(campo).hidden = !tipo;
+      porId(idAyuda).textContent = ER.recursos.tipos[tipo]?.[1] ?? '';
     }
 
     let listos = 0;
@@ -181,13 +330,17 @@
     boton.addEventListener('click', () => {
       guardarDia();
       dia = numero;
-      guardar(claveDia, dia);
+      guardar(clave('dia'), dia);
       mostrarDia();
     });
     porId('dias-editor').append(boton);
   }
 
   formulario.addEventListener('input', evento => {
+    if (evento.target === campos.tipo || evento.target === campos.configuracion) mostrarParametros();
+    if (evento.target === porId('respuestas-especiales')) {
+      campos.respuestas.value = evento.target.value;
+    }
     if (evento.target === campos.opciones) actualizarOpciones();
     guardarDia();
     hayCambios = true;
@@ -201,10 +354,39 @@
   formulario.addEventListener('submit', evento => {
     evento.preventDefault();
     guardarDia();
-    const guardado = guardar(claveBorrador, datos);
+    const guardado = guardar(clave('borrador'), datos);
     hayCambios = !guardado;
     anunciar(guardado ? `Borrador guardado. Puedes continuar desde el día ${dia}.`
       : 'El navegador bloqueó el guardado. Exporta un respaldo para conservar los cambios.');
+  });
+
+  porId('cargar-campana').addEventListener('click', () => {
+    elegirEspacio('campana');
+    anunciar('Campaña de prueba cargada en un espacio separado.');
+  });
+  porId('cargar-3946').addEventListener('click', () => {
+    elegirEspacio('campana3946');
+    if (!leer(clave('borrador'))) guardar(clave('borrador'), datos);
+    anunciar('Campaña 3946 cargada como una versión nueva. El día 1 conserva tu reto personal si ya estaba guardado.');
+  });
+  porId('volver-borradores').addEventListener('click', () => {
+    elegirEspacio('original');
+    anunciar('Has vuelto a tus borradores.');
+  });
+  porId('copias').addEventListener('change', evento => {
+    if (nombres.has(evento.target.value)) elegirEspacio(evento.target.value);
+  });
+  porId('copiar-dia-uno').addEventListener('click', () => {
+    guardarDia();
+    const original = (abiertos.get('original')?.datos ?? leerBorrador('original')).capitulos[0];
+    datos.capitulos[0] = structuredClone(original);
+    dia = 1;
+    guardar(clave('dia'), dia);
+    hayCambios = true;
+    hayRespaldo = false;
+    cerrarPrueba();
+    mostrarDia();
+    anunciar('Tu día 1 se copió en la campaña de prueba. Guarda el borrador para conservar la copia.');
   });
 
   porId('previsualizar').addEventListener('click', () => {
@@ -214,8 +396,17 @@
     porId('titulo-vista').textContent = reto.titulo || 'Capítulo sin título';
     const pruebaVista = porId('contenido-vista');
     const ganadas = ER.evidencias(datos).filter(evidencia => evidencia.dia < dia);
+    const estadoPrevio = leer(clave('previas')) ?? {};
+    if (reto.dependencias.length && ganadas.some(item => reto.dependencias.includes(item.id))) {
+      porId('dia-vista').textContent += ' · evidencias de ejemplo';
+    }
     ER.vista.renderizar(pruebaVista, reto, {
       ganadas,
+      interaccion: estadoPrevio[dia],
+      guardarInteraccion: estado => {
+        estadoPrevio[dia] = estado;
+        guardar(clave('previas'), estadoPrevio);
+      },
       comprobar: respuesta => {
         if (!ER.acertada(reto, respuesta)) return false;
         ER.vista.renderizar(pruebaVista, reto, {
@@ -231,18 +422,22 @@
     vista.scrollTop = 0;
   });
 
-  vista.addEventListener('close', () => porId('contenido-vista').replaceChildren());
+  vista.addEventListener('close', () => {
+    if (vista.open) return;
+    ER.vista.limpiar(porId('contenido-vista'));
+    porId('contenido-vista').replaceChildren();
+  });
 
   fecha.addEventListener('change', () => {
     prueba.fecha = fecha.value;
-    guardar(clavePrueba, prueba);
+    guardar(clave('prueba'), prueba);
   });
 
   porId('formulario-prueba').addEventListener('submit', evento => {
     evento.preventDefault();
     guardarDia();
     prueba.fecha = fecha.value;
-    guardar(clavePrueba, prueba);
+    guardar(clave('prueba'), prueba);
     sesionPrueba = { datos: structuredClone(datos), fecha: prueba.fecha };
     marco.src = './index.html?prueba';
     marco.hidden = false;
@@ -251,10 +446,8 @@
 
   porId('reiniciar-prueba').addEventListener('click', () => {
     prueba.avance = ER.progreso();
-    guardar(clavePrueba, prueba);
-    sesionPrueba = undefined;
-    marco.hidden = true;
-    marco.removeAttribute('src');
+    guardar(clave('prueba'), prueba);
+    cerrarPrueba();
     anunciar('Progreso de prueba reiniciado.');
   });
 
@@ -267,7 +460,7 @@
       }, origen);
     } else if (evento.data?.tipo === 'escape-progreso') {
       prueba.avance = ER.progreso(evento.data.avance);
-      if (!guardar(clavePrueba, prueba)) anunciar('El navegador no pudo guardar el progreso de prueba.');
+      if (!guardar(clave('prueba'), prueba)) anunciar('El navegador no pudo guardar el progreso de prueba.');
     }
   });
 
@@ -283,15 +476,16 @@
   archivo.addEventListener('change', async () => {
     if (!archivo.files.length) return;
     try {
-      if (hayCambios && !hayRespaldo) {
-        anunciar('Guarda o exporta los cambios pendientes antes de importar un respaldo.');
-        return;
-      }
-      datos = ER.calendario(JSON.parse(await archivo.files[0].text()));
-      hayCambios = true;
-      hayRespaldo = false;
-      mostrarDia();
-      anunciar('Respaldo importado. Pulsa «Guardar borrador» para conservarlo en este navegador.');
+      const copia = ER.calendario(JSON.parse(await archivo.files[0].text()));
+      const id = 'copia-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+      const nombre = 'Copia · ' + archivo.files[0].name;
+      const registro = { id, nombre };
+      const guardado = guardar(clave('borrador', id), copia) && guardar(claveCopias, [...copias, registro]);
+      copias.push(registro);
+      nombres.set(id, nombre);
+      abiertos.set(id, { datos: copia, dia: 1, hayCambios: !guardado });
+      elegirEspacio(id);
+      anunciar(guardado ? 'Respaldo importado como copia separada.' : 'Copia disponible en esta pestaña. Exporta un respaldo para conservarla.');
     } catch (error) {
       anunciar(`No se pudo importar el respaldo. ${error.message}`);
     } finally {
@@ -316,6 +510,12 @@
   });
 
   for (const [valor, etiqueta] of Object.entries(ER.tipos)) campos.tipo.add(new Option(etiqueta, valor));
+  for (const [valor, [etiqueta]] of Object.entries(ER.recursos.tipos)) {
+    campos.recursoTipo.add(new Option(etiqueta, valor));
+    if (!['cajas', 'interruptores', 'objetos', 'ruta', 'teclado', 'palabra', 'plantilla', 'caja'].includes(valor)) {
+      campos.evidenciaDibujo.add(new Option(etiqueta, valor));
+    }
+  }
   porId('editor-local').hidden = false;
-  mostrarDia();
+  elegirEspacio(espacio);
 }();

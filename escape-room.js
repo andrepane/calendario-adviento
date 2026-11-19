@@ -6,7 +6,16 @@
     escrita: 'Respuesta escrita',
     opciones: 'Elección entre opciones',
     ordenar: 'Ordenar elementos',
-    combinacion: 'Combinación final'
+    combinacion: 'Combinación final',
+    anagrama: 'Anagrama con fichas',
+    recorrido: 'Recorrido en cuadrícula',
+    ahorcado: 'Ahorcado',
+    ascensor: 'Ascensor con libreta',
+    registro: 'Registro lunar',
+    nonograma: 'Nonograma',
+    maquina: 'Máquina lunar',
+    perforado: 'Papel perforado',
+    fragmentos: 'Visor de fragmentos'
   };
   const texto = valor => typeof valor === 'string' ? valor : '';
   const lista = valor => Array.isArray(valor) ? valor.filter(item => typeof item === 'string') : [];
@@ -17,7 +26,9 @@
 
   function capitulo(entrada = {}) {
     const campos = ['titulo', 'instrucciones', 'pregunta', 'apoyo', 'imagen', 'alt', 'audio',
-      'acierto', 'premio', 'evidenciaTitulo', 'evidenciaTexto', 'combinacion'];
+      'acierto', 'premio', 'evidenciaTitulo', 'evidenciaTexto', 'combinacion',
+      'recursoTipo', 'recursoDatos', 'transcripcion', 'evidenciaDibujo', 'evidenciaDatos',
+      'configuracion', 'normalizacion'];
     return {
       ...Object.fromEntries(campos.map(campo => [campo, texto(entrada[campo])])),
       tipo: Object.hasOwn(tipos, entrada.tipo) ? entrada.tipo : 'escrita',
@@ -51,7 +62,8 @@
     return dias.flatMap(dia => {
       const reto = datos.capitulos[dia - 1];
       if (!reto.evidenciaTitulo.trim() || !reto.evidenciaTexto.trim()) return [];
-      return [{ id: idEvidencia(dia), dia, titulo: reto.evidenciaTitulo, texto: reto.evidenciaTexto }];
+      return [{ id: idEvidencia(dia), dia, titulo: reto.evidenciaTitulo, texto: reto.evidenciaTexto,
+        dibujo: reto.evidenciaDibujo, datos: reto.evidenciaDatos }];
     });
   }
 
@@ -73,6 +85,9 @@
   function errores(datos, dia) {
     const reto = datos.capitulos[dia - 1];
     const avisos = [];
+    if (window.EscapeRoom.especiales?.esEspecial(reto.tipo)) {
+      avisos.push(...window.EscapeRoom.especiales.errores(reto));
+    }
     if (!reto.titulo.trim()) avisos.push('escribe un título');
     if (!reto.instrucciones.trim()) avisos.push('escribe las instrucciones');
     if (reto.tipo === 'escrita' && !reto.respuestas.some(normalizar)) avisos.push('añade una respuesta válida');
@@ -91,6 +106,11 @@
       if (reto[campo].trim() && !rutaMultimedia(reto[campo])) avisos.push(`revisa la ruta de ${campo}`);
     }
     if (reto.imagen.trim() && !reto.alt.trim()) avisos.push('describe la imagen para quien no pueda verla');
+    for (const dibujo of [reto.recursoTipo, reto.evidenciaDibujo]) {
+      if (dibujo && !Object.hasOwn(window.EscapeRoom.recursos?.tipos ?? {}, dibujo)) {
+        avisos.push('selecciona un tipo de dibujo válido');
+      }
+    }
     const disponibles = new Set(evidencias(datos).map(item => item.id));
     for (const id of reto.dependencias) {
       const origen = /^(?:evidencia-)([1-9]|1\d|2[0-4])$/.exec(id)?.[1];
@@ -111,7 +131,9 @@
       pistas: Object.fromEntries(dias.flatMap(dia => {
         const cantidad = datos?.pistas?.[dia];
         return Number.isInteger(cantidad) && cantidad > 0 ? [[dia, cantidad]] : [];
-      }))
+      })),
+      interacciones: datos?.interacciones && typeof datos.interacciones === 'object'
+        && !Array.isArray(datos.interacciones) ? datos.interacciones : {}
     };
   }
 
@@ -123,14 +145,20 @@
   }
 
   function acertada(reto, respuesta) {
+    if (window.EscapeRoom.especiales?.esEspecial(reto.tipo)) {
+      return window.EscapeRoom.especiales.acertada(reto, respuesta);
+    }
     if (reto.tipo === 'opciones') return Number.isInteger(respuesta) && respuesta === reto.correcta;
     if (reto.tipo === 'ordenar') {
       return Array.isArray(respuesta) && respuesta.length === reto.orden.length
         && reto.orden.every((pieza, i) => pieza === respuesta[i]);
     }
-    const valor = normalizar(texto(respuesta));
+    const limpiar = valor => reto.normalizacion === 'frase'
+      ? normalizar(valor).replace(/[\p{P}\p{S}]/gu, ' ').replace(/\s+/g, ' ').trim()
+      : normalizar(valor);
+    const valor = limpiar(texto(respuesta));
     const validas = reto.tipo === 'combinacion' ? [reto.combinacion] : reto.respuestas;
-    return Boolean(valor) && validas.some(solucion => normalizar(solucion) === valor);
+    return Boolean(valor) && validas.some(solucion => limpiar(solucion) === valor);
   }
 
   function local() {

@@ -640,3 +640,125 @@ details .evidencia { margin-top: .5rem; }
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* Objetos de papel de la campaña */
+.recurso-reto { width: 100%; padding: .65rem; border: 1px solid #b59773; background: #f7ead0; }
+.recurso-reto .dibujo-reto { display: block; width: 5.5rem; height: 5.5rem; margin: .1rem auto .6rem; }
+.dibujo-reto { width: 3rem; height: 3rem; fill: #e4ca9d; stroke: #5e4936; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.recurso-conversacion { display: grid; gap: .5rem; }
+.fecha-chat { text-align: center; font-size: .85rem; border-block: 1px solid #b59773; padding: .35rem 0; }
+.burbuja-reto { padding: .6rem .7rem; max-width: 88%; border: 1px solid #c0aa87; border-radius: .7rem .7rem .7rem 0; background: #fffbec; }
+.burbuja-reto:nth-child(odd) { justify-self: end; border-radius: .7rem .7rem 0 .7rem; background: #dae3cd; }
+.fichas-reto { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.ficha-reto { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: .3rem; padding: .5rem; border: 1px solid #a58964; background: #fff4dc; }
+.ficha-reto .dibujo-reto { grid-row: span 2; width: 1.7rem; height: 2.5rem; margin: 0; }
+.ficha-reto small { font-weight: 700; }
+.ficha-reto strong { font-size: 1.25rem; }
+.flor-reto { position: relative; width: min(100%, 14.5rem); aspect-ratio: 1; margin: .2rem auto; }
+.recurso-reto .flor-reto > svg { width: 100%; height: 100%; fill: #d3ad76; margin: 0; }
+.petalo { position: absolute; display: grid; justify-items: center; color: #322d22; background: #f9eed9; border-radius: .4rem; padding: .2rem; min-width: 2.8rem; line-height: 1.15; }
+.petalo small { font: 600 .7rem var(--sans); }
+.petalo strong { font: 700 1.3rem var(--sans); }
+.petalo[data-posicion="1"] { top: 10%; left: 50%; transform: translateX(-50%); }
+.petalo[data-posicion="2"] { right: 7%; top: 50%; transform: translateY(-50%); }
+.petalo[data-posicion="3"] { bottom: 9%; left: 50%; transform: translateX(-50%); }
+.petalo[data-posicion="4"] { left: 7%; top: 50%; transform: translateY(-50%); }
+.petalo.marcado { outline: 3px solid #793a32; background: #edd1aa; }
+.petalo.marcado::after { content: "◆"; color: #793a32; font-size: 1.3rem; }
+.evidencia .recurso-reto { margin-top: .5rem; }
+.evidencia .dibujo-reto { width: 3rem; height: 3rem; }
+.evidencia .flor-reto .dibujo-reto { width: 100%; height: 100%; }
+.cuadricula-reto { display: grid; gap: .3rem; width: 100%; max-width: 23rem; margin: .5rem auto; }
+.fila-reto { display: grid; grid-template-columns: repeat(var(--columnas), minmax(0, 1fr)); gap: .3rem; }
+.casilla-reto { position: relative; display: grid; place-items: center; min-height: 44px; min-width: 0; padding: .3rem .05rem; font: 600 clamp(.85rem, 4vw, 1.2rem)/1.2 var(--sans); border: 1px solid #ad8f68; background: #fff8e6; }
+.casilla-reto.tapada { background: repeating-linear-gradient(45deg, #bea681 0 3px, #d0b992 3px 8px); color: transparent; }
+.paso-ruta { position: absolute; top: 1px; right: 2px; font-size: .65rem; color: #783932; }
+.recurso-reto > .control-reto { margin-top: .45rem; }
+.texto-espejo { font-weight: 650; text-align: center; letter-spacing: .09em; }
+.visor-reto { display: flex; flex-wrap: wrap; gap: .3rem; justify-content: center; margin-block: .5rem; }
+.visor-reto span { display: grid; place-items: center; min-height: 44px; min-width: 36px; border: 1px solid #795f44; background: #fff7e1; font-weight: 700; font-size: 1.3rem; }
+.teclas-reto { display: grid; grid-template-columns: repeat(3, 1fr); gap: .35rem; }
+.teclas-reto button:last-child { grid-column: span 2; }
+.palabra-reto { letter-spacing: .14em; font-size: clamp(1.1rem, 5vw, 1.6rem); text-align: center; font-weight: 650; }
+.nota-reto { white-space: pre-wrap; font: 1rem/1.7 var(--sans); }
+.fases-reto { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .25rem; text-align: center; }
+.fases-reto figure { margin: 0; min-width: 0; font-size: .65rem; }
+.recurso-reto .fases-reto .dibujo-reto { width: 100%; height: auto; margin: 0; max-width: 3.7rem; }
+.fases-reto strong { display: block; margin-top: .3rem; font-size: 1.4rem; }
+.dibujo-reto.nueva { fill: #394247; }
+.dibujo-reto.llena { fill: #f6dfab; }
+.dibujo-reto.creciente { fill: #394247; }
+.dibujo-reto.menguante { fill: #394247; }
+.opciones-reto label:has(.dibujo-reto) { padding: .4rem; border: 1px solid #b59773; margin: .4rem 0; font-size: .95rem; }
+.opciones-reto label:has(input:checked) { background: #d4dfc7; outline: 2px solid #456444; }
+.piezas-reto li .dibujo-reto { float: right; width: 2.8rem; height: 2.8rem; }
+.segmentos-reto { width: 4rem; height: 5rem; padding: .2rem; background: #ead6b0; border: 1px solid #a58a65; }
+.segmentos-reto path { fill: none; stroke: #c5b18c; stroke-width: 5; stroke-linecap: square; }
+.segmentos-reto .encendido { stroke: #453c30; }
+.pasos-reto { display: grid; justify-content: center; }
+.comparacion-reto { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .3rem; }
+.comparacion-reto figure { margin: .4rem 0; font-size: .75rem; }
+.comparacion-reto .segmentos-reto { max-width: 100%; }
+.portal-premio { position: relative; display: flex; width: 6rem; height: 5rem; margin: .5rem auto; perspective: 20rem; background: radial-gradient(ellipse, #ffe8a7, #d79b4f); border-radius: 40% 40% 0 0; }
+.portal-premio span { width: 50%; border: 2px solid #b39264; background: #6b4438; transform-origin: left; animation: premio-izquierda 900ms var(--giro) both; border-radius: 80% 0 0 0; }
+.portal-premio span:last-child { transform-origin: right; border-radius: 0 80% 0 0; animation-name: premio-derecha; }
+@keyframes premio-izquierda { to { transform: rotateY(-110deg); } }
+@keyframes premio-derecha { to { transform: rotateY(110deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .portal-premio span { animation: none; transform: rotateY(-110deg); }
+  .portal-premio span:last-child { transform: rotateY(110deg); }
+}
+
+.nota-reflejada { transform: scaleX(-1); font-size: 1.15rem; font-weight: 650; text-align: center; line-height: 1.6; white-space: pre-wrap; }
+.papel-reflejado { padding: .85rem; background: #fff7e3; border: 1px solid #a48762; }
+.juego-especial { width: 100%; min-width: 0; display: grid; gap: .7rem; }
+.juego-especial label { display: block; font-weight: 600; }
+.juego-especial textarea, .juego-especial select {
+  width: 100%; min-height: 44px; padding: .45rem; color: #292f27; background: #fff7e6;
+  border: 1px solid #9e825f; border-radius: 3px; font: inherit;
+}
+.fichas-anagrama, .huecos-anagrama { display: grid; grid-template-columns: repeat(auto-fit, minmax(44px,1fr)); gap: .3rem; }
+.fichas-anagrama button, .huecos-anagrama button { padding: .3rem; }
+.huecos-anagrama button { background: #e6d1ab; }
+.palabra-ahorcado { display: flex; flex-wrap: wrap; gap: .2rem; }
+.palabra-ahorcado span { width: 1.55rem; min-height: 2rem; display: grid; place-items: center; border-bottom: 2px solid #997b59; font-weight: 700; }
+.teclado-letras { display: grid; grid-template-columns: repeat(auto-fit,minmax(44px,1fr)); gap: .25rem; }
+.teclado-letras button { padding: .25rem; }
+.luces-ahorcado { display: flex; flex-wrap: wrap; gap: .35rem; color: #926222; font-size: 1.4rem; }
+.juego-ascensor > svg { width: 6rem; height: 7rem; margin: 0 auto; }
+.visor-ascensor { display: block; width: 5rem; padding: .5rem; margin: auto; text-align: center; font-size: 1.7rem; border: 2px solid #9a7b52; background: #24372e; color: #f2d3a4; }
+.libreta-ascensor { margin: 0; padding-left: 1.45rem; }
+.libreta-ascensor li { padding: .45rem 0 .8rem; border-bottom: 1px solid #c3a47c; }
+.libreta-ascensor label { margin-top: .3rem; }
+.ruedas-lunares { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .6rem; }
+.ruedas-lunares .recurso-reto { padding: .25rem; }
+.ruedas-lunares .fases-reto { display: block; }
+.ruedas-lunares .fases-reto figure { font-size: .8rem; }
+.expresion-lunar { display: flex; flex-wrap: wrap; gap: .2rem; align-items: center; justify-content: center; }
+.expresion-lunar .recurso-reto { width: 3.5rem; padding: .1rem; border: 0; }
+.expresion-lunar .fases-reto { display: block; }
+.expresion-lunar .fases-reto figcaption { font-size: .65rem; }
+.tablero-scroll { max-width: 100%; min-width: 0; overflow-x: auto; padding-bottom: .6rem; overscroll-behavior-inline: contain; }
+.tablero-grande { display: grid; grid-template-columns: repeat(var(--columnas),44px); gap: 3px; width: max-content; background: #cfb78e; padding: 4px; }
+.casilla-grande { display: grid; place-items: center; width: 44px; min-height: 44px; padding: .1rem; border: 1px solid #9c805c; background: #fff7e6; color: #282e25; font-size: 1rem; font-weight: 650; position: relative; }
+.casilla-grande[aria-pressed="true"] { background: #d0dfbd; outline: 2px solid #395d3c; outline-offset: -3px; }
+.casilla-grande[data-marca="1"] { background: #33483c; color: #f9e3be; }
+.casilla-grande[data-marca="2"] { color: #8e4535; }
+.casilla-grande.pista-nonograma { opacity: 1; color: #483a2b; border: 0; font-size: .78rem; white-space: pre-wrap; }
+.papel-perforado .casilla-grande { background: #c3a57a; border: 1px solid #8e714e; }
+.papel-perforado [data-agujero="true"] { background: #fbefd6; border-radius: 50%; box-shadow: inset 2px 2px 2px #684b3544; }
+.casilla-grande.tapada { color: transparent; background: #c3a57a; }
+.selector-piezas { display: flex; flex-wrap: wrap; gap: .35rem; }
+.selector-piezas [aria-pressed="true"] { background: #344e3e; color: #fff1d4; }
+.piezas-perforado { min-width: 0; }
+.piezas-perforado.juntas { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,25rem),1fr)); gap: .7rem; }
+.piezas-perforado section { min-width: 0; }
+.itinerario { margin: 0; padding-left: 1.45rem; }
+.itinerario li { padding: .2rem 0; }
+.visor-fragmentos { display: grid; place-items: center; }
+.visor-fragmentos .segmentos-reto { width: 7rem; height: 8.5rem; }
+.visor-fragmentos[data-color="ámbar"] .encendido { stroke: #8a4a10; }
+.visor-fragmentos[data-color="azul"] .encendido { stroke: #205d87; }
+.visor-fragmentos[data-color="verde"] .encendido { stroke: #285d3b; }
+.ayuda-fotogramas { display: flex; gap: .5rem; flex-wrap: wrap; }
+.ayuda-fotogramas p { width: 100%; }

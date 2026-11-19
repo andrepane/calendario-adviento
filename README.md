@@ -18,6 +18,47 @@ Para probar el recorrido, elige una fecha en **Probar la historia** y pulsa **Pr
 
 1. Completa y marca los 24 capítulos como listos. Prueba el encadenamiento y el premio final.
 2. Pulsa **Preparar versión para Cintia**. El editor descargará `calendario-publicado.js` si los capítulos están listos y las dependencias son válidas.
-3. Sustituye `calendario-publicado.js` en la copia que quieras entregar. Si la entregas para jugar en local, incluye `index.html`, `estilos.css`, `app.js`, `escape-room.js`, `vista-reto.js`, `calendario-publicado.js`, `fuentes/` y los medios referenciados. Abre `index.html` en esa carpeta para comprobar la versión. El calendario usa la fecha real de Madrid y guarda el avance por separado del editor y de la demo.
+3. Sustituye `calendario-publicado.js` en la copia que quieras entregar. Si la entregas para jugar en local, incluye `index.html`, `estilos.css`, `app.js`, `escape-room.js`, `vista-reto.js`, `recursos-reto.js`, `calendario-publicado.js`, `fuentes/` y los medios referenciados. Abre `index.html` en esa carpeta para comprobar la versión. El calendario usa la fecha real de Madrid y guarda el avance por separado del editor y de la demo.
 
 El proyecto de Vercel es estático. El editor se habilita solo en local y `.vercelignore` indica a Vercel que excluya sus archivos. Los cambios en borradores nunca modifican el sitio por sí solos. En Vercel o GitHub Pages, las soluciones y los medios de la versión publicada se pueden consultar directamente en los archivos públicos. Mantén la demo ficticia en el sitio público y guarda el respaldo JSON y la versión real fuera del repositorio público si quieres reservar las sorpresas.
+
+## Cargar la campaña completa de prueba
+
+Abre **editor.html** y pulsa **Cargar escape room de prueba**. Se abre un espacio independiente con los 24 capítulos rellenados. **Volver a mis borradores** recupera el calendario original. Cada espacio guarda su borrador, último día y partida simulada por separado. Pulsa **Guardar borrador** para conservar los cambios antes de cerrar la pestaña.
+
+La conversación del día 1 es ficticia. Si ya preparaste tu reto de Instagram, el botón **Usar una copia de mi día 1** lo copia al espacio de prueba. Guarda esa copia si quieres probar tu captura. Puedes seguir editando el original desde **Mis borradores**. Sus datos se conservan al cargar la campaña.
+
+### Empezar una partida desde el día 1
+
+1. Carga el escape room de prueba.
+2. En **Probar la historia**, pulsa **Reiniciar progreso de prueba**.
+3. Para jugar todos los capítulos seguidos, elige **24/12/2026** y pulsa **Jugar campaña**. Abre el sobre y la ventana 1. Las siguientes puertas se habilitan al resolver la anterior.
+4. Para comprobar la llave diferida, usa **01/12/2026**. Al resolver el día 1 se guarda la llave del 2. Cambia a **02/12/2026** y vuelve a pulsar **Jugar campaña** para usarla.
+
+**Previsualizar día** abre el reto seleccionado y ofrece las evidencias de ejemplo necesarias en esa vista. La campaña jugable muestra las evidencias que hayas ganado en su propia partida.
+
+### Dibujos, grabación y respaldos
+
+En **Material de apoyo**, elige el tipo de dibujo y edita sus datos siguiendo la ayuda del formulario. Las cuadrículas se escriben con una fila por línea, las etiquetas con una ficha por línea y las fases con su nombre y su cifra. Las opciones de las cajas e interruptores se editan en el formulario de opciones. Las fichas reordenables usan las piezas del reto. El dibujo de cada evidencia se configura en **Pistas y evidencias**.
+
+La grabación de prueba está en `./fotos/grabacion-campana.wav` y dice «nueve, cuatro, seis». Puedes sustituir su ruta y su transcripción desde el editor. La reproducción se inicia al pulsar los controles.
+
+**Exportar respaldo** incluye los datos de los dibujos, respuestas, pistas, recompensas y referencias del cuaderno. **Importar respaldo como copia** crea otro espacio, con progreso propio y acceso desde el selector de respaldos importados. Lleva las carpetas de medios junto con el JSON al cambiar de equipo. Los SVG de los objetos se generan con `recursos-reto.js`, que también debe acompañar a la vista del jugador.
+
+Esta campaña se carga desde el editor local. La versión publicada se sigue preparando mediante **Preparar versión para Cintia**.
+
+## Campaña 3946 · versión 2
+
+Abre **editor.html** y pulsa **Cargar campaña 3946 · versión 2**. Se crea otro espacio con borrador, vista previa y progreso de prueba propios. La versión anterior sigue disponible en **Cargar escape room de prueba**. El botón **Volver a mis borradores** recupera tus capítulos personales.
+
+Al crear la versión 2 por primera vez, el editor copia tu día 1 personal desde el borrador original, si ya está preparado. También busca una copia personalizada en la campaña anterior. Guarda tu día 1 antes de cargar la nueva versión. La copia se conserva en el espacio de la versión 2 y se incluye al exportarla.
+
+Para jugar desde el principio, pulsa **Reiniciar progreso de prueba**, elige **24/12/2026** y pulsa **Jugar campaña**. Abre la ventana 1 y avanza resolviendo los retos en orden. Para comprobar la llave diferida usa **01/12/2026**. El modo real sigue usando la fecha de Madrid.
+
+En los juegos nuevos, el editor muestra una **Configuración del juego** con sus datos. El ahorcado tiene controles para palabra, fallos y posición revelada. El nonograma permite editar la solución binaria, cambiar filas y columnas y generar las pistas. El visor permite editar duración de cada fotograma y pausa en milisegundos. Los demás datos, como letras, itinerario, órdenes del ascensor, valores lunares, agujeros y fragmentos, se editan en el cuadro JSON. **Guardar borrador**, la recarga y el respaldo conservan esa configuración. Las evidencias mantienen sus referencias por día.
+
+El recorrido y el papel perforado tienen tableros de 8 × 8 con casillas de 44 px. En móvil se desplazan horizontalmente. La plantilla y la cuadrícula conservan el mismo tamaño al alternarlas. La superposición se solicita desde **Pistas** mediante **Solicitar ayuda avanzada**. El visor también ofrece su navegación manual desde esa ayuda. La libreta del ascensor, las letras usadas del ahorcado y las casillas marcadas se guardan con el progreso de cada partida. Las vistas previas usan un cuaderno y anotaciones de ejemplo separados.
+
+Esta versión usa la combinación **3946**. En el mensaje cifrado del día 5 se corrigió el primer bloque a **912345** para representar **ANOCHE** con el alfabeto del día 2. Los capítulos de las versiones anteriores se conservan.
+
+Para entregar la campaña, prepara **calendario-publicado.js** desde el editor e incluye también **retos-avanzados.js** junto con los archivos de la vista del jugador. Los SVG siguen en **recursos-reto.js**. Los respaldos conservan las rutas de los medios. Lleva las carpetas multimedia junto al JSON al cambiar de equipo.

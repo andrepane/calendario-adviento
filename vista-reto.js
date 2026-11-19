@@ -3,9 +3,11 @@
 
   const ER = window.EscapeRoom;
   const limpiezas = new WeakMap();
+  const demostraciones=new WeakMap();
   function limpiar(padre) {
     limpiezas.get(padre)?.();
     limpiezas.delete(padre);
+    demostraciones.delete(padre);
   }
 
   function elemento(etiqueta, texto, clase) {
@@ -161,6 +163,7 @@
     }
 
     let ayudaEspecial;
+    let solicitarAyuda;
     const estado = elemento('p', '', 'feedback-reto');
     estado.setAttribute('role', 'status');
     if (resuelto) {
@@ -203,6 +206,7 @@
         obtener = juego.obtener;
         ayudaEspecial = juego.ayuda;
         limpiezas.set(padre, juego.limpiar);
+        if(juego.demostrar)demostraciones.set(padre,juego.demostrar);
       } else {
         obtener = reto.tipo === 'opciones' ? elegir(reto, formulario)
           : reto.tipo === 'ordenar' ? ordenar(reto, formulario) : escribir(reto, formulario);
@@ -237,6 +241,7 @@
       opciones.guardarPistas?.(vistas);
       revelar.textContent = vistas < reto.pistas.length ? 'Dame otra pista' : 'Has visto todas las pistas';
       revelar.setAttribute('aria-disabled', String(vistas >= reto.pistas.length));
+      if(solicitarAyuda&&vistas>=reto.pistas.length)solicitarAyuda.hidden=false;
     });
     // Mantiene el foco al revelar la última pista.
     bloque.append(elemento('h3', 'Pistas'), lista, aviso);
@@ -248,10 +253,13 @@
         solicitar.remove();
         ayuda.querySelector?.('button')?.focus();
       });
+      solicitarAyuda=solicitar;
+      if(reto.tipo==='anillos')solicitar.hidden=vistas<reto.pistas.length;
       bloque.append(solicitar);
     }
     padre.append(bloque);
   }
 
-  ER.vista = { renderizar, tarjetas, limpiar };
+  ER.vista = { renderizar, tarjetas, limpiar,
+    demostrar:padre=>{const iniciar=demostraciones.get(padre);if(!iniciar)return false;iniciar();return true;} };
 }();

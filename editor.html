@@ -11,6 +11,8 @@
   <script defer src="./calendario-publicado.js"></script>
   <script defer src="./recursos-reto.js"></script>
   <script defer src="./campana-prueba.js"></script>
+  <script defer src="./campana-3946.js"></script>
+  <script defer src="./retos-avanzados.js"></script>
   <script defer src="./vista-reto.js"></script>
   <script defer src="./editor.js"></script>
 </head>
@@ -27,6 +29,7 @@
         <h2 id="espacio-activo">Mis borradores</h2>
         <div class="acciones-editor">
           <button class="control-reto principal" type="button" id="cargar-campana">Cargar escape room de prueba</button>
+          <button class="control-reto principal" type="button" id="cargar-3946">Cargar campaña 3946 · versión 2</button>
           <button class="control-reto" type="button" id="volver-borradores" hidden>Volver a mis borradores</button>
           <button class="control-reto" type="button" id="copiar-dia-uno" hidden>Usar una copia de mi día 1</button>
         </div>
@@ -62,6 +65,13 @@
           <div data-tipo="combinacion" hidden>
             <label>Combinación válida <input name="combinacion" spellcheck="false"></label>
           </div>
+          <div id="configuracion-especial" hidden>
+            <div id="parametros-juego"></div>
+            <label>Configuración del juego (JSON) <textarea name="configuracion" rows="12" spellcheck="false"></textarea></label>
+            <p class="ayuda">Edita las fichas, filas, movimientos, palabra, fallos, valores lunares, agujeros o fotogramas. Las posiciones iniciales del ahorcado empiezan en 0. Los agujeros y soluciones de nonograma usan 1 y 0. Las pistas del nonograma se generan al previsualizar.</p>
+            <label>Respuestas válidas para este juego, una por línea <textarea id="respuestas-especiales" rows="2"></textarea></label>
+          </div>
+          <label>Normalización de la respuesta <select name="normalizacion"><option value="">Texto habitual</option><option value="frase">Ignorar también puntuación</option></select></label>
           <details class="detalle-editor">
             <summary>Material de apoyo</summary>
             <label>Dibujo del reto <select name="recursoTipo"></select></label>

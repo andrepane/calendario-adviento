@@ -26,6 +26,7 @@
   const copias = Array.isArray(restauradas) ? restauradas.filter(copia =>
     typeof copia?.id === 'string' && /^copia-[a-z0-9-]+$/.test(copia.id) && typeof copia.nombre === 'string') : [];
   const nombres = new Map([['original', 'Mis borradores'], ['campana', 'Escape room de prueba'],
+    ['campana3946', 'Campaña 3946 · versión 2'],
     ...copias.map(copia => [copia.id, copia.nombre])]);
   const abiertos = new Map();
   let espacio = leer(claveEspacio);
@@ -41,6 +42,21 @@
   function leerBorrador(id = espacio) {
     try { return ER.calendario(leer(clave('borrador', id))); }
     catch {
+      if (id === 'campana3946') {
+        const nueva = ER.calendario(window.CAMPANA_3946);
+        for (const anterior of ['original', 'campana']) {
+          const previa = abiertos.get(anterior)?.datos ?? leer(clave('borrador', anterior));
+          if (!previa) continue;
+          const personal = ER.calendario(previa).capitulos[0];
+          const ejemplo = ER.capitulo(anterior === 'campana'
+            ? window.CAMPANA_PRUEBA.capitulos[0] : window.CALENDARIO_PUBLICADO.capitulos[0]);
+          if (JSON.stringify(personal) !== JSON.stringify(ejemplo)) {
+            nueva.capitulos[0] = structuredClone(personal);
+            break;
+          }
+        }
+        return nueva;
+      }
       if (id === 'campana') return ER.calendario(window.CAMPANA_PRUEBA);
       const demo = ER.calendario(window.CALENDARIO_PUBLICADO);
       if (demo.partida === 'demo-2026') {
@@ -88,10 +104,11 @@
 
     porId('espacio-activo').textContent = nombres.get(id);
     porId('cargar-campana').hidden = id === 'campana';
+    porId('cargar-3946').hidden = id === 'campana3946';
     porId('volver-borradores').hidden = id === 'original';
     const original = (abiertos.get('original')?.datos ?? leerBorrador('original')).capitulos[0];
     const demo = ER.capitulo(window.CALENDARIO_PUBLICADO.capitulos[0]);
-    porId('copiar-dia-uno').hidden = id !== 'campana' || !(original.titulo || original.imagen)
+    porId('copiar-dia-uno').hidden = !['campana', 'campana3946'].includes(id) || !(original.titulo || original.imagen)
       || JSON.stringify(original) === JSON.stringify(demo);
     const selector = porId('copias');
     selector.replaceChildren(new Option('Elige un respaldo', ''),
@@ -148,12 +165,92 @@
     porId('campo-premio').hidden = dia !== 24;
     for (const campo of camposTexto) campos.namedItem(campo).value = reto[campo];
     for (const campo of arrays) campos.namedItem(campo).value = reto[campo].join('\n');
+    porId('respuestas-especiales').value = reto.respuestas.join('\n');
     campos.listo.checked = reto.listo;
     campos.correcta.replaceChildren(new Option('Elige la respuesta', '-1'),
       ...reto.opciones.map((opcion, i) => new Option(opcion, String(i))));
     campos.correcta.value = String(reto.opciones[reto.correcta] ? reto.correcta : -1);
     listaDependencias(reto);
+    mostrarParametros();
     actualizarVistaEditor();
+  }
+
+  function mostrarParametros() {
+    const panel = porId('parametros-juego');
+    panel.replaceChildren();
+    let config;
+    try { config = JSON.parse(campos.configuracion.value); } catch { return; }
+    if (!config || typeof config !== 'object' || Array.isArray(config)) return;
+    function control(nombre, valor, tipo, modificar) {
+      const etiqueta = document.createElement('label');
+      etiqueta.textContent = nombre;
+      const entrada = document.createElement(tipo === 'textarea' ? 'textarea' : 'input');
+      if (tipo !== 'textarea') entrada.type = tipo;
+      else entrada.rows = 6;
+      entrada.value = valor ?? '';
+      entrada.addEventListener('input', () => {
+        modificar(entrada.value);
+        campos.configuracion.value = JSON.stringify(config, null, 2);
+      });
+      etiqueta.append(entrada);
+      panel.append(etiqueta);
+      return entrada;
+    }
+    if (campos.tipo.value === 'ahorcado') {
+      control('Palabra del ahorcado', config.palabra, 'text', valor => { config.palabra = valor.toUpperCase(); });
+      const fallos = control('Fallos permitidos', config.fallos, 'number', valor => { config.fallos = Number(valor); });
+      fallos.min = 1;
+      fallos.max = 20;
+      const inicial = control('Posición revelada al empezar (0 es la primera)', config.inicial, 'number', valor => { config.inicial = Number(valor); });
+      inicial.min = 0;
+    }
+    if (campos.tipo.value === 'fragmentos') {
+      const duracion = control('Duración de cada fotograma (ms)', config.duracion, 'number', valor => { config.duracion = Number(valor); });
+      duracion.min = 100;
+      duracion.max = 30000;
+      const pausa = control('Pausa entre fotogramas (ms)', config.pausa, 'number', valor => { config.pausa = Number(valor); });
+      pausa.min = 100;
+      pausa.max = 10000;
+    }
+    if (campos.tipo.value === 'nonograma') {
+      const filas = Array.isArray(config.solucion) ? config.solucion : [];
+      const resumen = document.createElement('p');
+      function actualizarResumen() {
+        if (!config.solucion?.length || !config.solucion.every(f => /^[01]+$/.test(f))
+            || new Set(config.solucion.map(f=>f.length)).size !== 1) {
+          resumen.textContent = 'La solución debe ser rectangular y usar 0 y 1.';
+          return;
+        }
+        const pistas = ER.especiales.pistasNonograma(config.solucion);
+        resumen.textContent = 'Pistas de filas: ' + pistas.filas.map(p => p.join(' ') || '0').join(' / ')
+          + '. Columnas: ' + pistas.columnas.map(p => p.join(' ') || '0').join(' / ') + '.';
+      }
+      const solucion = control('Solución del nonograma, una fila por línea (1 pintada, 0 vacía)',
+        filas.join('\n'), 'textarea', valor => {
+          config.solucion = valor.split(/\r?\n/).filter(Boolean);
+          actualizarResumen();
+        });
+      const alto = control('Número de filas', filas.length, 'number', () => {});
+      const ancho = control('Número de columnas', filas[0]?.length ?? 5, 'number', () => {});
+      for (const dimension of [alto, ancho]) { dimension.min = 2; dimension.max = 12; }
+      const redimensionar = document.createElement('button');
+      redimensionar.type = 'button';
+      redimensionar.className = 'control-reto';
+      redimensionar.textContent = 'Aplicar dimensiones y generar pistas';
+      redimensionar.addEventListener('click', () => {
+        const h = Number(alto.value), w = Number(ancho.value);
+        if (!Number.isInteger(h) || h < 2 || h > 12 || !Number.isInteger(w) || w < 2 || w > 12) {
+          anunciar('El nonograma permite de 2 a 12 filas y columnas.');
+          return;
+        }
+        config.solucion = Array.from({length:h},(_,y) => (config.solucion[y] ?? '').padEnd(w,'0').slice(0,w));
+        solucion.value = config.solucion.join('\n');
+        campos.configuracion.value = JSON.stringify(config,null,2);
+        campos.configuracion.dispatchEvent(new Event('input',{bubbles:true}));
+      });
+      panel.append(redimensionar,resumen);
+      actualizarResumen();
+    }
   }
 
   function estado(reto, errores) {
@@ -171,6 +268,7 @@
   }
 
   function actualizarVistaEditor() {
+    porId('configuracion-especial').hidden = !ER.especiales.esEspecial(campos.tipo.value);
     for (const panel of formulario.querySelectorAll('[data-tipo]')) {
       panel.hidden = panel.dataset.tipo !== campos.tipo.value;
     }
@@ -239,6 +337,10 @@
   }
 
   formulario.addEventListener('input', evento => {
+    if (evento.target === campos.tipo || evento.target === campos.configuracion) mostrarParametros();
+    if (evento.target === porId('respuestas-especiales')) {
+      campos.respuestas.value = evento.target.value;
+    }
     if (evento.target === campos.opciones) actualizarOpciones();
     guardarDia();
     hayCambios = true;
@@ -261,6 +363,11 @@
   porId('cargar-campana').addEventListener('click', () => {
     elegirEspacio('campana');
     anunciar('Campaña de prueba cargada en un espacio separado.');
+  });
+  porId('cargar-3946').addEventListener('click', () => {
+    elegirEspacio('campana3946');
+    if (!leer(clave('borrador'))) guardar(clave('borrador'), datos);
+    anunciar('Campaña 3946 cargada como una versión nueva. El día 1 conserva tu reto personal si ya estaba guardado.');
   });
   porId('volver-borradores').addEventListener('click', () => {
     elegirEspacio('original');
@@ -289,11 +396,17 @@
     porId('titulo-vista').textContent = reto.titulo || 'Capítulo sin título';
     const pruebaVista = porId('contenido-vista');
     const ganadas = ER.evidencias(datos).filter(evidencia => evidencia.dia < dia);
+    const estadoPrevio = leer(clave('previas')) ?? {};
     if (reto.dependencias.length && ganadas.some(item => reto.dependencias.includes(item.id))) {
       porId('dia-vista').textContent += ' · evidencias de ejemplo';
     }
     ER.vista.renderizar(pruebaVista, reto, {
       ganadas,
+      interaccion: estadoPrevio[dia],
+      guardarInteraccion: estado => {
+        estadoPrevio[dia] = estado;
+        guardar(clave('previas'), estadoPrevio);
+      },
       comprobar: respuesta => {
         if (!ER.acertada(reto, respuesta)) return false;
         ER.vista.renderizar(pruebaVista, reto, {
@@ -309,7 +422,11 @@
     vista.scrollTop = 0;
   });
 
-  vista.addEventListener('close', () => porId('contenido-vista').replaceChildren());
+  vista.addEventListener('close', () => {
+    if (vista.open) return;
+    ER.vista.limpiar(porId('contenido-vista'));
+    porId('contenido-vista').replaceChildren();
+  });
 
   fecha.addEventListener('change', () => {
     prueba.fecha = fecha.value;

@@ -2,6 +2,11 @@
   'use strict';
 
   const ER = window.EscapeRoom;
+  const limpiezas = new WeakMap();
+  function limpiar(padre) {
+    limpiezas.get(padre)?.();
+    limpiezas.delete(padre);
+  }
 
   function elemento(etiqueta, texto, clase) {
     const nodo = document.createElement(etiqueta);
@@ -108,7 +113,7 @@
         bajar.disabled = indice === piezas.length - 1;
         fila.append(elemento('span', pieza), subir, bajar);
         if (reto.recursoTipo === 'objetos') {
-          const dibujo = ER.recursos.svg(pieza.toLocaleLowerCase('es'));
+          const dibujo = ER.recursos.svg(pieza === 'Nochevieja' ? 'reloj' : pieza.toLocaleLowerCase('es'));
           if (dibujo) fila.prepend(dibujo);
         }
         lista.append(fila);
@@ -120,6 +125,7 @@
   }
 
   function renderizar(padre, reto, opciones = {}) {
+    limpiar(padre);
     const { ganadas = [], resuelto = false } = opciones;
     padre.replaceChildren();
     if (reto.instrucciones) padre.append(elemento('p', reto.instrucciones));
@@ -154,6 +160,7 @@
       padre.append(consulta);
     }
 
+    let ayudaEspecial;
     const estado = elemento('p', '', 'feedback-reto');
     estado.setAttribute('role', 'status');
     if (resuelto) {
@@ -175,8 +182,22 @@
     } else {
       const formulario = elemento('form', '', 'form-reto');
       if (reto.pregunta) formulario.append(elemento('p', reto.pregunta, 'pregunta-reto'));
-      const obtener = reto.tipo === 'opciones' ? elegir(reto, formulario)
-        : reto.tipo === 'ordenar' ? ordenar(reto, formulario) : escribir(reto, formulario);
+      let obtener;
+      if (ER.especiales?.esEspecial(reto.tipo)) {
+        const errores = ER.especiales.errores(reto);
+        if (errores.length) {
+          formulario.append(elemento('p', 'Revisa la configuración en el editor. ' + errores.join('. ')));
+          padre.append(formulario);
+          return;
+        }
+        const juego = ER.especiales.mostrar(formulario, reto, opciones);
+        obtener = juego.obtener;
+        ayudaEspecial = juego.ayuda;
+        limpiezas.set(padre, juego.limpiar);
+      } else {
+        obtener = reto.tipo === 'opciones' ? elegir(reto, formulario)
+          : reto.tipo === 'ordenar' ? ordenar(reto, formulario) : escribir(reto, formulario);
+      }
       const comprobar = elemento('button', 'Comprobar', 'control-reto principal');
       comprobar.type = 'submit';
       formulario.append(comprobar, estado);
@@ -210,8 +231,17 @@
     // Mantiene el foco al revelar la última pista.
     bloque.append(elemento('h3', 'Pistas'), lista, aviso);
     if (vistas < reto.pistas.length) bloque.append(revelar);
+    if (ayudaEspecial) {
+      const solicitar = boton('Solicitar ayuda avanzada', () => {
+        const ayuda = ayudaEspecial();
+        bloque.append(ayuda);
+        solicitar.remove();
+        ayuda.querySelector?.('button')?.focus();
+      });
+      bloque.append(solicitar);
+    }
     padre.append(bloque);
   }
 
-  ER.vista = { renderizar, tarjetas };
+  ER.vista = { renderizar, tarjetas, limpiar };
 }();

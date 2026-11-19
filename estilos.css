@@ -708,3 +708,57 @@ details .evidencia { margin-top: .5rem; }
   .portal-premio span { animation: none; transform: rotateY(-110deg); }
   .portal-premio span:last-child { transform: rotateY(110deg); }
 }
+
+.nota-reflejada { transform: scaleX(-1); font-size: 1.15rem; font-weight: 650; text-align: center; line-height: 1.6; white-space: pre-wrap; }
+.papel-reflejado { padding: .85rem; background: #fff7e3; border: 1px solid #a48762; }
+.juego-especial { width: 100%; min-width: 0; display: grid; gap: .7rem; }
+.juego-especial label { display: block; font-weight: 600; }
+.juego-especial textarea, .juego-especial select {
+  width: 100%; min-height: 44px; padding: .45rem; color: #292f27; background: #fff7e6;
+  border: 1px solid #9e825f; border-radius: 3px; font: inherit;
+}
+.fichas-anagrama, .huecos-anagrama { display: grid; grid-template-columns: repeat(auto-fit, minmax(44px,1fr)); gap: .3rem; }
+.fichas-anagrama button, .huecos-anagrama button { padding: .3rem; }
+.huecos-anagrama button { background: #e6d1ab; }
+.palabra-ahorcado { display: flex; flex-wrap: wrap; gap: .2rem; }
+.palabra-ahorcado span { width: 1.55rem; min-height: 2rem; display: grid; place-items: center; border-bottom: 2px solid #997b59; font-weight: 700; }
+.teclado-letras { display: grid; grid-template-columns: repeat(auto-fit,minmax(44px,1fr)); gap: .25rem; }
+.teclado-letras button { padding: .25rem; }
+.luces-ahorcado { display: flex; flex-wrap: wrap; gap: .35rem; color: #926222; font-size: 1.4rem; }
+.juego-ascensor > svg { width: 6rem; height: 7rem; margin: 0 auto; }
+.visor-ascensor { display: block; width: 5rem; padding: .5rem; margin: auto; text-align: center; font-size: 1.7rem; border: 2px solid #9a7b52; background: #24372e; color: #f2d3a4; }
+.libreta-ascensor { margin: 0; padding-left: 1.45rem; }
+.libreta-ascensor li { padding: .45rem 0 .8rem; border-bottom: 1px solid #c3a47c; }
+.libreta-ascensor label { margin-top: .3rem; }
+.ruedas-lunares { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .6rem; }
+.ruedas-lunares .recurso-reto { padding: .25rem; }
+.ruedas-lunares .fases-reto { display: block; }
+.ruedas-lunares .fases-reto figure { font-size: .8rem; }
+.expresion-lunar { display: flex; flex-wrap: wrap; gap: .2rem; align-items: center; justify-content: center; }
+.expresion-lunar .recurso-reto { width: 3.5rem; padding: .1rem; border: 0; }
+.expresion-lunar .fases-reto { display: block; }
+.expresion-lunar .fases-reto figcaption { font-size: .65rem; }
+.tablero-scroll { max-width: 100%; min-width: 0; overflow-x: auto; padding-bottom: .6rem; overscroll-behavior-inline: contain; }
+.tablero-grande { display: grid; grid-template-columns: repeat(var(--columnas),44px); gap: 3px; width: max-content; background: #cfb78e; padding: 4px; }
+.casilla-grande { display: grid; place-items: center; width: 44px; min-height: 44px; padding: .1rem; border: 1px solid #9c805c; background: #fff7e6; color: #282e25; font-size: 1rem; font-weight: 650; position: relative; }
+.casilla-grande[aria-pressed="true"] { background: #d0dfbd; outline: 2px solid #395d3c; outline-offset: -3px; }
+.casilla-grande[data-marca="1"] { background: #33483c; color: #f9e3be; }
+.casilla-grande[data-marca="2"] { color: #8e4535; }
+.casilla-grande.pista-nonograma { opacity: 1; color: #483a2b; border: 0; font-size: .78rem; white-space: pre-wrap; }
+.papel-perforado .casilla-grande { background: #c3a57a; border: 1px solid #8e714e; }
+.papel-perforado [data-agujero="true"] { background: #fbefd6; border-radius: 50%; box-shadow: inset 2px 2px 2px #684b3544; }
+.casilla-grande.tapada { color: transparent; background: #c3a57a; }
+.selector-piezas { display: flex; flex-wrap: wrap; gap: .35rem; }
+.selector-piezas [aria-pressed="true"] { background: #344e3e; color: #fff1d4; }
+.piezas-perforado { min-width: 0; }
+.piezas-perforado.juntas { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,25rem),1fr)); gap: .7rem; }
+.piezas-perforado section { min-width: 0; }
+.itinerario { margin: 0; padding-left: 1.45rem; }
+.itinerario li { padding: .2rem 0; }
+.visor-fragmentos { display: grid; place-items: center; }
+.visor-fragmentos .segmentos-reto { width: 7rem; height: 8.5rem; }
+.visor-fragmentos[data-color="ámbar"] .encendido { stroke: #8a4a10; }
+.visor-fragmentos[data-color="azul"] .encendido { stroke: #205d87; }
+.visor-fragmentos[data-color="verde"] .encendido { stroke: #285d3b; }
+.ayuda-fotogramas { display: flex; gap: .5rem; flex-wrap: wrap; }
+.ayuda-fotogramas p { width: 100%; }

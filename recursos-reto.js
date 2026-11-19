@@ -3,6 +3,8 @@
 
   const ER = window.EscapeRoom;
   const tipos = {
+    reflejo: ['Nota reflejada', 'Texto original. Se refleja horizontalmente con las formas de las letras.'],
+    reloj: ['Reloj de medianoche', ''],
     '': ['Sin dibujo', ''],
     conversacion: ['Conversación de papel', 'Primera línea: fecha. Después, un mensaje por línea.'],
     fichas: ['Fichas o etiquetas', 'Una ficha por línea. Separa sus dos caras con | si la numeras o la emparejas.'],
@@ -25,6 +27,8 @@
     caja: ['Caja fuerte', 'Número de huecos.']
   };
   const figuras = {
+    reloj: '<circle cx="32" cy="32" r="25"/><circle cx="32" cy="32" r="20"/><path d="M32 15v17m0-17 1 16M32 8v4m0 40v4M8 32h4m40 0h4"/><circle cx="32" cy="32" r="2"/>',
+    ascensor: '<path d="M8 4h48v56H8zM13 19h38v35H13zM32 20v34M20 9h24v7H20z"/>',
     caja: '<rect x="8" y="11" width="48" height="43" rx="4"/><path d="M13 17h38v31H13zM46 24v17"/><circle cx="31" cy="32" r="8"/><path d="M31 24v16m-8-8h16"/>',
     cajaSencilla: '<path d="M7 25h50v28H7zM4 16h56v11H4zM27 27h10v10H27z"/>',
     archivador: '<path d="M10 7h44v50H10zM14 26h36m-36 19h36M27 17h10m-10 17h10m-10 18h10"/>',
@@ -204,7 +208,16 @@
     const datos = texto.split(/\r?\n/).map(linea => linea.trim()).filter(Boolean);
     const padre = nodo('section', '', `recurso-reto recurso-${tipo}`);
 
-    if (tipo === 'conversacion') {
+    if (tipo === 'reflejo') {
+      padre.append(svg('espejo'));
+      const nota = nodo('p', texto, 'nota-reflejada');
+      nota.setAttribute('aria-label', 'Nota con letras reflejadas horizontalmente. Puedes utilizar un espejo para leerla.');
+      const envoltorio = nodo('div', '', 'papel-reflejado');
+      envoltorio.append(nota);
+      padre.append(envoltorio);
+    } else if (tipo === 'reloj') {
+      padre.append(svg('reloj'));
+    } else if (tipo === 'conversacion') {
       const [fecha, ...mensajes] = datos;
       padre.append(nodo('p', fecha, 'fecha-chat'));
       mensajes.forEach(mensaje => padre.append(nodo('p', mensaje, 'burbuja-reto')));

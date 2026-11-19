@@ -46,3 +46,19 @@ La grabación de prueba está en `./fotos/grabacion-campana.wav` y dice «nueve,
 **Exportar respaldo** incluye los datos de los dibujos, respuestas, pistas, recompensas y referencias del cuaderno. **Importar respaldo como copia** crea otro espacio, con progreso propio y acceso desde el selector de respaldos importados. Lleva las carpetas de medios junto con el JSON al cambiar de equipo. Los SVG de los objetos se generan con `recursos-reto.js`, que también debe acompañar a la vista del jugador.
 
 Esta campaña se carga desde el editor local. La versión publicada se sigue preparando mediante **Preparar versión para Cintia**.
+
+## Campaña 3946 · versión 2
+
+Abre **editor.html** y pulsa **Cargar campaña 3946 · versión 2**. Se crea otro espacio con borrador, vista previa y progreso de prueba propios. La versión anterior sigue disponible en **Cargar escape room de prueba**. El botón **Volver a mis borradores** recupera tus capítulos personales.
+
+Al crear la versión 2 por primera vez, el editor copia tu día 1 personal desde el borrador original, si ya está preparado. También busca una copia personalizada en la campaña anterior. Guarda tu día 1 antes de cargar la nueva versión. La copia se conserva en el espacio de la versión 2 y se incluye al exportarla.
+
+Para jugar desde el principio, pulsa **Reiniciar progreso de prueba**, elige **24/12/2026** y pulsa **Jugar campaña**. Abre la ventana 1 y avanza resolviendo los retos en orden. Para comprobar la llave diferida usa **01/12/2026**. El modo real sigue usando la fecha de Madrid.
+
+En los juegos nuevos, el editor muestra una **Configuración del juego** con sus datos. El ahorcado tiene controles para palabra, fallos y posición revelada. El nonograma permite editar la solución binaria, cambiar filas y columnas y generar las pistas. El visor permite editar duración de cada fotograma y pausa en milisegundos. Los demás datos, como letras, itinerario, órdenes del ascensor, valores lunares, agujeros y fragmentos, se editan en el cuadro JSON. **Guardar borrador**, la recarga y el respaldo conservan esa configuración. Las evidencias mantienen sus referencias por día.
+
+El recorrido y el papel perforado tienen tableros de 8 × 8 con casillas de 44 px. En móvil se desplazan horizontalmente. La plantilla y la cuadrícula conservan el mismo tamaño al alternarlas. La superposición se solicita desde **Pistas** mediante **Solicitar ayuda avanzada**. El visor también ofrece su navegación manual desde esa ayuda. La libreta del ascensor, las letras usadas del ahorcado y las casillas marcadas se guardan con el progreso de cada partida. Las vistas previas usan un cuaderno y anotaciones de ejemplo separados.
+
+Esta versión usa la combinación **3946**. En el mensaje cifrado del día 5 se corrigió el primer bloque a **912345** para representar **ANOCHE** con el alfabeto del día 2. Los capítulos de las versiones anteriores se conservan.
+
+Para entregar la campaña, prepara **calendario-publicado.js** desde el editor e incluye también **retos-avanzados.js** junto con los archivos de la vista del jugador. Los SVG siguen en **recursos-reto.js**. Los respaldos conservan las rutas de los medios. Lleva las carpetas multimedia junto al JSON al cambiar de equipo.

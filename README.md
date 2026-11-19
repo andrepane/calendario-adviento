@@ -91,22 +91,3 @@ Reglas y decisiones de los nuevos mecanismos:
 El editor conserva el progreso de estos mecanismos al cerrar o recargar. La partida de prueba, la vista previa y la partida real usan sus propios guardados. El código final continúa siendo **3946**.
 
 Para instalar una versión preparada para Cintia, incluye **mecanismos.js** junto a **retos-avanzados.js**, **recursos-reto.js** y los demás archivos del jugador. El archivo **campana-mecanismos.js** se usa para cargar el ejemplo desde el editor local. La versión de Cintia se genera como **calendario-publicado.js**.
-
-## Corrección del laberinto de anillos
-
-El motor original permitía avanzar desde el anillo 1 al 2, pero el dibujo representaba las puertas mediante trazos de 10 unidades, más estrechos que la bola de diámetro 12. Las uniones y las paredes circulares resultaban difíciles de interpretar. La interfaz también mezclaba la selección del anillo con su giro y solo ofrecía cruzar hacia dentro.
-
-La topología compartida define ahora pasillos, puertas y sus extremos. El motor consulta esa topología para caminar y cruzar. El tablero dibuja esos mismos pasillos y abre una puerta real en la pared circular cuando los extremos coinciden. Los pasos miden 18 unidades para una bola de diámetro 12. Los callejones terminan en una pared. El anillo ocupado, el seleccionado para girar y las conexiones abiertas se indican mediante el dibujo y texto.
-
-**Avanzar ↶ / ↷** mueve la bola una posición por su pasillo. **Cruzar hacia el centro** y **Cruzar hacia fuera** están habilitados cuando la bola está en una puerta conectada. Las flechas de cada anillo giran solo ese anillo. También puedes seleccionarlo y deslizar tangencialmente sobre él. Girar el anillo ocupado transporta la bola con su pasillo.
-
-Desde el tablero inicial de la campaña:
-
-1. Gira el anillo 1 tres posiciones a la izquierda y cruza desde el borde exterior.
-2. Avanza cinco posiciones en sentido horario. La bola llega a la salida del anillo 1, a las 5 h.
-3. Gira el anillo 2 dos posiciones a la izquierda. Su entrada pasa de las 7 h a las 5 h y aparece un paso continuo.
-4. Pulsa **Cruzar hacia el centro**. Para volver al anillo 1 sin cambiar la alineación, pulsa **Cruzar hacia fuera**.
-
-En el editor, el día 11 tiene **Demostrar solución**. Calcula una ruta desde el estado guardado y permite ejecutarla con **Paso siguiente** o **Reproducir / Pausa**. Si cambias el mecanismo manualmente, recalcula con **Calcular desde aquí**. Tras completar una vista previa, volver a pulsar **Demostrar solución** abre un tablero nuevo. La vista de Cintia ofrece esta demostración como ayuda opcional después de revelar las tres pistas.
-
-La búsqueda incluye la posición local de la bola y las cuatro rotaciones. Encontró una ruta inicial de 35 acciones. La auditoría inversa recorrió 767.232 estados y confirmó la conexión con el centro de las 165.888 combinaciones alcanzables del anillo 1. La prueba en Chrome reprodujo la solución acción a acción y verificó que cada puerta dibujada como abierta coincidía con el motor.

@@ -804,3 +804,87 @@ details .evidencia { margin-top: .5rem; }
 @media (prefers-reduced-motion: reduce) {
   .bombilla-electrica .vidrio { transition: none; }
 }
+
+/* Mecanismos de invierno */
+.mecanismo { display:grid; gap:.75rem; width:100%; min-width:0; }
+.pantalla-mecanismo { min-width:0; display:grid; gap:.7rem; }
+.controles-mecanismo,.herramientas-mecanismo { display:flex; flex-wrap:wrap; gap:.45rem; }
+.aviso-mecanismo:empty { display:none; }
+.tablero-tuberias { display:grid; grid-template-columns:repeat(var(--lado),minmax(44px,1fr)); gap:3px; min-width:240px; background:#c3ae8d; padding:4px; }
+.tablero-tuberias button { position:relative; min-width:44px; min-height:66px; padding:0; background:#ede0c7; border:1px solid #9b825f; border-radius:3px; }
+.tablero-tuberias button:disabled { cursor:default; opacity:1; box-shadow:inset 0 0 0 3px #756950; }
+.pieza-tubo { display:block; width:100%; height:48px; }
+.pieza-tubo g { transition:transform 160ms ease; }
+.metal-tubo { fill:none; stroke:#71695b; stroke-width:16; stroke-linecap:round; }
+.agua-tubo { fill:none; stroke:#9bbccc; stroke-width:8; opacity:0; transition:opacity 180ms ease; }
+.mojada .agua-tubo { opacity:1; }
+.junta-tubo { fill:#a28e6d; stroke:#514d40; }
+.etiqueta-tubo { display:block; min-height:17px; font-size:.6rem; font-weight:650; color:#4b4233; }
+.tablero-tuberias .rota { border:2px dashed #843c32; }
+.edificio-mantenimiento { display:block; width:min(100%,16rem); max-height:31rem; margin:auto; }
+.edificio-mantenimiento text { fill:#403a2e; font:14px var(--sans); }
+.fachada-ascensor { fill:#dac49e; stroke:#7e6749; stroke-width:3; }
+.planta-linea { stroke:#a18c6b; }
+.edificio-mantenimiento .planta-bloqueada { fill:#8b3c31; font-size:22px; }
+.chimenea-destino { fill:#9f6651; stroke:#624b38; stroke-width:2; }
+.edificio-mantenimiento .etiqueta-destino { font-size:9px; }
+.cabina-mantenimiento { transition:transform 200ms ease; fill:#345345; stroke:#f8dba0; stroke-width:2; }
+.visores-diagnostico { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.7rem; }
+.visores-diagnostico article { padding:.5rem; border:1px solid #b09570; background:#f3e4c7; }
+.visores-diagnostico h3 { margin:0 0 .3rem; font-size:1rem; }
+.visores-diagnostico .segmentos-reto { display:block; margin:auto; width:4.7rem; height:5.3rem; }
+.diagnostico-segmentos { display:flex; flex-wrap:wrap; align-items:center; gap:.25rem; font-size:.7rem; margin-top:.4rem; }
+.diagnostico-segmentos .segmentos-reto { width:2.6rem; height:3rem; margin:0; }
+.segmentos-reto .averiado { stroke:#9d3f30; stroke-dasharray:3 4; }
+.cifras-referencia { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:.3rem; }
+.cifras-referencia figure { margin:0; text-align:center; }
+.cifras-referencia svg { width:100%; }
+.laberinto-anillos { display:block; width:100%; max-width:27rem; margin:auto; background:#dac9a6; border:2px solid #8b7652; border-radius:50%; }
+.anillo-giratorio { transform-origin:180px 180px; transition:transform 180ms ease; }
+.bolita-anillos { fill:#b75032; stroke:#fff0c5; stroke-width:2; transition:cx 150ms ease,cy 150ms ease; }
+.control-anillo { display:flex; width:100%; align-items:center; gap:.5rem; }
+.control-anillo span { flex:1; }
+.engranajes-svg { display:block; width:100%; background:#e2d0ad; border:1px solid #9d835d; }
+.rueda-dentada { transition:transform 180ms ease; }
+.rueda-dentada polygon { fill:#b79868; stroke:#5a5140; stroke-width:2; }
+.centro-engranaje { fill:#ecdbb7; stroke:#79694a; stroke-width:2; }
+.marca-engranaje { stroke:#783a2b; stroke-width:7; stroke-linecap:round; }
+.objetivo-engranaje { fill:#294d3b; stroke:#fff0c9; stroke-width:2; }
+.etiqueta-engranaje { text-anchor:middle; font:15px var(--sans); fill:#463b2d; }
+.tapa-espejo { display:flex; align-items:center; gap:.5rem; padding:.5rem; border:1px solid #a78c62; }
+.tapa-espejo svg { width:2.8rem; height:2.8rem; }
+.discos-vitral,.modelos-vitral { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.6rem; }
+.discos-vitral>div,.modelos-vitral>div { padding:.4rem; text-align:center; border:1px solid #ad9470; }
+.discos-vitral button[aria-pressed="true"] { background:#395442; color:#fff0cf; }
+.disco-vitral { display:block; width:100%; max-width:8rem; margin:.4rem auto; transition:transform 160ms ease; }
+.giro-disco { display:flex; justify-content:center; gap:.3rem; }
+.giro-disco button { min-width:44px; }
+.modelos-vitral button { width:100%; font-size:.83rem; }
+.lampara-vitral { padding:.6rem; border:2px solid #ad8b52; background:#e9d5a9; text-align:center; }
+.lampara-vitral .disco-vitral { width:8rem; }
+.nonograma { grid-template-rows:minmax(var(--alto-pistas,44px),auto); }
+.nonograma .pista-nonograma { display:flex; gap:3px; padding:3px; align-items:center; justify-content:center; }
+.nonograma .columna-pistas { flex-direction:column; justify-content:end; }
+.nonograma .fila-pistas { flex-wrap:wrap; }
+.ficha-pista { display:grid; place-items:center; min-width:16px; height:20px; background:#f5e6c7; border:1px solid #a38b65; border-radius:2px; font:650 .8rem/1 var(--sans); }
+.herramientas-nonograma { display:flex; flex-wrap:wrap; gap:.35rem; }
+.herramientas-nonograma [aria-pressed="true"] { background:#365640; color:#fff0d4; }
+.cuadro-electrico { grid-template-columns:repeat(var(--lado-electrico,3),minmax(0,1fr)); position:relative; }
+.cables-electricos { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; opacity:.65; }
+.cables-electricos path { fill:none; stroke:#e5b370; stroke-width:2.5; stroke-dasharray:5 3; }
+.cables-electricos .cable-1 { stroke:#97c4cf; }
+.extremo-cable { position:absolute; left:.15rem; top:.15rem; color:#ffd69e; font-size:.6rem; }
+.config-luces { grid-template-columns:repeat(var(--lado-electrico,3),minmax(0,1fr)); }
+.compartimento-abierto .evidencia { animation:abrir-compartimento 350ms ease both; transform-origin:top; }
+@keyframes abrir-compartimento { from {opacity:0;transform:translateY(-.5rem);} to {opacity:1;transform:none;} }
+@media(prefers-reduced-motion:reduce){
+ .pieza-tubo g,.agua-tubo,.cabina-mantenimiento,.anillo-giratorio,.bolita-anillos,.rueda-dentada,.disco-vitral{transition:none;}
+ .compartimento-abierto .evidencia{animation:none;}
+}
+.nucleo-engranaje { transition:transform 180ms ease; }
+.embrague-libre .nucleo-engranaje:last-child .centro-engranaje { stroke-dasharray:5 4; }
+.compartimento-espejo { position:relative; min-height:4rem; padding:1rem; border:2px solid #9c815a; background:#e4ca97; perspective:20rem; }
+.tapa-compartimento { position:absolute; inset:0; background:#4a5545; display:grid; place-items:center; transform-origin:top; animation:levantar-tapa 500ms ease forwards; }
+.tapa-compartimento svg { width:3rem; height:3rem; }
+@keyframes levantar-tapa { to {transform:rotateX(105deg);opacity:.2;} }
+@media(prefers-reduced-motion:reduce){.nucleo-engranaje{transition:none;}.tapa-compartimento{animation:none;transform:rotateX(105deg);opacity:.2;}}

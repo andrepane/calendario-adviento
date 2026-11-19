@@ -173,6 +173,15 @@
         portal.append(elemento('span'), elemento('span'));
         resultado.prepend(portal);
       }
+      if(['diagnostico','engranajes'].includes(reto.tipo)){
+        resultado.classList.add('compartimento-abierto');
+        const compartimento=elemento('div','','compartimento-espejo');
+        const tapa=elemento('div','','tapa-compartimento');
+        tapa.setAttribute('aria-hidden','true');
+        tapa.append(ER.recursos.svg('espejo'));
+        compartimento.append(tapa,elemento('p','Compartimento abierto'));
+        resultado.prepend(compartimento);
+      }
       if (reto.acierto) resultado.append(elemento('p', reto.acierto));
       if (opciones.evidenciaNueva) tarjetas([opciones.evidenciaNueva], resultado);
       if (opciones.mensajeLlave) resultado.append(elemento('p', opciones.mensajeLlave));
@@ -200,7 +209,7 @@
       }
       const comprobar = elemento('button', 'Comprobar', 'control-reto principal');
       comprobar.type = 'submit';
-      if (reto.tipo !== 'electrico') formulario.append(comprobar);
+      if (!['electrico','tuberias','mantenimiento','anillos','engranajes','vitral','diagnostico'].includes(reto.tipo)) formulario.append(comprobar);
       formulario.append(estado);
       formulario.addEventListener('submit', evento => {
         evento.preventDefault();

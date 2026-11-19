@@ -70,3 +70,24 @@ El día 8 de la campaña 3946 usa nueve interruptores. El editor permite elegir 
 Para actualizar un borrador ya guardado, ábrelo y pulsa **Aplicar cuadro eléctrico al día 8**, seguido de **Guardar borrador**. Este botón sustituye solo el capítulo 8 del espacio abierto. Para volver a jugarlo desde una partida que ya lo había completado, usa **Reiniciar progreso de prueba**. El enunciado y las tres pistas se editan en sus campos habituales.
 
 El cuadro guarda los interruptores seleccionados y calcula las luces a partir de la configuración inicial. Volver a tocar un interruptor deshace su efecto. Al apagar las nueve luces dentro del límite, el reto se completa automáticamente y entrega la llave del día 9. La fecha real o simulada sigue siendo necesaria para abrir esa puerta. El día 8 no entrega una evidencia y la caja final mantiene 3946.
+
+## Campaña de mecanismos · versión 3
+
+Abre **editor.html** y pulsa **Cargar campaña de mecanismos · versión 3**. La primera carga crea otro espacio de borrador con su propia partida. Copia el día 1 personal y conserva los capítulos que no se sustituyen de tu versión 2 guardada, incluidos los días 8, 15 y 22. Las versiones anteriores siguen accesibles desde sus botones. Guarda el nuevo borrador después de editarlo.
+
+Para jugar desde el principio, pulsa **Reiniciar progreso de prueba**, elige **24/12/2026** y pulsa **Jugar campaña**. Para revisar un reto aislado, selecciónalo y pulsa **Previsualizar día**. Las evidencias necesarias aparecen como ejemplo en esa vista. Los datos específicos y las soluciones de referencia están en **Configuración del juego**. Exportar e importar conserva esa configuración y las referencias.
+
+Reglas y decisiones de los nuevos mecanismos:
+
+- **Día 4, tuberías.** Cada boca se conecta solo con otra boca enfrentada. El agua se propaga desde la entrada y la validación exige alcanzar la caldera, visitar las dos válvulas y evitar la salida rota. Las piezas se editan mediante sus puertos 0 arriba, 1 derecha, 2 abajo y 3 izquierda. Los índices de casilla empiezan en 0. El campo **solucion** guarda los cuartos de vuelta de referencia.
+- **Día 6, mantenimiento.** El ascensor empieza en 4 y busca la chimenea del 21. H sube 4 y C baja 3, según el alfabeto del día 2. Está permitido pasar por una planta bloqueada, pero no terminar en ella. Salir del edificio o intentar detenerse en una planta bloqueada no consume movimiento. La ruta mínima tiene seis movimientos. **solucion** indica los índices de botón.
+- **Día 7, diagnóstico.** Cada visor tiene sus segmentos visibles y sus averías. Se verifica que esa pareja permita reconstruir una sola cifra. La leyenda muestra las diez cifras completas. El código de referencia está en la configuración.
+- **Día 11, anillos.** Cada anillo gira en doce posiciones discretas. Los pasillos conectan sectores vecinos y las puertas unen anillos solo cuando coinciden. La bolita se mueve con el anillo ocupado y conserva su sector local al girarlo. Los pasillos principales y los ramales sin salida se editan como conexiones. La secuencia de referencia combina giros, pasos y entradas.
+- **Día 12, engranajes.** Cada pulso avanza un diente de la motriz. Con 12, 18 y 24 dientes, los giros son de 30°, −20° y 15°. El embrague desacopla el núcleo marcado de la tercera corona. La corona sigue engranada y el núcleo conserva su orientación. Se necesitan cinco pasos conectados y dos pasos de vuelta con el núcleo liberado.
+- **Día 14, vitral.** Se superponen dos discos distintos. Una zona opaca bloquea la luz aunque el otro disco sea transparente. Para poder formar la luna llena se incluyen dos discos totalmente transparentes y dos con media superficie opaca. Cada modelo guarda sus discos y giros. La tarjeta conserva Nueva → Creciente → Llena → Menguante.
+- **Día 17, nonograma.** La casa de invierno de 8 × 8 tiene una sola solución, comprobada con un solucionador y con deducciones de intersecciones de líneas. Cada número tiene su ficha propia. Las herramientas Pintar y Marcar vacío permiten corregir casillas, deshacer y reiniciar.
+- **Día 21, segundo cuadro.** Las conexiones adicionales unen 1 ↔ 16 y 4 ↔ 13. Sus extremos se identifican con A y B además de los cables dibujados. Una luz afectada por varias conexiones de una misma pulsación cambia una sola vez. El mínimo verificado es seis interruptores y ese es el límite configurado.
+
+El editor conserva el progreso de estos mecanismos al cerrar o recargar. La partida de prueba, la vista previa y la partida real usan sus propios guardados. El código final continúa siendo **3946**.
+
+Para instalar una versión preparada para Cintia, incluye **mecanismos.js** junto a **retos-avanzados.js**, **recursos-reto.js** y los demás archivos del jugador. El archivo **campana-mecanismos.js** se usa para cargar el ejemplo desde el editor local. La versión de Cintia se genera como **calendario-publicado.js**.

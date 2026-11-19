@@ -16,7 +16,13 @@
     maquina: 'Máquina lunar',
     perforado: 'Papel perforado',
     fragmentos: 'Visor de fragmentos',
-    electrico: 'Cuadro eléctrico'
+    electrico: 'Cuadro eléctrico',
+    tuberias: 'Tuberías giratorias',
+    mantenimiento: 'Ascensor de mantenimiento',
+    diagnostico: 'Visores averiados',
+    anillos: 'Laberinto de anillos',
+    engranajes: 'Mecanismo de engranajes',
+    vitral: 'Vitral lunar'
   };
   const texto = valor => typeof valor === 'string' ? valor : '';
   const lista = valor => Array.isArray(valor) ? valor.filter(item => typeof item === 'string') : [];

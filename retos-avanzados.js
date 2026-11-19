@@ -5,38 +5,48 @@
   const letras = texto => texto.normalize('NFD').replace(/\p{M}/gu, '').toUpperCase();
   const compactar = texto => letras(String(texto)).replace(/\s+/g, '');
   const configuracion = reto => JSON.parse(reto.configuracion);
-  const esEspecial = tipo => tipos.includes(tipo);
+  const esEspecial = tipo => tipos.includes(tipo) || Boolean(ER.mecanismos?.tipos.includes(tipo));
   const lineas = filas => filas.map(fila => fila.trim().split(/\s+/));
 
-  function lucesElectricas(inicial, seleccionados) {
-    const luces = Array.from({length:9},(_,i)=>inicial.includes(i+1));
+  function lucesElectricas(inicial, seleccionados, lado=3, conexiones=[]) {
+    const luces = Array.from({length:lado*lado},(_,i)=>inicial.includes(i+1));
     for (const numero of seleccionados) {
-      const y = Math.floor((numero-1)/3), x = (numero-1)%3;
+      const y = Math.floor((numero-1)/lado), x = (numero-1)%lado;
+      const afectadas = new Set();
       for (const [dy,dx] of [[0,0],[-1,0],[1,0],[0,-1],[0,1]]) {
         const fila = y+dy, columna = x+dx;
-        if (fila>=0 && fila<3 && columna>=0 && columna<3) {
-          const indice = fila*3+columna;
-          luces[indice] = !luces[indice];
+        if (fila>=0 && fila<lado && columna>=0 && columna<lado) {
+          afectadas.add(fila*lado+columna);
         }
       }
+      for(const [a,b] of conexiones){
+        if(a===numero)afectadas.add(b-1);
+        if(b===numero)afectadas.add(a-1);
+      }
+      for(const i of afectadas)luces[i]=!luces[i];
     }
     return luces;
   }
 
   function solucionesElectricas(c) {
+    const lado=c.lado??3, cantidad=lado*lado;
     const soluciones = [];
-    for (let mascara=0;mascara<512;mascara++) {
-      const seleccionados = Array.from({length:9},(_,i)=>i+1).filter(n=>mascara & (1 << (n-1)));
-      if (seleccionados.length<=c.maximo && lucesElectricas(c.inicial,seleccionados).every(luz=>!luz)) {
-        soluciones.push(seleccionados);
-      }
+    const inicial=c.inicial.reduce((m,n)=>m|(1<<(n-1)),0);
+    const efectos=Array.from({length:cantidad},(_,i)=>lucesElectricas([], [i+1],lado,c.conexiones??[])
+      .reduce((m,v,n)=>v?m|(1<<n):m,0));
+    for(let mascara=0;mascara<(1<<cantidad);mascara++){
+      let estado=inicial,total=0;
+      for(let i=0;i<cantidad;i++)if(mascara&(1<<i)){total++;estado^=efectos[i];}
+      if(total<=c.maximo&&estado===0)soluciones.push(Array.from({length:cantidad},(_,i)=>i+1).filter(n=>mascara&(1<<(n-1))));
     }
     return soluciones;
   }
 
   function configuracionElectricaValida(c) {
-    return Array.isArray(c.inicial) && c.inicial.every(n=>Number.isInteger(n)&&n>=1&&n<=9)
-      && new Set(c.inicial).size===c.inicial.length && Number.isInteger(c.maximo) && c.maximo>=1 && c.maximo<=9;
+    const lado=c.lado??3,n=lado*lado;
+    return [3,4].includes(lado)&&Array.isArray(c.inicial)&&c.inicial.every(p=>Number.isInteger(p)&&p>=1&&p<=n)
+      &&new Set(c.inicial).size===c.inicial.length&&Number.isInteger(c.maximo)&&c.maximo>=1&&c.maximo<=n
+      &&(c.conexiones??[]).every(p=>Array.isArray(p)&&p.length===2&&p[0]!==p[1]&&p.every(v=>Number.isInteger(v)&&v>=1&&v<=n));
   }
 
   function grupos(fila) {
@@ -56,6 +66,7 @@
     try { c = configuracion(reto); } catch { return ['revisa el JSON de configuración de la prueba']; }
     if (!c || typeof c !== 'object' || Array.isArray(c)) return ['la configuración debe ser un objeto'];
     const fallos = [];
+    if(ER.mecanismos?.tipos.includes(reto.tipo))return ER.mecanismos.errores(reto.tipo,c);
     if (reto.tipo === 'electrico') {
       if (!configuracionElectricaValida(c)) {
         fallos.push('configura las luces iniciales con posiciones del 1 al 9 y un límite de 1 a 9 interruptores');
@@ -143,9 +154,10 @@
     if (reto.tipo === 'electrico') {
       return Array.isArray(respuesta) && respuesta.length<=c.maximo
         && new Set(respuesta).size===respuesta.length
-        && respuesta.every(n=>Number.isInteger(n)&&n>=1&&n<=9)
-        && lucesElectricas(c.inicial,respuesta).every(luz=>!luz);
+        && respuesta.every(n=>Number.isInteger(n)&&n>=1&&n<=(c.lado??3)**2)
+        && lucesElectricas(c.inicial,respuesta,c.lado??3,c.conexiones??[]).every(luz=>!luz);
     }
+    if(ER.mecanismos?.tipos.includes(reto.tipo))return ER.mecanismos.completa(reto.tipo,c,respuesta);
     if (reto.tipo === 'ahorcado') {
       const estado = estadoAhorcado(c, Array.isArray(respuesta) ? respuesta : []);
       return estado.ganada && !estado.perdida;
@@ -217,6 +229,7 @@
   }
 
   function mostrar(padre,reto,opciones) {
+    if(ER.mecanismos?.tipos.includes(reto.tipo))return ER.mecanismos.mostrar(padre,reto,opciones);
     const c = configuracion(reto);
     const estado = opciones.interaccion && typeof opciones.interaccion === 'object'
       ? structuredClone(opciones.interaccion) : {};
@@ -235,8 +248,10 @@
     };
 
     if (reto.tipo === 'electrico') {
+      const lado=c.lado??3,cantidad=lado*lado,conexiones=c.conexiones??[];
+      let historial=Array.isArray(estado.historial)?estado.historial.slice(-100):[];
       let seleccionados = Array.isArray(estado.seleccionados)
-        ? [...new Set(estado.seleccionados.filter(n=>Number.isInteger(n)&&n>=1&&n<=9))].slice(0,c.maximo) : [];
+        ? [...new Set(estado.seleccionados.filter(n=>Number.isInteger(n)&&n>=1&&n<=cantidad))].slice(0,c.maximo) : [];
       const guia = el('details','','guia-electrica');
       const ejemplo = el('div','','ejemplo-electrico');
       ejemplo.setAttribute('role','img');
@@ -249,15 +264,22 @@
       }
       guia.append(el('summary','Cómo funciona un interruptor'),
         el('p','Por ejemplo, el central cambia las cinco posiciones marcadas. En los bordes y las esquinas afecta a menos luces. Tocar de nuevo un interruptor deshace exactamente su efecto.'),ejemplo);
+      if(conexiones.length){
+        ejemplo.remove();
+        guia.replaceChildren(el('summary','Cómo funcionan los cables'),
+          el('p','Cada cable actúa en ambos sentidos. Por ejemplo, al tocar '+conexiones[0][0]+' también cambia la luz '+conexiones[0][1]+'. Sus vecinas ortogonales cambian igual que antes. Si una luz recibe ambos efectos, cambia solo una vez.'));
+      }
       const panel = el('div','','cuadro-electrico');
+      panel.style.setProperty('--lado-electrico',lado);
       panel.setAttribute('role','group');
-      panel.setAttribute('aria-label','Cuadro eléctrico de nueve luces, numeradas por filas');
+      panel.setAttribute('aria-label','Cuadro eléctrico de '+cantidad+' luces, numeradas por filas');
       const contador = el('p','','contador-electrico');
       const aviso = el('p','','aviso-electrico');
       aviso.setAttribute('role','status');
-      const controles = Array.from({length:9},(_,i) => {
+      const controles = Array.from({length:cantidad},(_,i) => {
         const numero = i+1;
         const b = boton('',()=>{
+          const anterior=[...seleccionados];
           const posicion = seleccionados.indexOf(numero);
           if (posicion>=0) seleccionados.splice(posicion,1);
           else if (seleccionados.length<c.maximo) seleccionados.push(numero);
@@ -265,6 +287,7 @@
             aviso.textContent = `Ya hay ${c.maximo} interruptores seleccionados. Deselecciona uno para cambiarlo.`;
             return;
           }
+          historial.push(anterior);historial=historial.slice(-100);
           aviso.textContent = '';
           actualizar();
           completar();
@@ -280,11 +303,13 @@
         marca.setAttribute('aria-hidden','true');
         b.append(numeroVisible,bombilla,estadoLuz,marca);
         b.dataset.interruptor = numero;
+        const cable=conexiones.findIndex(p=>p.includes(numero));
+        if(cable>=0){const etiqueta=el('span',String.fromCharCode(65+cable),'extremo-cable');b.append(etiqueta);}
         panel.append(b);
         return b;
       });
       function actualizar() {
-        const luces = lucesElectricas(c.inicial,seleccionados);
+        const luces = lucesElectricas(c.inicial,seleccionados,lado,conexiones);
         controles.forEach((b,i)=>{
           const seleccionado = seleccionados.includes(i+1);
           b.classList.toggle('encendida',luces[i]);
@@ -296,18 +321,33 @@
         });
         contador.textContent = `Interruptores utilizados: ${seleccionados.length}/${c.maximo}`;
         estado.seleccionados = [...seleccionados];
+        estado.historial=historial;
+        deshacer.disabled=!historial.length;
         guardar();
       }
       let completado = false;
       function completar() {
-        if (completado || !bloque.isConnected || !lucesElectricas(c.inicial,seleccionados).every(luz=>!luz)) return;
+        if (completado || !bloque.isConnected || !lucesElectricas(c.inicial,seleccionados,lado,conexiones).every(luz=>!luz)) return;
         completado = Boolean(opciones.comprobar?.([...seleccionados]));
         if (!completado) aviso.textContent = 'No se puede completar este reto en este momento.';
       }
       const reiniciar = boton('Reiniciar',()=>{
-        seleccionados = []; aviso.textContent=''; actualizar(); completar();
+        historial.push([...seleccionados]);seleccionados = []; aviso.textContent=''; actualizar(); completar();
       });
-      bloque.append(guia,panel,contador,aviso,reiniciar);
+      const deshacer=boton('Deshacer',()=>{if(historial.length){seleccionados=historial.pop();aviso.textContent='';actualizar();completar();}});
+      if(conexiones.length){
+        const cables=document.createElementNS('http://www.w3.org/2000/svg','svg');
+        cables.setAttribute('viewBox','0 0 400 400');cables.classList.add('cables-electricos');cables.setAttribute('aria-hidden','true');
+        conexiones.forEach(([a,b],i)=>{
+          const x1=((a-1)%lado+.5)*100,y1=(Math.floor((a-1)/lado)+.5)*100;
+          const x2=((b-1)%lado+.5)*100,y2=(Math.floor((b-1)/lado)+.5)*100;
+          const path=document.createElementNS(cables.namespaceURI,'path');
+          path.setAttribute('d',`M${x1} ${y1}Q${i?390:10} 200 ${x2} ${y2}`);
+          path.setAttribute('class','cable-'+i);cables.append(path);
+        });
+        panel.append(cables);
+      }
+      bloque.append(guia,panel,contador,aviso,deshacer,reiniciar);
       actualizar();
       respuesta = () => [...seleccionados];
       // Recupera también una partida cerrada entre el último toque y el guardado de la recompensa.
@@ -440,36 +480,63 @@
         const resultado = entrada(bloque,'Suma de sus dos cifras',estado.resultado ?? '',valor=>{estado.resultado=valor;guardar();});
         respuesta = () => ({ruedas:campos.map(campo=>campo.value),salida:salida.value,resultado:resultado.value});
       } else respuesta = () => campos.map(campo=>campo.value);
+
     } else if (reto.tipo === 'nonograma') {
-      const filas = c.solucion.length;
-      const columnas = c.solucion[0].length;
-      const marcas = Array.from({length:filas},(_,y)=>Array.from({length:columnas},(_,x)=>
-        [0,1,2].includes(estado.marcas?.[y]?.[x]) ? estado.marcas[y][x] : 0));
-      const ayudaReglas = el('details');
-      ayudaReglas.append(el('summary','Cómo jugar al nonograma'),el('p','Los números indican grupos de casillas pintadas consecutivas. Entre grupos deja al menos una casilla vacía. Cada toque cambia entre vacía, pintada y descartada. Las casillas descartadas cuentan como vacías.'));
-      bloque.append(ayudaReglas);
-      const pistas = pistasNonograma(c.solucion);
-      const tablero = [];
-      tablero.push(['',...pistas.columnas.map(p=>p.join(' ') || '0')]);
-      for(let y=0;y<filas;y++) tablero.push([pistas.filas[y].join(' ') || '0',...Array(columnas).fill('')]);
-      const tabla = matriz(bloque,tablero,(y,x,b) => {
-        if (!y || !x) return;
-        marcas[y-1][x-1] = (marcas[y-1][x-1]+1)%3;
-        actualizar(b,y-1,x-1);
-        estado.marcas=marcas;guardar();
-      },'nonograma');
-      function actualizar(b,y,x) {
-        const marca=marcas[y][x];
-        b.textContent=['','■','×'][marca];
-        b.dataset.marca=marca;
-        b.setAttribute('aria-label',`Fila ${y+1}, columna ${x+1}, ${['vacía','pintada','descartada'][marca]}`);
+      const filas=c.solucion.length,columnas=c.solucion[0].length;
+      let marcas=Array.from({length:filas},(_,y)=>Array.from({length:columnas},(_,x)=>
+        [0,1,2].includes(estado.marcas?.[y]?.[x])?estado.marcas[y][x]:0));
+      let historial=Array.isArray(estado.historial)?estado.historial.slice(-100):[];
+      let herramienta='alternar';
+      const herramientas=el('div','','herramientas-nonograma');
+      for(const [id,nombre]of [['pintar','Pintar'],['vacio','Marcar vacío'],['alternar','Alternar']]){
+        const b=boton(nombre,()=>{
+          herramienta=id;
+          for(const control of herramientas.children)control.setAttribute('aria-pressed',String(control===b));
+        });
+        b.setAttribute('aria-pressed',String(id===herramienta));herramientas.append(b);
       }
-      for(const b of tabla.children){
-        const y=Number(b.dataset.fila),x=Number(b.dataset.columna);
-        if (!y || !x) {b.disabled=true;b.classList.add('pista-nonograma');}
-        else actualizar(b,y-1,x-1);
+      const reglas=el('details');
+      reglas.append(el('summary','Cómo jugar al nonograma'),el('p','Cada ficha es un grupo de casillas consecutivas. Dos fichas con 1 significan dos grupos separados por al menos una casilla vacía. Pintar todos los vacíos no es obligatorio.'));
+      const pistas=pistasNonograma(c.solucion);
+      const scroll=el('div','','tablero-scroll');
+      scroll.tabIndex=0;scroll.setAttribute('role','region');scroll.setAttribute('aria-label','Nonograma, desplazamiento horizontal');
+      const tabla=el('div','','tablero-grande nonograma');
+      tabla.style.setProperty('--columnas',columnas+1);
+      tabla.style.setProperty('--alto-pistas',Math.max(...pistas.columnas.map(p=>p.length))*24+'px');
+      function pista(grupos,vertical){
+        const celda=el('div','',vertical?'pista-nonograma columna-pistas':'pista-nonograma fila-pistas');
+        for(const numero of grupos.length?grupos:[0])celda.append(el('span',String(numero),'ficha-pista'));
+        celda.setAttribute('aria-label','Grupos: '+(grupos.join(', ')||'0'));
+        return celda;
       }
-      respuesta=()=>marcas;
+      tabla.append(el('div','','pista-nonograma'));
+      pistas.columnas.forEach(p=>tabla.append(pista(p,true)));
+      const botones=[];
+      for(let y=0;y<filas;y++){
+        tabla.append(pista(pistas.filas[y],false));
+        for(let x=0;x<columnas;x++){
+          const b=boton('',()=>{
+            historial.push(structuredClone(marcas));historial=historial.slice(-100);
+            marcas[y][x]=herramienta==='alternar'?(marcas[y][x]+1)%3:herramienta==='pintar'?(marcas[y][x]===1?0:1):(marcas[y][x]===2?0:2);
+            actualizar();
+          });
+          b.classList.add('casilla-grande');b.dataset.fila=y+1;b.dataset.columna=x+1;
+          botones.push({b,y,x});tabla.append(b);
+        }
+      }
+      const deshacer=boton('Deshacer',()=>{if(historial.length){marcas=historial.pop();actualizar();}});
+      const reiniciar=boton('Reiniciar',()=>{
+        historial.push(structuredClone(marcas));marcas=Array.from({length:filas},()=>Array(columnas).fill(0));actualizar();
+      });
+      function actualizar(){
+        for(const {b,y,x}of botones){
+          b.textContent=['','■','×'][marcas[y][x]];b.dataset.marca=marcas[y][x];
+          b.setAttribute('aria-label','Fila '+(y+1)+', columna '+(x+1)+', '+['vacía','pintada','descartada'][marcas[y][x]]);
+        }
+        deshacer.disabled=!historial.length;estado.marcas=marcas;estado.historial=historial;guardar();
+      }
+      scroll.append(tabla);bloque.append(reglas,herramientas,scroll,deshacer,reiniciar);
+      actualizar();respuesta=()=>marcas;
     } else if (reto.tipo === 'recorrido') {
       const itinerario = el('ol','','itinerario');
       c.movimientos.forEach(([direccion,pasos])=>itinerario.append(el('li',`${direccion}, ${pasos} ${pasos===1 ? 'casilla' : 'casillas'}.`)));

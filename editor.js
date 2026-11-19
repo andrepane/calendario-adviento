@@ -27,6 +27,7 @@
     typeof copia?.id === 'string' && /^copia-[a-z0-9-]+$/.test(copia.id) && typeof copia.nombre === 'string') : [];
   const nombres = new Map([['original', 'Mis borradores'], ['campana', 'Escape room de prueba'],
     ['campana3946', 'Campaña 3946 · versión 2'],
+    ['mecanismos', 'Campaña de mecanismos · versión 3'],
     ...copias.map(copia => [copia.id, copia.nombre])]);
   const abiertos = new Map();
   let espacio = leer(claveEspacio);
@@ -42,6 +43,26 @@
   function leerBorrador(id = espacio) {
     try { return ER.calendario(leer(clave('borrador', id))); }
     catch {
+      if(id==='mecanismos'){
+        const nueva=ER.calendario(window.CAMPANA_MECANISMOS);
+        const previa=abiertos.get('campana3946')?.datos??leer(clave('borrador','campana3946'));
+        if(previa){
+          const base=ER.calendario(previa);
+          const sustituidos=new Set([4,6,7,11,12,14,17,21]);
+          const dependencias=new Map([16,18,23,24].map(dia=>[dia,[...nueva.capitulos[dia-1].dependencias]]));
+          for(const dia of ER.dias)if(!sustituidos.has(dia))nueva.capitulos[dia-1]=structuredClone(base.capitulos[dia-1]);
+          for(const [dia,referencias]of dependencias)nueva.capitulos[dia-1].dependencias=referencias;
+          nueva.capitulos[23].combinacion='3946';
+        }
+        const publicada=ER.calendario(window.CALENDARIO_PUBLICADO);
+        nueva.capitulos[0]=structuredClone(publicada.capitulos[0]);
+        for(const anterior of ['campana3946','original','campana']){
+          const guardada=abiertos.get(anterior)?.datos??leer(clave('borrador',anterior));
+          if(!guardada)continue;
+          nueva.capitulos[0]=structuredClone(ER.calendario(guardada).capitulos[0]);break;
+        }
+        return nueva;
+      }
       if (id === 'campana3946') {
         const nueva = ER.calendario(window.CAMPANA_3946);
         for (const anterior of ['original', 'campana']) {
@@ -105,10 +126,11 @@
     porId('espacio-activo').textContent = nombres.get(id);
     porId('cargar-campana').hidden = id === 'campana';
     porId('cargar-3946').hidden = id === 'campana3946';
+    porId('cargar-mecanismos').hidden=id==='mecanismos';
     porId('volver-borradores').hidden = id === 'original';
     const original = (abiertos.get('original')?.datos ?? leerBorrador('original')).capitulos[0];
     const demo = ER.capitulo(window.CALENDARIO_PUBLICADO.capitulos[0]);
-    porId('copiar-dia-uno').hidden = !['campana', 'campana3946'].includes(id) || !(original.titulo || original.imagen)
+    porId('copiar-dia-uno').hidden = !['campana', 'campana3946','mecanismos'].includes(id) || !(original.titulo || original.imagen)
       || JSON.stringify(original) === JSON.stringify(demo);
     const selector = porId('copias');
     selector.replaceChildren(new Option('Elige un respaldo', ''),
@@ -214,7 +236,8 @@
           : soluciones.length ? `${soluciones.length} soluciones dentro del límite elegido.`
           : 'Este tablero no puede resolverse dentro del límite elegido.';
       }
-      for (let n=1;n<=9;n++) {
+      grupo.style.setProperty('--lado-electrico',config.lado??3);
+      for (let n=1;n<=(config.lado??3)**2;n++) {
         const etiqueta = document.createElement('label');
         const check = document.createElement('input');
         check.type = 'checkbox';
@@ -233,7 +256,7 @@
         config.maximo = Number(valor); informar();
       });
       maximo.min=1;
-      maximo.max=9;
+      maximo.max=(config.lado??3)**2;
       panel.append(resumen);
       informar();
     }
@@ -265,6 +288,11 @@
         const pistas = ER.especiales.pistasNonograma(config.solucion);
         resumen.textContent = 'Pistas de filas: ' + pistas.filas.map(p => p.join(' ') || '0').join(' / ')
           + '. Columnas: ' + pistas.columnas.map(p => p.join(' ') || '0').join(' / ') + '.';
+        if(ER.mecanismos&&config.solucion.length<=10&&config.solucion[0].length<=10){
+          const revision=ER.mecanismos.resolverNonograma(config.solucion);
+          resumen.textContent+=' '+(revision.soluciones.length===1?'Solución única.':'El dibujo admite varias soluciones.')
+            +(revision.deducible?' Se resuelve por deducciones de líneas.':' Puede requerir más deducción o revisar las pistas.');
+        }
       }
       const solucion = control('Solución del nonograma, una fila por línea (1 pintada, 0 vacía)',
         filas.join('\n'), 'textarea', valor => {
@@ -409,6 +437,11 @@
     elegirEspacio('campana3946');
     if (!leer(clave('borrador'))) guardar(clave('borrador'), datos);
     anunciar('Campaña 3946 cargada como una versión nueva. El día 1 conserva tu reto personal si ya estaba guardado.');
+  });
+  porId('cargar-mecanismos').addEventListener('click',()=>{
+    elegirEspacio('mecanismos');
+    if(!leer(clave('borrador')))guardar(clave('borrador'),datos);
+    anunciar('Nueva campaña de mecanismos cargada en un espacio propio. Sus soluciones de referencia están en la configuración de cada reto.');
   });
   porId('actualizar-dia-8').addEventListener('click', () => {
     guardarDia();

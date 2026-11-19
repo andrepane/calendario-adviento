@@ -22,7 +22,8 @@
     diagnostico: 'Visores averiados',
     anillos: 'Laberinto de anillos',
     engranajes: 'Mecanismo de engranajes',
-    vitral: 'Vitral lunar'
+    vitral: 'Vitral lunar',
+    cerradura: 'Cerradura de tres ruedas'
   };
   const texto = valor => typeof valor === 'string' ? valor : '';
   const lista = valor => Array.isArray(valor) ? valor.filter(item => typeof item === 'string') : [];
@@ -58,7 +59,16 @@
       esquema: 1,
       partida: typeof datos.partida === 'string' && /^[a-zA-Z0-9-]{1,80}$/.test(datos.partida)
         ? datos.partida : 'demo-2026',
-      capitulos: datos.capitulos.map(capitulo)
+      capitulos: datos.capitulos.map(capitulo),
+      experiencia: {
+        introduccion: datos.experiencia?.introduccion !== false,
+        final: datos.experiencia?.final === true,
+        nota: texto(datos.experiencia?.nota) || 'Alguien acaba de llegar a la casa. Te está esperando fuera de esta pantalla.',
+        pista: texto(datos.experiencia?.pista) || 'Busca el paquete bajo la manta del sofá',
+        codigo: texto(datos.experiencia?.codigo) || 'NACIMIENTO',
+        mensaje: texto(datos.experiencia?.mensaje) || 'Misión 25: que llegue vivo a Nochevieja',
+        permitirNombre: datos.experiencia?.permitirNombre !== false
+      }
     };
   }
 
@@ -140,6 +150,12 @@
         return Number.isInteger(cantidad) && cantidad > 0 ? [[dia, cantidad]] : [];
       })),
       repeticiones: Object.fromEntries(cadena.filter(dia=>datos?.repeticiones?.[dia]===true).map(dia=>[dia,true])),
+      introduccionVista: datos?.introduccionVista === true,
+      desenlace: {
+        etapa: Math.max(0, Math.min(6, Number.isInteger(datos?.desenlace?.etapa) ? datos.desenlace.etapa : 0)),
+        confirmado: datos?.desenlace?.confirmado === true,
+        nombre: texto(datos?.desenlace?.nombre).slice(0,40)
+      },
       interacciones: datos?.interacciones && typeof datos.interacciones === 'object'
         && !Array.isArray(datos.interacciones) ? datos.interacciones : {}
     };

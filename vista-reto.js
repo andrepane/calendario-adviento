@@ -167,7 +167,7 @@
       const resultado = elemento('section', '', 'resultado-reto');
       resultado.tabIndex = -1;
       resultado.append(elemento('h3', 'Reto resuelto'));
-      if (reto.recursoTipo === 'caja') {
+      if (reto.recursoTipo === 'caja' && !opciones.experiencia?.final) {
         const portal = elemento('div', '', 'portal-premio');
         portal.setAttribute('aria-hidden', 'true');
         portal.append(elemento('span'), elemento('span'));
@@ -183,6 +183,13 @@
         resultado.prepend(compartimento);
       }
       if (reto.acierto) resultado.append(elemento('p', reto.acierto));
+      if(reto.tipo==='cerradura'){
+        const luz=elemento('div','✦ La casa se ilumina ✦','casa-despierta');
+        luz.setAttribute('role','status');resultado.append(luz);
+      }
+      if(reto.tipo==='combinacion'&&opciones.experiencia?.final){
+        limpiezas.set(padre,ER.experiencias.final(resultado,opciones.experiencia,opciones.desenlace,opciones.guardarDesenlace));
+      }
       if(reto.tipo==='engranajes'){
         const configuracion=ER.especiales.configuracion(reto);
         if(!ER.mecanismos.errores('engranajes',configuracion).length){
@@ -202,7 +209,7 @@
       if (opciones.evidenciaNueva) tarjetas([opciones.evidenciaNueva], resultado);
       if (opciones.mensajeLlave) resultado.append(elemento('p', opciones.mensajeLlave));
       if (opciones.irSiguiente) resultado.append(boton('Abrir la siguiente ventana', opciones.irSiguiente));
-      if (reto.premio) resultado.append(elemento('h3', 'El premio'), elemento('p', reto.premio));
+      if (reto.premio && !opciones.experiencia?.final) resultado.append(elemento('h3', 'El premio'), elemento('p', reto.premio));
       if (opciones.volverAJugar) resultado.append(boton('Volver a jugar', opciones.volverAJugar));
       padre.append(resultado);
     } else {
@@ -226,7 +233,7 @@
       }
       const comprobar = elemento('button', 'Comprobar', 'control-reto principal');
       comprobar.type = 'submit';
-      if (!['electrico','tuberias','mantenimiento','anillos','engranajes','vitral','diagnostico'].includes(reto.tipo)) formulario.append(comprobar);
+      if (!['electrico','tuberias','mantenimiento','anillos','engranajes','vitral','diagnostico','cerradura'].includes(reto.tipo)) formulario.append(comprobar);
       formulario.append(estado);
       formulario.addEventListener('submit', evento => {
         evento.preventDefault();

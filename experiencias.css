@@ -68,3 +68,17 @@
 .movimiento-reducido .hoja-caja { animation-duration:.1s; }
 .movimiento-reducido :is(.criatura-pixel,.huevo-pixel,.huevo-pixel::after,.nota-cayendo,.arranque-pixel,.casa-despierta .fachada,.casa-despierta:not(#calendario)) { animation:none; }
 html { scrollbar-gutter:stable; }
+.selector-transmision { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-block:.7rem; }
+.selector-transmision button { min-height:48px; padding:.5rem .25rem; }
+.selector-transmision button[aria-pressed='true'] { background:#2e4e3d; color:#fff1ce; outline:2px solid #b39252; outline-offset:2px; }
+.conexiones-transmision { padding:.55rem; border:1px solid #aa936b; background:#e9d8b73b; margin-block:.7rem; }
+.conexiones-transmision svg { display:block; width:100%; max-width:22rem; margin:auto; }
+.conexiones-transmision p { font-size:.86rem; margin:.25rem 0; }
+.numero-rueda { fill:#27372e; stroke:#f7e6be; stroke-width:3px; paint-order:stroke; font:750 17px var(--sans); }
+.rueda-afectada path { stroke:#fff0a0; stroke-width:17; stroke-dasharray:7 2; }
+.demostracion-cerradura { margin-top:1rem; padding:.65rem; border:1px dashed #947a51; }
+.demostracion-cerradura button { margin:.25rem .25rem .25rem 0; }
+.demostracion-cerradura p { margin:.4rem 0; font-size:.9rem; }
+.esquema-transmisiones { margin-block:.75rem; }
+.cerradura-transmisiones .controles-ruedas>div { grid-template-columns:4.5rem 1fr 1fr; }
+@media(max-width:360px) { .cerradura-transmisiones .controles-ruedas>div { grid-template-columns:3.8rem 1fr 1fr; } }

@@ -113,3 +113,19 @@ La caja contiene la misma casa y los mismos elementos de calendario, que se tras
 Al entregar una copia, incluye también **experiencias.js** y **experiencias.css** junto a los archivos existentes. El editor local continúa excluido de Vercel. Guardar un borrador no publica cambios: prepara calendario-publicado.js cuando quieras instalar tus propios textos.
 
 Verificación de la lógica: ejecuta `node tests/experiencias.test.cjs` desde el repositorio. Contrasta las 216 búsquedas de la cerradura con una distancia calculada de forma independiente, comprueba el pestillo, las fechas, el respaldo y las etapas persistentes del final.
+
+## Cerradura de transmisiones · versión 5
+
+Abre **editor.html**, recarga con **Ctrl + F5** y pulsa **Cargar cerradura de transmisiones · versión 5**. Se conserva el borrador abierto y se crea otro espacio que sustituye solo el día 1. Los demás capítulos, la caja de entrada y el desenlace mantienen su configuración. Las campañas anteriores y los respaldos importados siguen disponibles.
+
+En **La caja y el habitante**, pulsa **Probar día 1**. Dentro de esa vista están **Demostrar solución** y **Avanzar un paso**. La demostración empieza desde el inicio, ejecuta los mismos movimientos del juego y muestra por separado los cambios de transmisión y el pestillo. Puedes detenerla haciendo un movimiento o deshaciendo. Cambiar los datos del mecanismo reinicia automáticamente su vista previa para que no se conserve como resuelta una configuración diferente.
+
+La cerradura tiene cuatro ruedas, numeradas del exterior al interior, con ocho posiciones de 0 a 7. En **Configuración del juego** se editan el inicio, los objetivos y la transmisión inicial. Los campos actualizan la referencia ejecutable y muestran la distancia mínima, junto con el aviso de si basta una transmisión. Si editas directamente el JSON, usa **Recalcular solución de referencia**. El enunciado y las pistas se editan en sus campos habituales; la tercera pista añade una orientación calculada desde la partida actual.
+
+El inicio es **[4,0,0,0]**, con objetivos **[0,0,0,0]** y transmisión **A**. Requiere **16 giros mínimos**. Ni A ni B por sí solas alcanzan el objetivo. Aunque tres ruedas empiezan alineadas, hay que moverlas y volverlas a alinear. La búsqueda del juego cuenta cada giro como uno y el cambio de transmisión como cero. La prueba independiente recorre los **8192 estados** que incluyen las cuatro posiciones y el selector, con una búsqueda 0–1. La solución guardada contiene 16 giros, un cambio de transmisión y la apertura del pestillo.
+
+El estado conserva posiciones, transmisión, vueltas continuas, contador e historial. Deshacer restaura también los cambios de transmisión. El pestillo solo abre si coinciden las cuatro posiciones objetivo; entonces se entrega la llave del día 2, que sigue necesitando su fecha. La partida de Cintia y las pruebas del editor guardan su avance por separado. Los borradores antiguos de tres ruedas siguen siendo compatibles.
+
+Para entregar una copia incluye **cerradura-transmisiones.js** además de los archivos de la versión 4. Los respaldos incluyen la configuración y la solución de referencia. Ejecuta **node tests/cerradura-transmisiones.test.cjs** para verificar la búsqueda independiente, los movimientos, la apertura, la referencia, la exportación y la fecha de la llave.
+
+La cerradura nueva se ha instalado también en el calendario publicado de Vercel, conservando el identificador de partida y los capítulos 2–24. No hace falta preparar ni subir un archivo para ver esta actualización. Una recarga con Ctrl + F5 obtiene los archivos nuevos. Las ediciones posteriores que hagas en tu borrador siguen requiriendo preparar e instalar tu calendario-publicado.js.

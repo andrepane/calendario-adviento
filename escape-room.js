@@ -23,7 +23,7 @@
     anillos: 'Laberinto de anillos',
     engranajes: 'Mecanismo de engranajes',
     vitral: 'Vitral lunar',
-    cerradura: 'Cerradura de tres ruedas'
+    cerradura: 'Cerradura mecánica'
   };
   const texto = valor => typeof valor === 'string' ? valor : '';
   const lista = valor => Array.isArray(valor) ? valor.filter(item => typeof item === 'string') : [];

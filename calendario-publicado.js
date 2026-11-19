@@ -3,8 +3,8 @@ window.CALENDARIO_PUBLICADO = {
   "partida": "caja-adviento-v4",
   "capitulos": [
     {
-      "titulo": "La cerradura de las tres ruedas",
-      "instrucciones": "Alinea las tres muescas con el pestillo. Algunas ruedas arrastran a otras.",
+      "titulo": "La cerradura de las cuatro ruedas",
+      "instrucciones": "Las cuatro muescas deben coincidir con el pestillo. Cambia la transmisión para elegir qué ruedas arrastras. Cada giro prepara el siguiente.",
       "pregunta": "",
       "apoyo": "",
       "imagen": "",
@@ -20,7 +20,7 @@ window.CALENDARIO_PUBLICADO = {
       "transcripcion": "",
       "evidenciaDibujo": "",
       "evidenciaDatos": "",
-      "configuracion": "{\n  \"inicio\": [\n    3,\n    0,\n    3\n  ],\n  \"objetivos\": [\n    0,\n    0,\n    0\n  ]\n}",
+      "configuracion": "{\n  \"version\": 2,\n  \"inicio\": [\n    4,\n    0,\n    0,\n    0\n  ],\n  \"objetivos\": [\n    0,\n    0,\n    0,\n    0\n  ],\n  \"transmision\": \"A\",\n  \"solucion\": [\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"exterior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"exterior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"exterior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"exterior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"interior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"interior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"interior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"interior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"transmision\",\n      \"transmision\": \"B\"\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"exterior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"exterior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"exterior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"exterior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"interior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"interior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"interior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"giro\",\n      \"control\": \"interior\",\n      \"sentido\": -1\n    },\n    {\n      \"tipo\": \"abrir\"\n    }\n  ]\n}",
       "normalizacion": "",
       "tipo": "cerradura",
       "listo": true,
@@ -29,9 +29,9 @@ window.CALENDARIO_PUBLICADO = {
       "correcta": -1,
       "orden": [],
       "pistas": [
-        "La rueda exterior arrastra a la central. La central arrastra a la interior.",
-        "Empieza por la rueda exterior y termina por la interior.",
-        "Puedes retroceder. Cada pulso cuenta como un giro."
+        "Observa qué rueda solo puedes mover con la transmisión A.",
+        "La rueda exterior puede quedar alineada mientras sigues ajustando las otras.",
+        "Orientación calculada desde el estado actual."
       ],
       "dependencias": []
     },

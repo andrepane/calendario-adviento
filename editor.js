@@ -29,6 +29,7 @@
     ['campana3946', 'Campaña 3946 · versión 2'],
     ['mecanismos', 'Campaña de mecanismos · versión 3'],
     ['caja', 'La caja de Adviento · versión 4'],
+    ['transmisiones', 'Cerradura de transmisiones · versión 5'],
     ...copias.map(copia => [copia.id, copia.nombre])]);
   const abiertos = new Map();
   let espacio = leer(claveEspacio);
@@ -58,9 +59,11 @@
     const inicio=porId('inicio-final').value;
     const id=tipo==='final'?'final-'+inicio:tipo;
     const pruebas=leer(clave('escenas-previas'))??{};
+    if(tipo==='dia1'&&pruebas[id]?.configuracion!==datos.capitulos[0].configuracion)delete pruebas[id];
     if(reiniciar)delete pruebas[id];
     const estado=pruebas[id]??{resuelto:tipo==='final'&&inicio!=='antes',desenlace:{etapa:inicio==='paquete'?6:0}};
     pruebas[id]=estado;
+    if(tipo==='dia1')estado.configuracion=datos.capitulos[0].configuracion;
     const persistir=()=>guardar(clave('escenas-previas'),pruebas);
     if(tipo==='introduccion'){
       sesionPrueba={datos:structuredClone(datos),fecha:'2026-12-24',avance:ER.progreso(),temporal:true,movimientoReducido:porId('reducir-movimiento-pruebas').checked};
@@ -72,11 +75,12 @@
     porId('titulo-vista').textContent=reto.titulo;
     function dibujar(){
       ER.vista.renderizar(padre,reto,{
+        esEditor:true,
         ganadas:ER.evidencias(datos),resuelto:estado.resuelto,interaccion:estado.interaccion,
         experiencia:datos.experiencia,desenlace:estado.desenlace,
         guardarDesenlace:s=>{estado.desenlace=s;persistir();},
         guardarInteraccion:s=>{estado.interaccion=s;persistir();},
-        comprobar:respuesta=>{if(!ER.acertada(reto,respuesta))return false;estado.resuelto=true;persistir();dibujar();return true;},
+        comprobar:respuesta=>{if(!ER.acertada(reto,respuesta))return false;estado.resuelto=true;persistir();dibujar();padre.querySelector('.resultado-reto')?.focus({preventScroll:true});return true;},
         mensajeLlave:numero===1?'Has ganado la llave del día 2. Su fecha sigue siendo necesaria.':undefined,
         volverAJugar:()=>{estado.resuelto=false;delete estado.interaccion;persistir();dibujar();}
       });
@@ -96,6 +100,7 @@
   function leerBorrador(id = espacio) {
     try { return ER.calendario(leer(clave('borrador', id))); }
     catch {
+      if(id==='transmisiones')return ER.cerradura4.campana(abiertos.get('caja')?.datos??leer(clave('borrador','caja'))??window.CALENDARIO_PUBLICADO);
       if(id==='caja')return ER.experiencias.campana(abiertos.get('mecanismos')?.datos??leer(clave('borrador','mecanismos'))??window.CAMPANA_MECANISMOS);
       if(id==='mecanismos'){
         const nueva=ER.calendario(window.CAMPANA_MECANISMOS);
@@ -182,6 +187,7 @@
     porId('cargar-3946').hidden = id === 'campana3946';
     porId('cargar-mecanismos').hidden=id==='mecanismos';
     porId('cargar-caja').hidden=id==='caja';
+    porId('cargar-transmisiones').hidden=id==='transmisiones';
     mostrarExperienciaConfig();
     porId('volver-borradores').hidden = id === 'original';
     const original = (abiertos.get('original')?.datos ?? leerBorrador('original')).capitulos[0];
@@ -274,7 +280,23 @@
       panel.append(etiqueta);
       return entrada;
     }
-    if(campos.tipo.value==='cerradura'){
+    if(campos.tipo.value==='cerradura'&&config.version===2){
+      const resumen=document.createElement('p');
+      function distancia(){
+        const revision=ER.cerradura4.revision(config);
+        resumen.textContent=revision.error??('Distancia mínima comprobada: '+revision.minimo+' giros. '+(revision.soloA===null&&revision.soloB===null?'Ambas transmisiones son necesarias.':'Aviso: puede resolverse usando una sola transmisión.'));
+        if(!revision.error)config.solucion=revision.solucion;
+      }
+      for(const [campo,nombre]of [['inicio','Estado inicial, ruedas 1–4 (0–7)'],['objetivos','Posiciones objetivo, ruedas 1–4 (0–7)']]){
+        control(nombre,(config[campo]??[]).join(', '),'text',valor=>{config[campo]=valor.split(',').map(v=>Number(v.trim()));distancia();});
+      }
+      const transmision=document.createElement('label');transmision.textContent='Transmisión inicial';
+      const select=document.createElement('select');select.add(new Option('Transmisión A','A'));select.add(new Option('Transmisión B','B'));select.value=config.transmision;
+      select.addEventListener('change',()=>{config.transmision=select.value;distancia();campos.configuracion.value=JSON.stringify(config,null,2);campos.configuracion.dispatchEvent(new Event('input',{bubbles:true}));});transmision.append(select);panel.append(transmision);
+      const recalcular=document.createElement('button');recalcular.type='button';recalcular.className='control-reto';recalcular.textContent='Recalcular solución de referencia';
+      recalcular.addEventListener('click',()=>{distancia();campos.configuracion.value=JSON.stringify(config,null,2);campos.configuracion.dispatchEvent(new Event('input',{bubbles:true}));});
+      distancia();panel.append(resumen,recalcular);
+    }else if(campos.tipo.value==='cerradura'){
       const resumen=document.createElement('p');
       function distancia(){resumen.textContent=ER.experiencias.configValida(config)?'Distancia mínima comprobada: '+ER.experiencias.ruta(config).length+' giros.':'Usa tres números enteros entre 0 y 5.';}
       for(const [campo,nombre]of [['inicio','Estado inicial (exterior, central, interior; 0–5)'],['objetivos','Posiciones objetivo (exterior, central, interior; 0–5)']]){
@@ -518,6 +540,14 @@
     guardar(clave('borrador'),datos);
     anunciar('Versión 4 creada en un espacio separado. Los otros 23 capítulos conservan tus datos.');
   });
+  porId('cargar-transmisiones').addEventListener('click',()=>{
+    guardarDia();guardarExperienciaConfig();
+    if(!guardar(clave('borrador'),datos)){anunciar('No se pudo conservar el borrador. Exporta un respaldo antes de cambiar de versión.');return;}
+    hayCambios=false;
+    if(!leer(clave('borrador','transmisiones'))&&!abiertos.has('transmisiones'))abiertos.set('transmisiones',{datos:ER.cerradura4.campana(datos),dia:1});
+    elegirEspacio('transmisiones');guardar(clave('borrador'),datos);
+    anunciar('Versión 5 cargada en un espacio independiente. Previsualiza el día 1 para usar «Demostrar solución».');
+  });
   porId('actualizar-dia-8').addEventListener('click', () => {
     guardarDia();
     datos.capitulos[7] = ER.capitulo(structuredClone(window.CAMPANA_3946.capitulos[7]));
@@ -570,6 +600,7 @@
     }
     function dibujarVista(){
       ER.vista.renderizar(pruebaVista,reto,{
+        esEditor:true,
         ganadas,
         interaccion:estadoPrevio[dia],
         experiencia:datos.experiencia,
@@ -580,6 +611,7 @@
         comprobar:respuesta=>{
           if(!ER.acertada(reto,respuesta))return false;
           ER.vista.renderizar(pruebaVista,reto,{
+        esEditor:true,
             ganadas,
             resuelto:true,
             interaccion:estadoPrevio[dia],

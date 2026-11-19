@@ -160,7 +160,14 @@
       padre.append(consulta);
     }
 
-    let ayudaEspecial;
+    let ayudaEspecial,obtenerEstado;
+    function textoPista(i){
+      const texto=reto.pistas[i];
+      if(!resuelto&&i===2&&reto.tipo==='cerradura'&&ER.cerradura4){
+        try{const c=JSON.parse(reto.configuracion);if(c.version===2)return texto+' '+ER.cerradura4.pista(c,obtenerEstado?.());}catch{}
+      }
+      return texto;
+    }
     const estado = elemento('p', '', 'feedback-reto');
     estado.setAttribute('role', 'status');
     if (resuelto) {
@@ -225,6 +232,7 @@
         }
         const juego = ER.especiales.mostrar(formulario, reto, opciones);
         obtener = juego.obtener;
+        obtenerEstado=juego.obtener;
         ayudaEspecial = juego.ayuda;
         limpiezas.set(padre, juego.limpiar);
       } else {
@@ -252,11 +260,12 @@
     const aviso = elemento('p', '', 'solo-lector');
     aviso.setAttribute('role', 'status');
     let vistas = resuelto ? reto.pistas.length : Math.min(opciones.pistasVistas ?? 0, reto.pistas.length);
-    for (const pista of reto.pistas.slice(0, vistas)) lista.append(elemento('li', pista));
+    for (let i=0;i<vistas;i++) lista.append(elemento('li',textoPista(i)));
     const revelar = boton('Dame una pista', () => {
       if (vistas >= reto.pistas.length) return;
-      lista.append(elemento('li', reto.pistas[vistas]));
-      aviso.textContent = `Pista ${vistas + 1}: ${reto.pistas[vistas]}`;
+      const pista=textoPista(vistas);
+      lista.append(elemento('li',pista));
+      aviso.textContent = `Pista ${vistas + 1}: ${pista}`;
       vistas++;
       opciones.guardarPistas?.(vistas);
       revelar.textContent = vistas < reto.pistas.length ? 'Dame otra pista' : 'Has visto todas las pistas';

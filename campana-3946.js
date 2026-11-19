@@ -39,6 +39,18 @@
     respuestas: ['REFLEJO'], pistas: ['Un espejo puede deshacer lo que hizo otro.'],
     evidenciaTitulo: 'El espejo', evidenciaTexto: 'El espejo vuelve a aparecer más adelante.', evidenciaDibujo: 'espejo'
   });
+  reemplazar(8, {
+    titulo: 'El cuadro eléctrico',
+    instrucciones: 'El cuadro está averiado. Cada interruptor cambia su propia luz y las que tiene justo arriba, abajo, a izquierda y a derecha. Las diagonales quedan igual. Consigue apagar todo el panel utilizando como máximo cuatro interruptores distintos.',
+    tipo: 'electrico',
+    configuracion: JSON.stringify({ inicial: [3,5,7,9], maximo: 4 }, null, 2),
+    pistas: [
+      'El orden de los interruptores no cambia el resultado. Importa cuáles dejas seleccionados.',
+      'Necesitarás cuatro interruptores. Uno de ellos es el central.',
+      'Dos están en el centro de los bordes superior e izquierdo. El cuarto está en una esquina.'
+    ],
+    acierto: 'El cuadro está apagado. Ya tienes la llave del día 9.'
+  });
   reemplazar(9, {
     titulo: 'Cerradura de tres cifras',
     instrucciones: 'El código tiene tres cifras distintas. La primera no puede ser cero.',

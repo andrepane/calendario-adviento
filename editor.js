@@ -196,6 +196,47 @@
       panel.append(etiqueta);
       return entrada;
     }
+    if (campos.tipo.value === 'electrico') {
+      const grupo = document.createElement('fieldset');
+      grupo.className = 'config-luces';
+      const leyenda = document.createElement('legend');
+      leyenda.textContent = 'Luces encendidas al empezar';
+      grupo.append(leyenda);
+      const resumen = document.createElement('p');
+      resumen.setAttribute('role','status');
+      function informar() {
+        if (!ER.especiales.configuracionElectricaValida(config)) {
+          resumen.textContent = 'Configura nueve posiciones válidas y el límite de interruptores.';
+          return;
+        }
+        const soluciones = ER.especiales.solucionesElectricas(config);
+        resumen.textContent = soluciones.length === 1 ? 'Solución única dentro del límite elegido.'
+          : soluciones.length ? `${soluciones.length} soluciones dentro del límite elegido.`
+          : 'Este tablero no puede resolverse dentro del límite elegido.';
+      }
+      for (let n=1;n<=9;n++) {
+        const etiqueta = document.createElement('label');
+        const check = document.createElement('input');
+        check.type = 'checkbox';
+        check.checked = Array.isArray(config.inicial) && config.inicial.includes(n);
+        check.dataset.luz = n;
+        check.addEventListener('input',()=>{
+          config.inicial = [...grupo.querySelectorAll('input:checked')].map(c=>Number(c.dataset.luz));
+          campos.configuracion.value = JSON.stringify(config,null,2);
+          informar();
+        });
+        etiqueta.append(check,String(n));
+        grupo.append(etiqueta);
+      }
+      panel.append(grupo);
+      const maximo = control('Máximo de interruptores seleccionados',config.maximo,'number',valor=>{
+        config.maximo = Number(valor); informar();
+      });
+      maximo.min=1;
+      maximo.max=9;
+      panel.append(resumen);
+      informar();
+    }
     if (campos.tipo.value === 'ahorcado') {
       control('Palabra del ahorcado', config.palabra, 'text', valor => { config.palabra = valor.toUpperCase(); });
       const fallos = control('Fallos permitidos', config.fallos, 'number', valor => { config.fallos = Number(valor); });
@@ -368,6 +409,17 @@
     elegirEspacio('campana3946');
     if (!leer(clave('borrador'))) guardar(clave('borrador'), datos);
     anunciar('Campaña 3946 cargada como una versión nueva. El día 1 conserva tu reto personal si ya estaba guardado.');
+  });
+  porId('actualizar-dia-8').addEventListener('click', () => {
+    guardarDia();
+    datos.capitulos[7] = ER.capitulo(structuredClone(window.CAMPANA_3946.capitulos[7]));
+    dia = 8;
+    hayCambios = true;
+    hayRespaldo = false;
+    guardar(clave('dia'),dia);
+    cerrarPrueba();
+    mostrarDia();
+    anunciar('Día 8 actualizado en este borrador. Pulsa «Guardar borrador». Reinicia la partida de prueba para volver a jugarlo si ya estaba resuelto.');
   });
   porId('volver-borradores').addEventListener('click', () => {
     elegirEspacio('original');

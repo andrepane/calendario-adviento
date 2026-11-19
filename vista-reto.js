@@ -200,7 +200,8 @@
       }
       const comprobar = elemento('button', 'Comprobar', 'control-reto principal');
       comprobar.type = 'submit';
-      formulario.append(comprobar, estado);
+      if (reto.tipo !== 'electrico') formulario.append(comprobar);
+      formulario.append(estado);
       formulario.addEventListener('submit', evento => {
         evento.preventDefault();
         if (!opciones.comprobar?.(obtener())) {

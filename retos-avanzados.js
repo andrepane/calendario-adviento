@@ -1,12 +1,43 @@
 !function () {
   'use strict';
   const ER = window.EscapeRoom;
-  const tipos = ['anagrama','recorrido','ahorcado','ascensor','registro','nonograma','maquina','perforado','fragmentos'];
+  const tipos = ['anagrama','recorrido','ahorcado','ascensor','registro','nonograma','maquina','perforado','fragmentos','electrico'];
   const letras = texto => texto.normalize('NFD').replace(/\p{M}/gu, '').toUpperCase();
   const compactar = texto => letras(String(texto)).replace(/\s+/g, '');
   const configuracion = reto => JSON.parse(reto.configuracion);
   const esEspecial = tipo => tipos.includes(tipo);
   const lineas = filas => filas.map(fila => fila.trim().split(/\s+/));
+
+  function lucesElectricas(inicial, seleccionados) {
+    const luces = Array.from({length:9},(_,i)=>inicial.includes(i+1));
+    for (const numero of seleccionados) {
+      const y = Math.floor((numero-1)/3), x = (numero-1)%3;
+      for (const [dy,dx] of [[0,0],[-1,0],[1,0],[0,-1],[0,1]]) {
+        const fila = y+dy, columna = x+dx;
+        if (fila>=0 && fila<3 && columna>=0 && columna<3) {
+          const indice = fila*3+columna;
+          luces[indice] = !luces[indice];
+        }
+      }
+    }
+    return luces;
+  }
+
+  function solucionesElectricas(c) {
+    const soluciones = [];
+    for (let mascara=0;mascara<512;mascara++) {
+      const seleccionados = Array.from({length:9},(_,i)=>i+1).filter(n=>mascara & (1 << (n-1)));
+      if (seleccionados.length<=c.maximo && lucesElectricas(c.inicial,seleccionados).every(luz=>!luz)) {
+        soluciones.push(seleccionados);
+      }
+    }
+    return soluciones;
+  }
+
+  function configuracionElectricaValida(c) {
+    return Array.isArray(c.inicial) && c.inicial.every(n=>Number.isInteger(n)&&n>=1&&n<=9)
+      && new Set(c.inicial).size===c.inicial.length && Number.isInteger(c.maximo) && c.maximo>=1 && c.maximo<=9;
+  }
 
   function grupos(fila) {
     return fila.join('').split(/0+/).filter(Boolean).map(grupo => grupo.length);
@@ -25,6 +56,13 @@
     try { c = configuracion(reto); } catch { return ['revisa el JSON de configuración de la prueba']; }
     if (!c || typeof c !== 'object' || Array.isArray(c)) return ['la configuración debe ser un objeto'];
     const fallos = [];
+    if (reto.tipo === 'electrico') {
+      if (!configuracionElectricaValida(c)) {
+        fallos.push('configura las luces iniciales con posiciones del 1 al 9 y un límite de 1 a 9 interruptores');
+      } else if (!solucionesElectricas(c).length) {
+        fallos.push('el cuadro no puede apagarse dentro del límite de interruptores elegido');
+      }
+    }
     const matriz = (filas, binaria = false) => Array.isArray(filas) && filas.length >= 2 && filas.length <= 12
       && filas.every(fila => typeof fila === 'string' && (binaria ? /^[01]{2,12}$/.test(fila) : fila.trim()))
       && new Set(filas.map(fila => binaria ? fila.length : fila.trim().split(/\s+/).length)).size === 1;
@@ -85,7 +123,7 @@
           || !/^[a-g]+$/.test(f.segmentos)))) {
       fallos.push('revisa los fotogramas, duración y pausa del visor');
     }
-    if (!['ahorcado','nonograma','registro','maquina'].includes(reto.tipo) && !reto.respuestas.some(r=>r.trim())) {
+    if (!['ahorcado','nonograma','registro','maquina','electrico'].includes(reto.tipo) && !reto.respuestas.some(r=>r.trim())) {
       fallos.push('añade la respuesta válida de la prueba');
     }
     return fallos;
@@ -102,6 +140,12 @@
   function acertada(reto, respuesta) {
     if (errores(reto).length) return false;
     const c = configuracion(reto);
+    if (reto.tipo === 'electrico') {
+      return Array.isArray(respuesta) && respuesta.length<=c.maximo
+        && new Set(respuesta).size===respuesta.length
+        && respuesta.every(n=>Number.isInteger(n)&&n>=1&&n<=9)
+        && lucesElectricas(c.inicial,respuesta).every(luz=>!luz);
+    }
     if (reto.tipo === 'ahorcado') {
       const estado = estadoAhorcado(c, Array.isArray(respuesta) ? respuesta : []);
       return estado.ganada && !estado.perdida;
@@ -190,7 +234,85 @@
       return campo;
     };
 
-    if (reto.tipo === 'anagrama') {
+    if (reto.tipo === 'electrico') {
+      let seleccionados = Array.isArray(estado.seleccionados)
+        ? [...new Set(estado.seleccionados.filter(n=>Number.isInteger(n)&&n>=1&&n<=9))].slice(0,c.maximo) : [];
+      const guia = el('details','','guia-electrica');
+      const ejemplo = el('div','','ejemplo-electrico');
+      ejemplo.setAttribute('role','img');
+      ejemplo.setAttribute('aria-label','El interruptor central afecta a las posiciones 2, 4, 5, 6 y 8. Las esquinas no cambian.');
+      for (let n=1;n<=9;n++) {
+        const casilla = el('span',String(n));
+        if ([2,4,5,6,8].includes(n)) casilla.classList.add('afectada');
+        if (n===5) casilla.classList.add('centro');
+        ejemplo.append(casilla);
+      }
+      guia.append(el('summary','Cómo funciona un interruptor'),
+        el('p','Por ejemplo, el central cambia las cinco posiciones marcadas. En los bordes y las esquinas afecta a menos luces. Tocar de nuevo un interruptor deshace exactamente su efecto.'),ejemplo);
+      const panel = el('div','','cuadro-electrico');
+      panel.setAttribute('role','group');
+      panel.setAttribute('aria-label','Cuadro eléctrico de nueve luces, numeradas por filas');
+      const contador = el('p','','contador-electrico');
+      const aviso = el('p','','aviso-electrico');
+      aviso.setAttribute('role','status');
+      const controles = Array.from({length:9},(_,i) => {
+        const numero = i+1;
+        const b = boton('',()=>{
+          const posicion = seleccionados.indexOf(numero);
+          if (posicion>=0) seleccionados.splice(posicion,1);
+          else if (seleccionados.length<c.maximo) seleccionados.push(numero);
+          else {
+            aviso.textContent = `Ya hay ${c.maximo} interruptores seleccionados. Deselecciona uno para cambiarlo.`;
+            return;
+          }
+          aviso.textContent = '';
+          actualizar();
+          completar();
+        });
+        const numeroVisible = el('span',String(numero),'numero-interruptor');
+        const bombilla = document.createElementNS('http://www.w3.org/2000/svg','svg');
+        bombilla.setAttribute('viewBox','0 0 48 48');
+        bombilla.setAttribute('aria-hidden','true');
+        bombilla.classList.add('bombilla-electrica');
+        bombilla.innerHTML = '<path class="vidrio" d="M14 22a10 10 0 1 1 20 0c0 5-6 7-6 13h-8c0-6-6-8-6-13Z"/><path d="M20 36h8m-8 4h8m-7 3h6M21 24l3 5 3-5"/>';
+        const estadoLuz = el('span','','estado-luz');
+        const marca = el('span','','marca-interruptor');
+        marca.setAttribute('aria-hidden','true');
+        b.append(numeroVisible,bombilla,estadoLuz,marca);
+        b.dataset.interruptor = numero;
+        panel.append(b);
+        return b;
+      });
+      function actualizar() {
+        const luces = lucesElectricas(c.inicial,seleccionados);
+        controles.forEach((b,i)=>{
+          const seleccionado = seleccionados.includes(i+1);
+          b.classList.toggle('encendida',luces[i]);
+          b.classList.toggle('seleccionado',seleccionado);
+          b.setAttribute('aria-pressed',String(seleccionado));
+          b.setAttribute('aria-label',`Interruptor ${i+1}, luz ${luces[i] ? 'encendida' : 'apagada'}, ${seleccionado ? 'seleccionado' : 'sin seleccionar'}`);
+          b.querySelector('.estado-luz').textContent = luces[i] ? 'Encendida' : 'Apagada';
+          b.querySelector('.marca-interruptor').textContent = seleccionado ? '✓' : '';
+        });
+        contador.textContent = `Interruptores utilizados: ${seleccionados.length}/${c.maximo}`;
+        estado.seleccionados = [...seleccionados];
+        guardar();
+      }
+      let completado = false;
+      function completar() {
+        if (completado || !bloque.isConnected || !lucesElectricas(c.inicial,seleccionados).every(luz=>!luz)) return;
+        completado = Boolean(opciones.comprobar?.([...seleccionados]));
+        if (!completado) aviso.textContent = 'No se puede completar este reto en este momento.';
+      }
+      const reiniciar = boton('Reiniciar',()=>{
+        seleccionados = []; aviso.textContent=''; actualizar(); completar();
+      });
+      bloque.append(guia,panel,contador,aviso,reiniciar);
+      actualizar();
+      respuesta = () => [...seleccionados];
+      // Recupera también una partida cerrada entre el último toque y el guardado de la recompensa.
+      queueMicrotask(completar);
+    } else if (reto.tipo === 'anagrama') {
       const campo = responder();
       const fichas = el('div','','fichas-anagrama');
       const huecos = el('div','','huecos-anagrama');
@@ -477,5 +599,6 @@
     return { obtener:respuesta, ayuda, limpiar };
   }
 
-  ER.especiales={esEspecial,configuracion,errores,acertada,mostrar,estadoAhorcado,pistasNonograma};
+  ER.especiales={esEspecial,configuracion,errores,acertada,mostrar,estadoAhorcado,pistasNonograma,
+    lucesElectricas,solucionesElectricas,configuracionElectricaValida};
 }();

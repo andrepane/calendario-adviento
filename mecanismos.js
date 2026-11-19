@@ -57,124 +57,35 @@
     });
   }
 
-
-  const topologiasAnillos=new WeakMap();
-
-  function topologiaAnillos(c) {
-    if(topologiasAnillos.has(c))return topologiasAnillos.get(c);
-    const sectores=c.sectores,cantidad=c.anillos.length;
-    const pasillos=c.anillos.map(anillo=>{
-      const vecinos=Array.from({length:sectores},()=>[]);
-      for(const [a,b]of anillo.pasillos){
-        if(!vecinos[a].includes(b))vecinos[a].push(b);
-        if(!vecinos[b].includes(a))vecinos[b].push(a);
-      }
-      return vecinos;
-    });
-    const puertas=Array.from({length:cantidad+1},(_,i)=>({
-      id:'puerta-'+i,
-      afuera:i===0?{anillo:-1,sector:c.entrada}:{anillo:i-1,sector:c.anillos[i-1].salida},
-      dentro:i===cantidad?{anillo:cantidad,sector:0}:{anillo:i,sector:c.anillos[i].entrada}
-    }));
-    const t={sectores,cantidad,pasillos,puertas};
-    topologiasAnillos.set(c,t);return t;
-  }
-
-  function puertaAnillos(c,giros,puerta) {
-    const cantidad=c.anillos.length;
-    const angulo=p=>mod(p.sector+(p.anillo>=0&&p.anillo<cantidad?giros[p.anillo]:0),c.sectores);
-    const exterior=angulo(puerta.afuera);
-    const interior=puerta.dentro.anillo===cantidad?exterior:angulo(puerta.dentro);
-    return {...puerta,exterior,interior,abierta:exterior===interior};
-  }
-
-  function pasoAnillos(c,giros,bola,tipo,paso=0) {
-    const t=topologiaAnillos(c);
-    if(tipo==='andar'){
-      if(bola.anillo<0||bola.anillo>=t.cantidad)return null;
-      const sector=mod(bola.sector+paso,t.sectores);
-      return t.pasillos[bola.anillo][bola.sector].includes(sector)?{anillo:bola.anillo,sector}:null;
-    }
-    const i=tipo==='entrar'?bola.anillo+1:tipo==='salir'?bola.anillo:-1;
-    const puerta=t.puertas[i];
-    if(!puerta)return null;
-    const origen=tipo==='entrar'?puerta.afuera:puerta.dentro;
-    if(origen.anillo!==bola.anillo||origen.sector!==bola.sector)return null;
-    if(!puertaAnillos(c,giros,puerta).abierta)return null;
-    return {...(tipo==='entrar'?puerta.dentro:puerta.afuera)};
-  }
-
-  function redAnillos(c,s) {
-    const t=topologiaAnillos(c);
-    return {
-      ...t,
-      puertas:t.puertas.map(p=>puertaAnillos(c,s.giros,p)),
-      radios:c.anillos.map((_,i)=>165-i*40),
-      limites:Array.from({length:t.cantidad+1},(_,i)=>185-i*40),
-      centro:200,anchura:18,radioBola:6
-    };
-  }
-
   function moverAnillos(c,s,accion) {
+    const siguiente=structuredClone(s);
     if(accion.tipo==='girar'){
       const i=accion.anillo;
-      if(!Number.isInteger(i)||i<0||i>=c.anillos.length||![-1,1].includes(accion.paso))return null;
-      const siguiente=structuredClone(s);
       siguiente.rotaciones=[...(s.rotaciones??s.giros)];
       siguiente.rotaciones[i]+=accion.paso;
       siguiente.giros[i]=mod(s.giros[i]+accion.paso,c.sectores);
       return siguiente;
     }
-    if(accion.tipo==='andar'&&![-1,1].includes(accion.paso))return null;
-    const bola=pasoAnillos(c,s.giros,s.bola,accion.tipo,accion.paso);
-    return bola?{...structuredClone(s),bola}:null;
-  }
-
-  function claveAnillos(c,s) {
-    return s.giros.map(g=>mod(g,c.sectores)).join(',')+'|'+s.bola.anillo+','+s.bola.sector;
-  }
-
-  function buscarAnillos(c,origen,{auditar=false}={}) {
-    const n=c.sectores,k=c.anillos.length;
-    const posiciones=k*n+2,rotaciones=n**k,total=posiciones*rotaciones;
-    if(total>1500000)throw new Error('El laberinto supera el tamaño de búsqueda admitido.');
-    const potencias=Array.from({length:k},(_,i)=>n**i);
-    const codificarBola=b=>b.anillo<0?0:b.anillo===k?posiciones-1:1+b.anillo*n+b.sector;
-    const codificarGiros=giros=>giros.reduce((codigo,g,i)=>codigo+mod(g,n)*potencias[i],0);
-    const inicio=codificarGiros(origen.giros)*posiciones+codificarBola(origen.bola);
-    const padres=new Int32Array(total);padres.fill(-1);
-    const pasos=new Uint8Array(total),cola=new Uint32Array(total);
-    let cabeza=0,final=1,objetivo=-1;cola[0]=inicio;padres[inicio]=inicio;
-    const acciones=Array.from({length:k},(_,i)=>[{tipo:'girar',anillo:i,paso:-1},{tipo:'girar',anillo:i,paso:1}]).flat();
-    acciones.push({tipo:'andar',paso:-1},{tipo:'andar',paso:1},{tipo:'entrar'},{tipo:'salir'});
-    const giros=Array(k).fill(0);
-    function agregar(id,anterior,accion){
-      if(padres[id]!==-1)return;
-      padres[id]=anterior;pasos[id]=accion;cola[final++]=id;
+    const bola=s.bola;
+    if(accion.tipo==='entrar'){
+      if(bola.anillo===-1){
+        if(mod(c.anillos[0].entrada+s.giros[0],c.sectores)!==c.entrada)return null;
+        siguiente.bola={anillo:0,sector:c.anillos[0].entrada};return siguiente;
+      }
+      const anillo=c.anillos[bola.anillo];
+      if(bola.sector!==anillo.salida)return null;
+      if(bola.anillo===c.anillos.length-1){siguiente.bola={anillo:c.anillos.length,sector:0};return siguiente;}
+      const vecino=c.anillos[bola.anillo+1];
+      if(mod(anillo.salida+s.giros[bola.anillo],c.sectores)!==mod(vecino.entrada+s.giros[bola.anillo+1],c.sectores))return null;
+      siguiente.bola={anillo:bola.anillo+1,sector:vecino.entrada};return siguiente;
     }
-    while(cabeza<final){
-      const id=cola[cabeza++],rot=Math.floor(id/posiciones),b=id%posiciones;
-      if(b===posiciones-1){
-        if(objetivo<0)objetivo=id;
-        if(!auditar)break;
-      }
-      let tmp=rot;
-      for(let i=0;i<k;i++){giros[i]=tmp%n;tmp=Math.floor(tmp/n);}
-      for(let i=0;i<k;i++){
-        agregar((rot+(mod(giros[i]-1,n)-giros[i])*potencias[i])*posiciones+b,id,i*2);
-        agregar((rot+(mod(giros[i]+1,n)-giros[i])*potencias[i])*posiciones+b,id,i*2+1);
-      }
-      const bola=b===0?{anillo:-1,sector:c.entrada}:{anillo:Math.floor((b-1)/n),sector:(b-1)%n};
-      for(let a=k*2;a<acciones.length;a++){
-        const movimiento=acciones[a],destino=pasoAnillos(c,giros,bola,movimiento.tipo,movimiento.paso);
-        if(destino)agregar(rot*posiciones+codificarBola(destino),id,a);
-      }
+    if(accion.tipo==='andar'&&bola.anillo>=0&&bola.anillo<c.anillos.length){
+      const destino=mod(bola.sector+accion.paso,c.sectores);
+      const conectado=c.anillos[bola.anillo].pasillos.some(([a,b])=>(a===bola.sector&&b===destino)||(b===bola.sector&&a===destino));
+      if(!conectado)return null;
+      siguiente.bola.sector=destino;return siguiente;
     }
-    if(objetivo<0)return {acciones:null,visitados:cabeza};
-    const ruta=[];
-    for(let id=objetivo;id!==inicio;id=padres[id])ruta.push(acciones[pasos[id]]);
-    return {acciones:ruta.reverse(),visitados:cabeza,
-      ...(auditar?{alcanzables:Uint8Array.from(padres,p=>p!==-1?1:0)}:{})};
+    return null;
   }
 
   function girarEngranajes(c,s,paso) {
@@ -245,7 +156,7 @@
   function inicial(tipo,c) {
     if(tipo==='tuberias')return {giros:c.piezas.map(p=>p.giro??0)};
     if(tipo==='mantenimiento')return {piso:c.inicio,ruta:[]};
-    if(tipo==='anillos')return {giros:[...c.giros],bola:{anillo:-1,sector:c.entrada},seleccionado:0};
+    if(tipo==='anillos')return {giros:[...c.giros],bola:{anillo:-1,sector:c.entrada}};
     if(tipo==='engranajes')return {posiciones:[...c.inicio],embrague:true};
     if(tipo==='vitral')return {discos:[0,1],giros:[0,0,0,0],modelos:{}};
     return {codigo:''};
@@ -281,13 +192,6 @@
       if(tipo==='mantenimiento'&&(!Number.isInteger(c.limite)||!rutaAscensor(c)))return ['el ascensor no llega al destino dentro del límite'];
       if(tipo==='diagnostico'&&(c.visores.length!==4||c.visores.some(v=>!candidatasVisor(v)||candidatasVisor(v).length!==1)))return ['cada visor y su diagnóstico deben identificar una sola cifra'];
       if(tipo==='anillos'){
-        if(!Number.isInteger(c.sectores)||c.sectores!==12||c.anillos.length!==4
-          ||!Array.isArray(c.giros)||c.giros.length!==4||c.giros.some(g=>!Number.isInteger(g))
-          ||!Number.isInteger(c.entrada)||c.entrada<0||c.entrada>=c.sectores
-          ||c.anillos.some(a=>![a.entrada,a.salida].every(v=>Number.isInteger(v)&&v>=0&&v<c.sectores)
-            ||!Array.isArray(a.pasillos)||a.pasillos.some(p=>!Array.isArray(p)||p.length!==2
-              ||!p.every(v=>Number.isInteger(v)&&v>=0&&v<c.sectores)
-              ||![1,c.sectores-1].includes(Math.abs(p[0]-p[1])))))return ['configura cuatro anillos de doce posiciones con pasillos entre sectores vecinos'];
         let s=inicial(tipo,c);
         for(const a of c.solucion){s=moverAnillos(c,s,a);if(!s)return ['la solución de los anillos atraviesa una pared o una puerta desconectada'];}
         if(s.bola.anillo!==c.anillos.length)return ['la solución de los anillos no llega al centro'];
@@ -309,7 +213,7 @@
   }
 
   ER.mecanismos={tipos,digitos,mod,flujo,moverAscensor,rutaAscensor,candidatasVisor,moverAnillos,girarEngranajes,
-    superponer,resolverNonograma,inicial,completa,errores,topologiaAnillos,puertaAnillos,pasoAnillos,redAnillos,claveAnillos,buscarAnillos};
+    superponer,resolverNonograma,inicial,completa,errores};
 }();
 
 !function(){
@@ -358,7 +262,6 @@
       historial.push(structuredClone(s));s=M.inicial(tipo,c);aviso.textContent='Mecanismo reiniciado.';actualizar();
     });
     let dibujar=()=>{};
-    let demostrar=null,ayuda=null,limpiarExtra=()=>{};
     function actualizar(){
       dibujar();deshacer.disabled=!historial.length;persistir();
     }
@@ -462,170 +365,80 @@
         completar();
       }));
     }else if(tipo==='anillos'){
-      const dibujo=svg('svg',{viewBox:'0 0 400 400',class:'laberinto-anillos','aria-label':'Laberinto. Usa los controles para avanzar y cruzar puertas.'});
-      const fondos=svg('g'),pasillos=svg('g'),paredes=svg('g'),puertas=svg('g');
-      const bolita=svg('circle',{r:6,class:'bolita-anillos'});
-      dibujo.append(fondos,pasillos,paredes,puertas,bolita);
-      const red=M.redAnillos(c,s),centro=red.centro;
+      const tam=360,centro=180;
+      const dibujo=svg('svg',{viewBox:'0 0 360 360',class:'laberinto-anillos'});
+      const grupos=[],bolita=svg('circle',{r:6,class:'bolita-anillos'});
       const punto=(r,sector)=>[centro+r*Math.sin(sector*2*Math.PI/c.sectores),centro-r*Math.cos(sector*2*Math.PI/c.sectores)];
-      const hora=sector=>String(M.mod(sector,c.sectores)||12)+' h';
-      const instruccion=el('p','Avanzar mueve la bola una posición por el pasillo. Llega a la salida de tu anillo, alinea ambas puertas y pulsa «Cruzar hacia el centro». «Cruzar hacia fuera» permite volver por una puerta abierta. La bola viaja con el anillo ocupado si lo giras.');
-      const estadoBola=el('p','','estado-anillos');estadoBola.setAttribute('role','status');
-      const conexiones=el('ul','','conexiones-anillos');
-      pantalla.append(instruccion,dibujo,estadoBola,conexiones);
-      const grupos=[],fondosAnillos=[];
-      s.seleccionado=Number.isInteger(s.seleccionado)?s.seleccionado:Math.max(0,Math.min(c.anillos.length-1,s.bola.anillo));
       for(let i=0;i<c.anillos.length;i++){
-        const r=red.radios[i],fondo=svg('circle',{cx:centro,cy:centro,r,fill:'none','stroke-width':40,class:'fondo-anillo'});
-        fondos.append(fondo);fondosAnillos.push(fondo);
-        const grupo=svg('g',{class:'anillo-giratorio'}),nodos=new Set([red.puertas[i].dentro.sector,red.puertas[i+1].afuera.sector]);
-        red.pasillos[i].forEach((vecinos,a)=>{
-          for(const b of vecinos){
-            nodos.add(a);nodos.add(b);if(a>b)continue;
-            const [x1,y1]=punto(r,a),[x2,y2]=punto(r,b),sentido=M.mod(b-a,c.sectores)===1?1:0;
-            grupo.append(svg('path',{d:'M'+x1+' '+y1+'A'+r+' '+r+' 0 0 '+sentido+' '+x2+' '+y2,class:'pasillo-anillo'}));
-          }
-        });
-        for(const sector of nodos){
-          const [cx,cy]=punto(r,sector);grupo.append(svg('circle',{cx,cy,r:red.anchura/2,class:'nodo-anillo'}));
+        const r=155-i*36,g=svg('g',{class:'anillo-giratorio'});
+        g.append(svg('circle',{cx:centro,cy:centro,r,fill:'none',stroke:'#564b3b','stroke-width':29}));
+        for(let a=0;a<c.sectores;a++){
+          const ang=a+0.5,[x1,y1]=punto(r-14,ang),[x2,y2]=punto(r+14,ang);
+          g.append(svg('line',{x1,y1,x2,y2,stroke:'#a18966','stroke-width':2}));
         }
-        for(const [tipoPuerta,sector]of [['entrada',red.puertas[i].dentro.sector],['salida',red.puertas[i+1].afuera.sector]]){
-          const [x1,y1]=punto(r,sector),[x2,y2]=punto(r+(tipoPuerta==='entrada'?20:-20),sector);
-          grupo.append(svg('path',{d:'M'+x1+' '+y1+'L'+x2+' '+y2,class:'pasillo-anillo puerta-media'}));
+        for(const [a,b]of c.anillos[i].pasillos){
+          const [x1,y1]=punto(r,a),[x2,y2]=punto(r,b);
+          const adelante=M.mod(b-a,c.sectores)===1;
+          g.append(svg('path',{d:`M${x1} ${y1}A${r} ${r} 0 0 ${adelante?1:0} ${x2} ${y2}`,fill:'none',stroke:'#eed8ac','stroke-width':13,'stroke-linecap':'round'}));
         }
-        pasillos.append(grupo);grupos.push(grupo);
+        for(const [tipoPuerta,valor]of [['entrada',c.anillos[i].entrada],['salida',c.anillos[i].salida]]){
+          const [x1,y1]=punto(tipoPuerta==='entrada'?r+15:r-15,valor);
+          const [x2,y2]=punto(r,valor);
+          g.append(svg('line',{x1,y1,x2,y2,stroke:tipoPuerta==='entrada'?'#a3bba1':'#e1b461','stroke-width':10}));
+        }
+        dibujo.append(g);grupos.push(g);
+      }
+      const puentes=svg('g',{class:'puentes-anillos'});
+      dibujo.append(svg('circle',{cx:180,cy:180,r:22,fill:'#e2bd78'}),puentes,bolita);
+      const estadoBola=el('p');pantalla.append(dibujo,estadoBola);
+      for(let i=0;i<c.anillos.length;i++){
         const fila=el('div','','control-anillo');
-        const elegir=boton('Anillo '+(i+1),()=>{s.seleccionado=i;actualizar();});
-        elegir.dataset.seleccionarAnillo=i;
-        const izquierda=boton('↶',()=>accion({tipo:'girar',anillo:i,paso:-1}));
-        const derecha=boton('↷',()=>accion({tipo:'girar',anillo:i,paso:1}));
-        izquierda.setAttribute('aria-label','Girar anillo '+(i+1)+' a la izquierda');
-        derecha.setAttribute('aria-label','Girar anillo '+(i+1)+' a la derecha');
-        izquierda.dataset.giro=-1;derecha.dataset.giro=1;fila.dataset.anillo=i;
-        fila.append(elegir,izquierda,derecha);controles.append(fila);
+        fila.append(el('span','Anillo '+(i+1)),
+          boton('↶',()=>accion({tipo:'girar',anillo:i,paso:-1})),boton('↷',()=>accion({tipo:'girar',anillo:i,paso:1})));
+        fila.children[1].setAttribute('aria-label',`Girar anillo ${i+1} a la izquierda`);
+        fila.children[2].setAttribute('aria-label',`Girar anillo ${i+1} a la derecha`);
+        controles.append(fila);
       }
-      for(const r of red.limites)paredes.append(svg('circle',{cx:centro,cy:centro,r,class:'pared-circular'}));
-      fondos.append(svg('circle',{cx:centro,cy:centro,r:20,class:'centro-laberinto'}));
-      const atras=boton('Avanzar ↶',()=>accion({tipo:'andar',paso:-1}));
-      const adelante=boton('Avanzar ↷',()=>accion({tipo:'andar',paso:1}));
-      const entrar=boton('Cruzar hacia el centro',()=>accion({tipo:'entrar'}));
-      const salir=boton('Cruzar hacia fuera',()=>accion({tipo:'salir'}));
-      atras.dataset.movimiento='antihorario';adelante.dataset.movimiento='horario';
-      entrar.dataset.movimiento='entrar';salir.dataset.movimiento='salir';
-      controles.append(atras,adelante,entrar,salir);
-      let enDemostracion=false,ruta=[],cursor=0,esperada='',temporizador,running=false,visitados=0;
-      const panelDemo=el('section','','demo-anillos');panelDemo.hidden=true;
-      const resumenDemo=el('p');resumenDemo.setAttribute('role','status');
-      const avanzarDemo=boton('Paso siguiente',()=>{pausar();pasoDemo();});
-      const reproducir=boton('Reproducir',()=>{
-        if(running){pausar();return;}
-        if(!ruta.length||cursor>=ruta.length)calcular();
-        if(!ruta.length)return;
-        running=true;reproducir.textContent='Pausa';reproducir.setAttribute('aria-pressed','true');reproducirPaso();
-      });
-      const recalcular=boton('Calcular desde aquí',()=>calcular()),listaDemo=el('ol','','ruta-demo');
-      panelDemo.append(el('h3','Demostrar solución'),resumenDemo,avanzarDemo,reproducir,recalcular,listaDemo);
-      function descripcion(a){
-        if(a.tipo==='girar')return 'Girar anillo '+(a.anillo+1)+' una posición a la '+(a.paso===-1?'izquierda':'derecha');
-        if(a.tipo==='andar')return 'Avanzar una posición en sentido '+(a.paso===1?'horario':'antihorario');
-        return a.tipo==='entrar'?'Cruzar hacia el centro':'Cruzar hacia fuera';
-      }
-      function pausar(){
-        clearTimeout(temporizador);running=false;reproducir.textContent='Reproducir';reproducir.setAttribute('aria-pressed','false');
-      }
-      function actualizarDemo(){
-        avanzarDemo.disabled=!ruta.length||cursor>=ruta.length;
-        resumenDemo.textContent=ruta.length?'Paso '+cursor+'/'+ruta.length+'. '+(cursor<ruta.length?'Siguiente: '+descripcion(ruta[cursor]):'Ruta completada.')+' Estados explorados: '+visitados+'.':'Calcula una ruta desde la posición actual.';
-        for(const [i,nodo]of [...listaDemo.children].entries())nodo.classList.toggle('paso-ejecutado',i<cursor);
-      }
-      function calcular(){
-        pausar();
-        const resultado=M.buscarAnillos(c,s);ruta=resultado.acciones??[];visitados=resultado.visitados;cursor=0;esperada=M.claveAnillos(c,s);
-        listaDemo.replaceChildren(...ruta.map(a=>el('li',descripcion(a))));actualizarDemo();
-      }
-      function pasoDemo(){
-        if(!ruta.length||cursor>=ruta.length)return false;
-        if(M.claveAnillos(c,s)!==esperada){calcular();return false;}
-        enDemostracion=true;const valido=accion(ruta[cursor]);enDemostracion=false;
-        if(!valido){pausar();aviso.textContent='La ruta cambió. Calcula una nueva demostración.';return false;}
-        cursor++;esperada=M.claveAnillos(c,s);actualizarDemo();return true;
-      }
-      function reproducirPaso(){
-        if(!running||!contenedor.isConnected||document.hidden){pausar();return;}
-        if(!pasoDemo()||cursor>=ruta.length){pausar();return;}
-        temporizador=setTimeout(reproducirPaso,700);
-      }
-      demostrar=()=>{
-        panelDemo.hidden=false;if(!panelDemo.isConnected)contenedor.append(panelDemo);
-        calcular();panelDemo.scrollIntoView({block:'nearest'});
-      };
-      ayuda=()=>boton('Demostrar solución desde aquí',()=>demostrar());
-      const visibilidad=()=>{if(document.hidden)pausar();};
-      document.addEventListener('visibilitychange',visibilidad);
-      limpiarExtra=()=>{pausar();document.removeEventListener('visibilitychange',visibilidad);};
       function accion(a){
-        const siguiente=M.moverAnillos(c,s,a);
-        if(!siguiente){
-          aviso.textContent=a.tipo==='andar'?'En esa dirección hay una pared. Prueba el otro sentido.':'Para cruzar, coloca la bola en la puerta y alinea las dos aberturas.';
-          return false;
-        }
         actuar(actual=>{
-          siguiente.acciones=[...(actual.acciones??[]),a];
-          if(a.tipo==='girar')siguiente.seleccionado=a.anillo;
-          aviso.textContent='';return siguiente;
+          const sig=M.moverAnillos(c,actual,a);
+          if(!sig){aviso.textContent='Hay una pared o las puertas no están conectadas.';return null;}
+          sig.acciones=[...(actual.acciones??[]),a];aviso.textContent='';return sig;
         });
-        return true;
       }
+      controles.append(boton('Avanzar ↶',()=>accion({tipo:'andar',paso:-1})),
+        boton('Avanzar ↷',()=>accion({tipo:'andar',paso:1})),boton('Entrar hacia el centro',()=>accion({tipo:'entrar'})));
       let inicioPuntero;
-      dibujo.style.touchAction='none';
+      dibujo.style.touchAction='pan-y';
       dibujo.addEventListener('pointerdown',e=>{
-        const rect=dibujo.getBoundingClientRect(),x=(e.clientX-rect.left)/rect.width*400-centro,y=(e.clientY-rect.top)/rect.height*400-centro;
-        const i=Math.round((red.radios[0]-Math.hypot(x,y))/40);
-        if(i<0||i>=c.anillos.length)return;
-        s.seleccionado=i;actualizar();
-        inicioPuntero={angulo:Math.atan2(y,x),anillo:i,x:e.clientX,y:e.clientY};
-        try{dibujo.setPointerCapture(e.pointerId);}catch{}
+        const rect=dibujo.getBoundingClientRect();
+        const x=(e.clientX-rect.left)/rect.width*360-180,y=(e.clientY-rect.top)/rect.height*360-180;
+        const r=Math.hypot(x,y),i=Math.round((155-r)/36);
+        if(i>=0&&i<4)inicioPuntero={x:e.clientX,y:e.clientY,anillo:i};
       });
       dibujo.addEventListener('pointerup',e=>{
         if(!inicioPuntero)return;
-        const rect=dibujo.getBoundingClientRect(),x=(e.clientX-rect.left)/rect.width*400-centro,y=(e.clientY-rect.top)/rect.height*400-centro;
-        const dif=Math.atan2(Math.sin(Math.atan2(y,x)-inicioPuntero.angulo),Math.cos(Math.atan2(y,x)-inicioPuntero.angulo));
-        if(Math.hypot(e.clientX-inicioPuntero.x,e.clientY-inicioPuntero.y)>18&&Math.abs(dif)>.1)accion({tipo:'girar',anillo:inicioPuntero.anillo,paso:dif>0?1:-1});
+        const dx=e.clientX-inicioPuntero.x,dy=e.clientY-inicioPuntero.y;
+        if(Math.hypot(dx,dy)>22)accion({tipo:'girar',anillo:inicioPuntero.anillo,paso:dx>=0?1:-1});
         inicioPuntero=null;
       });
-      dibujo.addEventListener('pointercancel',()=>{inicioPuntero=null;});
       dibujar=()=>{
-        const actual=M.redAnillos(c,s);
-        if(!Number.isInteger(s.seleccionado)||s.seleccionado<0||s.seleccionado>=c.anillos.length)s.seleccionado=Math.max(0,Math.min(c.anillos.length-1,s.bola.anillo));
-        if(!enDemostracion&&ruta.length&&esperada&&M.claveAnillos(c,s)!==esperada){
-          pausar();ruta=[];cursor=0;listaDemo.replaceChildren();actualizarDemo();
+        grupos.forEach((g,i)=>{g.style.transform=`rotate(${(s.rotaciones??s.giros)[i]*360/c.sectores}deg)`;});
+        puentes.replaceChildren();
+        function puente(r1,r2,sector){
+          const [x1,y1]=punto(r1,sector),[x2,y2]=punto(r2,sector);
+          puentes.append(svg('line',{x1,y1,x2,y2,stroke:'#d9bc7d','stroke-width':10}));
         }
-        grupos.forEach((g,i)=>{
-          g.style.transformOrigin=centro+'px '+centro+'px';
-          g.style.transform='rotate('+((s.rotaciones??s.giros)[i]*360/c.sectores)+'deg)';
-          g.classList.toggle('anillo-ocupado',s.bola.anillo===i);
-          fondosAnillos[i].classList.toggle('anillo-seleccionado',s.seleccionado===i);
-          const b=controles.querySelector('[data-seleccionar-anillo="'+i+'"]');
-          b.textContent=(s.seleccionado===i?'✓ ':'')+'Anillo '+(i+1)+(s.bola.anillo===i?' · bola':'');
-          b.setAttribute('aria-pressed',String(s.seleccionado===i));
-        });
-        puertas.replaceChildren();conexiones.replaceChildren();
-        for(const p of actual.puertas){
-          if(p.abierta){
-            const r1=p.afuera.anillo<0?194:actual.radios[p.afuera.anillo],r2=p.dentro.anillo===c.anillos.length?0:actual.radios[p.dentro.anillo];
-            const [x1,y1]=punto(r1,p.exterior),[x2,y2]=punto(r2,p.interior);
-            const paso=svg('path',{d:'M'+x1+' '+y1+'L'+x2+' '+y2,class:'paso-abierto','data-puerta':p.id});
-            paso.dataset.anchura=actual.anchura;puertas.append(paso);
-          }
-          if(p.afuera.anillo>=0&&p.dentro.anillo<c.anillos.length){
-            conexiones.append(el('li','Anillos '+(p.afuera.anillo+1)+' → '+(p.dentro.anillo+1)+': '+(p.abierta?'paso abierto a las '+hora(p.exterior):'cerrado. Salida '+hora(p.exterior)+'; entrada '+hora(p.interior))));
-          }
+        if(M.mod(c.anillos[0].entrada+s.giros[0],c.sectores)===c.entrada)puente(174,170,c.entrada);
+        for(let n=0;n<c.anillos.length-1;n++){
+          const salida=M.mod(c.anillos[n].salida+s.giros[n],c.sectores);
+          if(salida===M.mod(c.anillos[n+1].entrada+s.giros[n+1],c.sectores))puente(155-n*36-15,155-(n+1)*36+15,salida);
         }
-        const i=s.bola.anillo,r=i<0?194:i>=c.anillos.length?0:actual.radios[i],sector=i<0?c.entrada:s.bola.sector+(s.giros[i]??0);
+        puente(155-(c.anillos.length-1)*36-15,20,M.mod(c.anillos.at(-1).salida+s.giros.at(-1),c.sectores));
+        const i=s.bola.anillo,r=i<0?174:i>=4?0:155-i*36;
+        const sector=i<0?c.entrada:s.bola.sector+(s.giros[i]??0);
         const [x,y]=punto(r,sector);bolita.setAttribute('cx',x);bolita.setAttribute('cy',y);
-        estadoBola.textContent=(i<0?'Bola en la entrada exterior.':i>=c.anillos.length?'Bola en el centro.':'Bola en el anillo '+(i+1)+', a las '+hora(sector)+'.')+' Seleccionado para girar: anillo '+(s.seleccionado+1)+'.';
-        atras.disabled=!M.pasoAnillos(c,s.giros,s.bola,'andar',-1);adelante.disabled=!M.pasoAnillos(c,s.giros,s.bola,'andar',1);
-        entrar.disabled=!M.pasoAnillos(c,s.giros,s.bola,'entrar');salir.disabled=!M.pasoAnillos(c,s.giros,s.bola,'salir');
+        estadoBola.textContent=i<0?'Bolita en la entrada exterior.':i>=4?'Bolita en el centro.':'Bolita en el anillo '+(i+1)+'.';
       };
     }else if(tipo==='engranajes'){
       const tapa=el('div','','tapa-espejo');tapa.append(ER.recursos.svg('espejo'),el('span','Compartimento del espejo'));
@@ -717,7 +530,7 @@
     contenedor.append(pantalla,controles,herramientas,aviso);padre.append(contenedor);
     try{actualizar();}catch{s=M.inicial(tipo,c);historial=[];actualizar();}
     queueMicrotask(completar);
-    return {obtener:()=>structuredClone(s),limpiar:limpiarExtra,ayuda,demostrar};
+    return {obtener:()=>structuredClone(s),limpiar:()=>{},ayuda:null};
   }
   M.mostrar=mostrar;
 }();

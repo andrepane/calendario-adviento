@@ -337,7 +337,6 @@
   }
 
   function actualizarVistaEditor() {
-    porId('demostrar-anillos').hidden=campos.tipo.value!=='anillos';
     porId('configuracion-especial').hidden = !ER.especiales.esEspecial(campos.tipo.value);
     for (const panel of formulario.querySelectorAll('[data-tipo]')) {
       panel.hidden = panel.dataset.tipo !== campos.tipo.value;
@@ -512,15 +511,6 @@
     if (vista.open) return;
     ER.vista.limpiar(porId('contenido-vista'));
     porId('contenido-vista').replaceChildren();
-  });
-  porId('demostrar-anillos').addEventListener('click',()=>{
-    const previas=leer(clave('previas'))??{};
-    if(previas[dia]?.actual?.bola?.anillo===4){
-      delete previas[dia];
-      guardar(clave('previas'),previas);
-    }
-    porId('previsualizar').click();
-    if(!ER.vista.demostrar(porId('contenido-vista')))anunciar('Revisa la configuración del laberinto antes de demostrar la solución.');
   });
 
   fecha.addEventListener('change', () => {

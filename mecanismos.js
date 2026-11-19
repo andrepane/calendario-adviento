@@ -95,6 +95,14 @@
     return {...s,posiciones,vueltas,arrastre:(s.arrastre??0)+paso};
   }
 
+  function marcasEngranajes(c,s) {
+    return c.dientes.map((dientes,i)=>{
+      const posicion=mod(s.posiciones[i],dientes),objetivo=mod(c.objetivos[i],dientes);
+      return {posicion,objetivo,angulo:posicion*360/dientes,anguloObjetivo:objetivo*360/dientes,
+        alineada:posicion===objetivo};
+    });
+  }
+
   function superponer(c,s) {
     const elegidos=s.discos;
     if(!Array.isArray(elegidos)||elegidos.length!==2||new Set(elegidos).size!==2)return null;
@@ -177,7 +185,8 @@
       for(const accion of s.acciones){actual=moverAnillos(c,actual,accion);if(!actual)return false;}
       return actual.bola.anillo===c.anillos.length;
     }
-    if(tipo==='engranajes')return Array.isArray(s?.posiciones)&&igual(s.posiciones,c.objetivos);
+    if(tipo==='engranajes')return Array.isArray(s?.posiciones)&&s.posiciones.length===3
+      &&s.posiciones.every(Number.isInteger)&&marcasEngranajes(c,s).every(m=>m.alineada);
     if(tipo==='vitral')return c.modelos.every(m=>s?.modelos?.[m.id]&&igual(superponer(c,s.modelos[m.id]),m.opaco));
     return false;
   }
@@ -199,6 +208,8 @@
       if(tipo==='engranajes'){
         let s=inicial(tipo,c);
         if(c.dientes.length!==3||c.dientes.some(n=>!Number.isInteger(n)||n<8||n>48))return ['configura tres cantidades de dientes entre 8 y 48'];
+        if([c.inicio,c.objetivos].some(valores=>!Array.isArray(valores)||valores.length!==3
+          ||valores.some((v,i)=>!Number.isInteger(v)||v<0||v>=c.dientes[i])))return ['las posiciones iniciales y las marcas objetivo deben estar entre 0 y el número de dientes menos uno'];
         for(const a of c.solucion)s=a==='embrague'?{...s,embrague:!s.embrague}:girarEngranajes(c,s,a);
         if(!completa(tipo,c,s))return ['la secuencia de referencia no alinea los engranajes'];
       }
@@ -213,7 +224,7 @@
   }
 
   ER.mecanismos={tipos,digitos,mod,flujo,moverAscensor,rutaAscensor,candidatasVisor,moverAnillos,girarEngranajes,
-    superponer,resolverNonograma,inicial,completa,errores};
+    superponer,resolverNonograma,inicial,completa,errores,marcasEngranajes};
 }();
 
 !function(){
@@ -241,6 +252,68 @@
     }
     dibujo.append(svg('circle',{cx:50,cy:50,r:45,fill:'none',stroke:'#8b704e','stroke-width':3}));
     return dibujo;
+  }
+
+  function esquemaEngranajes(c){
+    const dibujo=svg('svg',{class:'engranajes-svg','aria-label':'Tres ruedas con marca móvil roja y muesca fija. Cada marca debe coincidir con la muesca de su propia rueda.'});
+    const radios=c.dientes.map(n=>n*4.6667);
+    const xs=[radios[0]+20,radios[0]*2+radios[1]+20,radios[0]*2+radios[1]*2+radios[2]+20],ruedas=[];
+    const maximo=Math.max(...radios);
+    const arriba=Math.min(0,125-maximo);
+    dibujo.setAttribute('viewBox','0 '+arriba+' '+(xs[2]+radios[2]+20)+' '+(140+maximo+58-arriba));
+    const objetivos=svg('g',{class:'objetivos-fijos'});
+    const uniones=[],marcasFijas=[],estados=[];
+    let nucleo;
+    c.dientes.forEach((dientes,i)=>{
+      const r=radios[i],grupo=svg('g',{class:'rueda-dentada','data-rueda':i});
+      const puntos=[];
+      for(let p=0;p<dientes*4;p++){
+        const a=p*Math.PI*2/(dientes*4),rr=p%4<2?r:r-7;
+        puntos.push((xs[i]+rr*Math.sin(a))+','+(140-rr*Math.cos(a)));
+      }
+      grupo.append(svg('polygon',{points:puntos.join(' ')}));
+      const centro=svg('g',{class:'nucleo-engranaje'});
+      centro.append(svg('circle',{cx:xs[i],cy:140,r:r*.7,class:'centro-engranaje'}),
+        svg('line',{x1:xs[i],y1:140-r*.7+3,x2:xs[i],y2:140-r*.7+20,
+          class:'marca-engranaje','data-marca-movil':i}));
+      if(i===2)nucleo=centro;else grupo.append(centro);
+      dibujo.append(grupo);ruedas.push(grupo);
+      if(i===2)dibujo.append(centro);
+      const a=c.objetivos[i]*2*Math.PI/dientes;
+      const punto=factor=>[xs[i]+r*factor*Math.sin(a),140-r*factor*Math.cos(a)];
+      const [x1,y1]=punto(.76),[x2,y2]=punto(.94);
+      const objetivo=svg('g',{class:'objetivo-engranaje','data-objetivo':i,
+        'data-centro-x':xs[i],'data-centro-y':140,'data-angulo-objetivo':c.objetivos[i]*360/dientes});
+      const base=svg('line',{x1,y1,x2,y2,class:'fondo-muesca-fija'});
+      const muesca=svg('line',{x1,y1,x2,y2,class:'muesca-fija'});
+      const [u1,v1]=punto(.7-3/r),[u2,v2]=punto(.76);
+      const union=svg('line',{x1:u1,y1:v1,x2:u2,y2:v2,class:'union-marcas',visibility:'hidden'});
+      objetivo.append(base,union,muesca);
+      objetivos.append(objetivo);marcasFijas.push(objetivo);uniones.push(union);
+      textoSVG(dibujo,dientes+' dientes',xs[i],140+maximo+23,'etiqueta-engranaje');
+      const estado=textoSVG(dibujo,'',xs[i],140+maximo+45,'estado-marca-engranaje');
+      estados.push(estado);
+    });
+    // La capa fija se dibuja al final y permanece dentro de cada rueda.
+    dibujo.append(objetivos);
+    function actualizar(s){
+      const marcas=M.marcasEngranajes(c,s);
+      ruedas.forEach((g,i)=>{
+        g.style.transformOrigin=xs[i]+'px 140px';
+        g.style.transform='rotate('+((i===2?(s.arrastre??0):(s.vueltas??s.posiciones)[i])*360/c.dientes[i])+'deg)';
+      });
+      nucleo.style.transformOrigin=xs[2]+'px 140px';
+      nucleo.style.transform='rotate('+((s.vueltas??s.posiciones)[2]*360/c.dientes[2])+'deg)';
+      dibujo.classList.toggle('embrague-libre',!s.embrague);
+      marcas.forEach((m,i)=>{
+        marcasFijas[i].classList.toggle('alineado',m.alineada);
+        marcasFijas[i].dataset.anguloActual=m.angulo;
+        uniones[i].setAttribute('visibility',m.alineada?'visible':'hidden');
+        estados[i].textContent=m.alineada?'✓ Alineada':'Por alinear';
+      });
+      return marcas;
+    }
+    return {dibujo,actualizar};
   }
 
   function mostrar(padre,reto,opciones){
@@ -440,45 +513,22 @@
         const [x,y]=punto(r,sector);bolita.setAttribute('cx',x);bolita.setAttribute('cy',y);
         estadoBola.textContent=i<0?'Bolita en la entrada exterior.':i>=4?'Bolita en el centro.':'Bolita en el anillo '+(i+1)+'.';
       };
+
     }else if(tipo==='engranajes'){
       const tapa=el('div','','tapa-espejo');tapa.append(ER.recursos.svg('espejo'),el('span','Compartimento del espejo'));
-      const dibujo=svg('svg',{viewBox:'0 0 540 280',class:'engranajes-svg'});
-      const radios=c.dientes.map(n=>n*4.6667);
-      const xs=[radios[0]+20,radios[0]*2+radios[1]+20,radios[0]*2+radios[1]*2+radios[2]+20],ruedas=[];
-      dibujo.setAttribute('viewBox',`0 ${Math.min(0,125-Math.max(...radios))} ${xs[2]+radios[2]+20} ${Math.max(...radios)*2+56}`);
-      let nucleo;
-      c.dientes.forEach((dientes,i)=>{
-        const r=radios[i],grupo=svg('g',{class:'rueda-dentada'});
-        const puntos=[];
-        for(let p=0;p<dientes*4;p++){
-          const a=p*Math.PI*2/(dientes*4),rr=p%4<2?r:r-7;
-          puntos.push((xs[i]+rr*Math.sin(a))+','+(140-rr*Math.cos(a)));
-        }
-        grupo.append(svg('polygon',{points:puntos.join(' ')}));
-        const centro=svg('g',{class:'nucleo-engranaje'});
-        centro.append(svg('circle',{cx:xs[i],cy:140,r:r*.7,class:'centro-engranaje'}),
-          svg('line',{x1:xs[i],y1:140-r*.7+3,x2:xs[i],y2:140-r*.7+20,class:'marca-engranaje'}));
-        if(i===2){nucleo=centro;}else grupo.append(centro);
-        dibujo.append(grupo);ruedas.push(grupo);
-        if(i===2)dibujo.append(centro);
-        const a=c.objetivos[i]*2*Math.PI/dientes;
-        const xx=xs[i]+(r+7)*Math.sin(a),yy=140-(r+7)*Math.cos(a);
-        dibujo.append(svg('circle',{cx:xx,cy:yy,r:5,class:'objetivo-engranaje'}));
-        textoSVG(dibujo,dientes+' dientes',xs[i],140+Math.max(...radios)+25,'etiqueta-engranaje');
-      });
+      const esquema=esquemaEngranajes(c);
       const embrague=boton('Embrague',()=>actuar(actual=>({...actual,embrague:!actual.embrague})));
       controles.append(boton('Girar −',()=>actuar(actual=>M.girarEngranajes(c,actual,-1))),
         boton('Girar +',()=>actuar(actual=>M.girarEngranajes(c,actual,1))),embrague);
       const estado=el('p');
-      pantalla.append(tapa,dibujo,el('p','El embrague conecta el núcleo marcado de la tercera rueda con su corona dentada. Al liberarlo, la corona sigue girando y el núcleo conserva su marca.'),estado);
+      pantalla.append(tapa,esquema.dibujo,
+        el('p','Haz coincidir la raya roja móvil con la muesca fija roja de su propia rueda. Al coincidir, forman una línea continua y aparece «Alineada».'),
+        el('p','El embrague conecta el núcleo marcado de la tercera rueda con su corona dentada. Al liberarlo, la corona sigue girando y el núcleo conserva su marca.'),estado);
       dibujar=()=>{
-        ruedas.forEach((g,i)=>{g.style.transformOrigin=`${xs[i]}px 140px`;g.style.transform=`rotate(${(i===2?(s.arrastre??0):(s.vueltas??s.posiciones)[i])*360/c.dientes[i]}deg)`;});
-        nucleo.style.transformOrigin=`${xs[2]}px 140px`;
-        nucleo.style.transform=`rotate(${(s.vueltas??s.posiciones)[2]*360/c.dientes[2]}deg)`;
+        const marcas=esquema.actualizar(s);
         embrague.textContent=s.embrague?'Embrague conectado · liberar':'Embrague libre · conectar';
         embrague.setAttribute('aria-pressed',String(s.embrague));
-        estado.textContent='Marcas alineadas: '+s.posiciones.filter((p,i)=>p===c.objetivos[i]).length+'/3. La tercera rueda está '+(s.embrague?'conectada.':'libre.');
-        dibujo.classList.toggle('embrague-libre',!s.embrague);
+        estado.textContent='Marcas alineadas: '+marcas.filter(m=>m.alineada).length+'/3. La tercera rueda está '+(s.embrague?'conectada.':'libre.');
       };
     }else if(tipo==='vitral'){
       const discos=el('div','','discos-vitral');
@@ -533,4 +583,5 @@
     return {obtener:()=>structuredClone(s),limpiar:()=>{},ayuda:null};
   }
   M.mostrar=mostrar;
+  M.esquemaEngranajes=esquemaEngranajes;
 }();

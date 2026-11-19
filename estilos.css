@@ -849,7 +849,11 @@ details .evidencia { margin-top: .5rem; }
 .rueda-dentada polygon { fill:#b79868; stroke:#5a5140; stroke-width:2; }
 .centro-engranaje { fill:#ecdbb7; stroke:#79694a; stroke-width:2; }
 .marca-engranaje { stroke:#783a2b; stroke-width:7; stroke-linecap:round; }
-.objetivo-engranaje { fill:#294d3b; stroke:#fff0c9; stroke-width:2; }
+.fondo-muesca-fija { fill:none; stroke:#fff3d4; stroke-width:10; stroke-linecap:round; }
+.muesca-fija { fill:none; stroke:#783a2b; stroke-width:4; stroke-linecap:butt; }
+.union-marcas { stroke:#783a2b; stroke-width:4; }
+.estado-marca-engranaje { text-anchor:middle; font:650 12px var(--sans); fill:#4a4232; }
+.objetivo-engranaje.alineado .fondo-muesca-fija { stroke:#dce7ce; }
 .etiqueta-engranaje { text-anchor:middle; font:15px var(--sans); fill:#463b2d; }
 .tapa-espejo { display:flex; align-items:center; gap:.5rem; padding:.5rem; border:1px solid #a78c62; }
 .tapa-espejo svg { width:2.8rem; height:2.8rem; }

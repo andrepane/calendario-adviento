@@ -183,6 +183,22 @@
         resultado.prepend(compartimento);
       }
       if (reto.acierto) resultado.append(elemento('p', reto.acierto));
+      if(reto.tipo==='engranajes'){
+        const configuracion=ER.especiales.configuracion(reto);
+        if(!ER.mecanismos.errores('engranajes',configuracion).length){
+          let final=opciones.interaccion?.actual;
+          if(!final){
+            final=ER.mecanismos.inicial('engranajes',configuracion);
+            for(const paso of configuracion.solucion){
+              final=paso==='embrague'?{...final,embrague:!final.embrague}
+                :ER.mecanismos.girarEngranajes(configuracion,final,paso);
+            }
+          }
+          const esquema=ER.mecanismos.esquemaEngranajes(configuracion);
+          esquema.actualizar(final);
+          resultado.append(esquema.dibujo,elemento('p','Cada raya móvil coincide con la muesca fija de su rueda.'));
+        }
+      }
       if (opciones.evidenciaNueva) tarjetas([opciones.evidenciaNueva], resultado);
       if (opciones.mensajeLlave) resultado.append(elemento('p', opciones.mensajeLlave));
       if (opciones.irSiguiente) resultado.append(boton('Abrir la siguiente ventana', opciones.irSiguiente));

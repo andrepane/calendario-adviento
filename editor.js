@@ -506,6 +506,7 @@
           ER.vista.renderizar(pruebaVista,reto,{
             ganadas,
             resuelto:true,
+            interaccion:estadoPrevio[dia],
             evidenciaNueva:ER.evidencias(datos).find(evidencia=>evidencia.dia===dia),
             volverAJugar:reiniciarVista
           });

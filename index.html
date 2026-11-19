@@ -6,29 +6,20 @@
   <meta name="theme-color" content="#111d29">
   <title>Diciembre para Cintia</title>
   <link rel="stylesheet" href="./estilos.css">
+  <link rel="stylesheet" href="./experiencias.css">
   <script defer src="./escape-room.js"></script>
   <script defer src="./calendario-publicado.js"></script>
   <script defer src="./recursos-reto.js"></script>
   <script defer src="./retos-avanzados.js"></script>
   <script defer src="./mecanismos.js"></script>
+  <script defer src="./experiencias.js"></script>
   <script defer src="./vista-reto.js"></script>
   <script defer src="./app.js"></script>
 </head>
 <body>
   <main>
     <section id="portada" aria-labelledby="dedicatoria">
-      <div class="sobre">
-        <div class="sobre-luz" aria-hidden="true"></div>
-        <div class="sobre-carta" aria-hidden="true"></div>
-        <div class="sobre-pliegues" aria-hidden="true"></div>
-        <div class="sobre-solapa" aria-hidden="true"></div>
-        <div class="sobre-frente">
-          <span class="sello" aria-hidden="true">✶</span>
-          <h1 id="dedicatoria">Para Cintia</h1>
-          <p class="fecha">DICIEMBRE 2026</p>
-        </div>
-      </div>
-      <button id="abrir" class="boton" type="button">Abrir el sobre <span aria-hidden="true">↗</span></button>
+      <button id="abrir" type="button">Abrir caja</button>
     </section>
 
     <section id="calendario" aria-labelledby="titulo-calendario" hidden>
@@ -53,6 +44,7 @@
         <div class="suelo" aria-hidden="true"></div>
       </div>
       <button class="boton" id="abrir-cuaderno" type="button" aria-haspopup="dialog">Cuaderno</button>
+      <button class="repetir-introduccion" id="repetir-introduccion" type="button">Volver a abrir la caja</button>
     </section>
   </main>
 

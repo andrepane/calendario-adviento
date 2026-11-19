@@ -97,3 +97,19 @@ Para instalar una versión preparada para Cintia, incluye **mecanismos.js** junt
 Después de resolver una **Previsualización de día**, pulsa **Volver a jugar** para empezar ese reto desde cero. También puedes hacerlo en una ventana ya resuelta de **Jugar campaña**. La repetición de la campaña conserva sus llaves, evidencias y capítulos completados. Si recargas durante una repetición, puedes continuarla desde el estado guardado.
 
 Para reiniciar todos los días de la campaña de prueba sigue disponible **Reiniciar progreso de prueba**.
+
+## La caja de Adviento · versión 4
+
+Abre **editor.html**, recarga con Ctrl + F5 y pulsa **Cargar La caja de Adviento · versión 4**. La primera carga copia el espacio que tengas abierto y sustituye únicamente el día 1; los demás capítulos, sus soluciones y la combinación final se conservan. La versión 4 guarda su borrador y sus pruebas en claves propias. Tus espacios anteriores siguen disponibles.
+
+En el panel **La caja y el habitante**, encima de los 24 días, están **Probar introducción**, **Probar día 1** y **Probar final del día 24**. Las pruebas usan los campos que estás editando. El selector del final permite empezar antes de la combinación, después del acierto o en la confirmación del paquete. Cada vista tiene reinicio; la introducción se reinicia desde el botón del panel y también ofrece Saltar y Volver a abrir la caja. Ninguna de estas pruebas modifica el progreso real de Cintia. El control **Reducir movimiento en las pruebas** permite ensayar la alternativa simplificada; el jugador respeta también la preferencia del sistema.
+
+El día 1 tiene seis posiciones por rueda. Los campos **Estado inicial** y **Posiciones objetivo** se encuentran en **Configuración del juego**; instrucciones y pistas usan sus campos habituales. El editor muestra la distancia mínima calculada mediante búsqueda de los 216 estados. El inicio [3,0,3] y objetivo [0,0,0] requiere seis giros. La llave se entrega únicamente después de accionar el pestillo. La fecha del día 2 sigue siendo obligatoria. Deshacer, reinicio y estado parcial se guardan con el mecanismo.
+
+El final se activa y configura en **La caja y el habitante**. La confirmación del paquete es independiente de la combinación del día 24, que sigue saliendo de su campo actual. Se guardan la etapa, la confirmación y el nombre; el cuaderno y el reto resuelto se conservan. Repetir la escena no borra el nombre ni la confirmación. Los valores de prueba son la pista «Busca el paquete bajo la manta del sofá» y el código «NACIMIENTO». Cámbialos antes de preparar tu versión definitiva.
+
+La caja contiene la misma casa y los mismos elementos de calendario, que se trasladan a su posición final al abrirla. Se ha implementado la variante con la casa montada. Los dibujos de ruedas, caja, huevo y criatura se generan en el código: no necesitan descargas ni recursos externos. **Exportar respaldo** incluye la configuración completa. **Respaldo en texto** ofrece otra forma de copiar e importar ese mismo JSON como espacio independiente. Las fotografías y audios existentes mantienen sus rutas habituales.
+
+Al entregar una copia, incluye también **experiencias.js** y **experiencias.css** junto a los archivos existentes. El editor local continúa excluido de Vercel. Guardar un borrador no publica cambios: prepara calendario-publicado.js cuando quieras instalar tus propios textos.
+
+Verificación de la lógica: ejecuta `node tests/experiencias.test.cjs` desde el repositorio. Contrasta las 216 búsquedas de la cerradura con una distancia calculada de forma independiente, comprueba el pestillo, las fechas, el respaldo y las etapas persistentes del final.

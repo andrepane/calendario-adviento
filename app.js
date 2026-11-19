@@ -45,7 +45,8 @@ function guardarProgreso() {
       abiertos: [...guardado.abiertos, ...avance.abiertos],
       resueltos: [...guardado.resueltos, ...avance.resueltos],
       pistas,
-      interacciones: { ...guardado.interacciones, ...avance.interacciones }
+      interacciones: { ...guardado.interacciones, ...avance.interacciones },
+      introduccionVista:avance.introduccionVista||guardado.introduccionVista,desenlace:avance.desenlace
     });
     localStorage.setItem(claveProgreso, JSON.stringify(avance));
   } catch {
@@ -117,6 +118,9 @@ function prepararTarjeta(dia, recienResuelto = false) {
   ER.vista.renderizar(contenido, reto, {
     ganadas: evidencia,
     resuelto,
+    experiencia:datos.experiencia,
+    desenlace:avance.desenlace,
+    guardarDesenlace:estado=>{avance.desenlace=estado;guardarProgreso();},
     volverAJugar: enPrueba ? () => {
       avance.repeticiones[dia] = true;
       delete avance.interacciones[dia];
@@ -144,7 +148,8 @@ function prepararTarjeta(dia, recienResuelto = false) {
           abiertos: [...avance.abiertos, ...guardado.abiertos],
           resueltos: [...avance.resueltos, ...guardado.resueltos],
           pistas: avance.pistas,
-          interacciones: avance.interacciones
+          interacciones: avance.interacciones,
+          introduccionVista:avance.introduccionVista,desenlace:avance.desenlace
         });
       }
       if (avance.resueltos.includes(dia)) {
@@ -162,6 +167,7 @@ function prepararTarjeta(dia, recienResuelto = false) {
       guardarProgreso();
       actualizarPuertas();
       prepararTarjeta(dia, true);
+      if(dia===1){calendario.classList.remove('casa-despierta');void calendario.offsetWidth;calendario.classList.add('casa-despierta');}
       return true;
     },
     mensajeLlave: dia < 24 && (fechaLlegada ? `Has ganado la llave del día ${proximo}.`
@@ -216,28 +222,30 @@ function programarActualizacion() {
 crearPuertas();
 actualizarPuertas();
 
-abrir.addEventListener('click', () => {
-  if (portada.classList.contains('abriendo')) return;
-  portada.classList.add('abriendo');
-  abrir.setAttribute('aria-disabled', 'true');
-
-  const mostrar = () => {
-    portada.hidden = true;
-    calendario.hidden = false;
-    document.querySelector('#titulo-calendario').focus({ preventScroll: true });
-    window.scrollTo(0, 0);
-    programarActualizacion();
-  };
-
-  if (movimientoReducido.matches) mostrar();
-  else window.setTimeout(mostrar, 620);
-});
+/* La introducción mueve la casa real entre la caja y su posición en el calendario. */
+let entrada;
+function prepararEntrada(){
+  entrada?.limpiar();
+  entrada=ER.experiencias.introduccion(portada,calendario,datos.experiencia,{
+    vista:avance.introduccionVista,
+    guardar:()=>{avance.introduccionVista=true;guardarProgreso();},
+    terminar:()=>{document.querySelector('#titulo-calendario').focus({preventScroll:true});programarActualizacion();}
+  });
+}
+document.querySelector('#repetir-introduccion').addEventListener('click',()=>entrada.repetir());
+if(!enPrueba)prepararEntrada();
 
 abrirCuaderno.addEventListener('click', () => {
   tarjetasCuaderno.replaceChildren();
   const evidencias = ganadas();
   ER.vista.tarjetas(evidencias, tarjetasCuaderno);
   if (!evidencias.length) tarjetasCuaderno.textContent = 'Aquí aparecerán las evidencias que consigas al resolver retos.';
+  if(avance.desenlace.confirmado&&avance.desenlace.nombre){
+    const recuerdo=document.createElement('article');recuerdo.className='evidencia';
+    const titulo=document.createElement('h3');titulo.textContent='El habitante de la casa';
+    const nombre=document.createElement('p');nombre.textContent=avance.desenlace.nombre;
+    recuerdo.append(titulo,nombre);tarjetasCuaderno.append(recuerdo);
+  }
   cuaderno.showModal();
   document.documentElement.classList.add('modal-abierto');
   cuaderno.scrollTop = 0;
@@ -295,8 +303,10 @@ if (enPrueba) {
     datos = ER.calendario(evento.data.datos);
     fechaSimulada = evento.data.fecha;
     avance = ER.progreso(evento.data.avance);
+    document.documentElement.classList.toggle('movimiento-reducido',evento.data.movimientoReducido===true);
     abrir.disabled = false;
     actualizarPuertas();
+    prepararEntrada();
   });
   window.parent.postMessage({ tipo: 'escape-listo' }, origenLocal);
 }

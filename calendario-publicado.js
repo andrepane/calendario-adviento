@@ -1,16 +1,16 @@
 window.CALENDARIO_PUBLICADO = {
   "esquema": 1,
-  "partida": "campana-3946-v2",
+  "partida": "caja-adviento-v4",
   "capitulos": [
     {
-      "titulo": "ADIVINA LA FECHA",
-      "instrucciones": "Tienes que adivinar la fecha en las que nos enviamos estos mensajes",
-      "pregunta": "¿Qué día nos enviamos estos mensajes?",
+      "titulo": "La cerradura de las tres ruedas",
+      "instrucciones": "Alinea las tres muescas con el pestillo. Algunas ruedas arrastran a otras.",
+      "pregunta": "",
       "apoyo": "",
-      "imagen": "./fotos/dia1.png",
-      "alt": "foto mensajes",
+      "imagen": "",
+      "alt": "",
       "audio": "",
-      "acierto": "¡¡Correcto!! El día que nos conocimos. ",
+      "acierto": "La casa despierta. Has ganado la llave del día 2.",
       "premio": "",
       "evidenciaTitulo": "",
       "evidenciaTexto": "",
@@ -20,22 +20,19 @@ window.CALENDARIO_PUBLICADO = {
       "transcripcion": "",
       "evidenciaDibujo": "",
       "evidenciaDatos": "",
-      "configuracion": "",
+      "configuracion": "{\n  \"inicio\": [\n    3,\n    0,\n    3\n  ],\n  \"objetivos\": [\n    0,\n    0,\n    0\n  ]\n}",
       "normalizacion": "",
-      "tipo": "escrita",
+      "tipo": "cerradura",
       "listo": true,
-      "respuestas": [
-        "12/07/2022",
-        "12 de julio de 2022"
-      ],
-      "opciones": [
-        "Dos",
-        "Tres",
-        "Cuatro"
-      ],
-      "correcta": 1,
+      "respuestas": [],
+      "opciones": [],
+      "correcta": -1,
       "orden": [],
-      "pistas": [],
+      "pistas": [
+        "La rueda exterior arrastra a la central. La central arrastra a la interior.",
+        "Empieza por la rueda exterior y termina por la interior.",
+        "Puedes retroceder. Cada pulso cuenta como un giro."
+      ],
       "dependencias": []
     },
     {
@@ -796,5 +793,14 @@ window.CALENDARIO_PUBLICADO = {
         "evidencia-23"
       ]
     }
-  ]
+  ],
+  "experiencia": {
+    "introduccion": true,
+    "final": true,
+    "nota": "Alguien acaba de llegar a la casa. Te está esperando fuera de esta pantalla.",
+    "pista": "Busca el paquete bajo la manta del sofá",
+    "codigo": "NACIMIENTO",
+    "mensaje": "Misión 25: que llegue vivo a Nochevieja",
+    "permitirNombre": true
+  }
 };

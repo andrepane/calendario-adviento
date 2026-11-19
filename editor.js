@@ -28,6 +28,7 @@
   const nombres = new Map([['original', 'Mis borradores'], ['campana', 'Escape room de prueba'],
     ['campana3946', 'Campaña 3946 · versión 2'],
     ['mecanismos', 'Campaña de mecanismos · versión 3'],
+    ['caja', 'La caja de Adviento · versión 4'],
     ...copias.map(copia => [copia.id, copia.nombre])]);
   const abiertos = new Map();
   let espacio = leer(claveEspacio);
@@ -35,6 +36,58 @@
   const clave = (tipo, id = espacio) => prefijo + tipo + (id === 'original' ? '' : '-' + id);
   let datos, dia, prueba, hayCambios, hayRespaldo;
   let sesionPrueba;
+  let ultimaExperiencia='dia1';
+  porId('reducir-movimiento-pruebas').addEventListener('change',e=>document.documentElement.classList.toggle('movimiento-reducido',e.target.checked));
+  const camposExperiencia=porId('formulario-experiencias').elements;
+  function mostrarExperienciaConfig(){
+    for(const [campo,valor]of Object.entries(datos.experiencia)){
+      const control=camposExperiencia.namedItem(campo);
+      if(control.type==='checkbox')control.checked=valor;else control.value=valor;
+    }
+  }
+  function guardarExperienciaConfig(){
+    for(const campo of Object.keys(datos.experiencia)){
+      const control=camposExperiencia.namedItem(campo);
+      datos.experiencia[campo]=control.type==='checkbox'?control.checked:control.value;
+    }
+  }
+  porId('formulario-experiencias').addEventListener('input',()=>{guardarExperienciaConfig();hayCambios=true;hayRespaldo=false;anunciar('Configuración pendiente de guardar.');});
+  porId('formulario-experiencias').addEventListener('submit',e=>{e.preventDefault();guardarExperienciaConfig();formulario.requestSubmit();});
+  function probarExperiencia(tipo,reiniciar=false){
+    guardarDia();guardarExperienciaConfig();ultimaExperiencia=tipo;
+    const inicio=porId('inicio-final').value;
+    const id=tipo==='final'?'final-'+inicio:tipo;
+    const pruebas=leer(clave('escenas-previas'))??{};
+    if(reiniciar)delete pruebas[id];
+    const estado=pruebas[id]??{resuelto:tipo==='final'&&inicio!=='antes',desenlace:{etapa:inicio==='paquete'?6:0}};
+    pruebas[id]=estado;
+    const persistir=()=>guardar(clave('escenas-previas'),pruebas);
+    if(tipo==='introduccion'){
+      sesionPrueba={datos:structuredClone(datos),fecha:'2026-12-24',avance:ER.progreso(),temporal:true,movimientoReducido:porId('reducir-movimiento-pruebas').checked};
+      marco.src='./index.html?prueba&introduccion';marco.hidden=false;marco.scrollIntoView({block:'start'});
+      anunciar('Prueba independiente de la introducción. Usa Saltar o abre el cierre.');return;
+    }
+    const numero=tipo==='dia1'?1:24,reto=datos.capitulos[numero-1],padre=porId('contenido-vista');
+    porId('dia-vista').textContent='Prueba independiente · día '+numero;
+    porId('titulo-vista').textContent=reto.titulo;
+    function dibujar(){
+      ER.vista.renderizar(padre,reto,{
+        ganadas:ER.evidencias(datos),resuelto:estado.resuelto,interaccion:estado.interaccion,
+        experiencia:datos.experiencia,desenlace:estado.desenlace,
+        guardarDesenlace:s=>{estado.desenlace=s;persistir();},
+        guardarInteraccion:s=>{estado.interaccion=s;persistir();},
+        comprobar:respuesta=>{if(!ER.acertada(reto,respuesta))return false;estado.resuelto=true;persistir();dibujar();return true;},
+        mensajeLlave:numero===1?'Has ganado la llave del día 2. Su fecha sigue siendo necesaria.':undefined,
+        volverAJugar:()=>{estado.resuelto=false;delete estado.interaccion;persistir();dibujar();}
+      });
+      const reset=document.createElement('button');reset.type='button';reset.className='control-reto';reset.textContent='Reiniciar esta previsualización';reset.addEventListener('click',()=>probarExperiencia(tipo,true));padre.append(reset);
+    }
+    persistir();dibujar();if(!vista.open)vista.showModal();vista.scrollTop=0;
+  }
+  porId('probar-introduccion').addEventListener('click',()=>probarExperiencia('introduccion',true));
+  porId('probar-dia-1').addEventListener('click',()=>probarExperiencia('dia1'));
+  porId('probar-final').addEventListener('click',()=>probarExperiencia('final'));
+  porId('reiniciar-experiencia').addEventListener('click',()=>probarExperiencia(ultimaExperiencia,true));
 
   function leer(clave) {
     try { return JSON.parse(localStorage.getItem(clave)); } catch { return undefined; }
@@ -43,6 +96,7 @@
   function leerBorrador(id = espacio) {
     try { return ER.calendario(leer(clave('borrador', id))); }
     catch {
+      if(id==='caja')return ER.experiencias.campana(abiertos.get('mecanismos')?.datos??leer(clave('borrador','mecanismos'))??window.CAMPANA_MECANISMOS);
       if(id==='mecanismos'){
         const nueva=ER.calendario(window.CAMPANA_MECANISMOS);
         const previa=abiertos.get('campana3946')?.datos??leer(clave('borrador','campana3946'));
@@ -127,6 +181,8 @@
     porId('cargar-campana').hidden = id === 'campana';
     porId('cargar-3946').hidden = id === 'campana3946';
     porId('cargar-mecanismos').hidden=id==='mecanismos';
+    porId('cargar-caja').hidden=id==='caja';
+    mostrarExperienciaConfig();
     porId('volver-borradores').hidden = id === 'original';
     const original = (abiertos.get('original')?.datos ?? leerBorrador('original')).capitulos[0];
     const demo = ER.capitulo(window.CALENDARIO_PUBLICADO.capitulos[0]);
@@ -217,6 +273,14 @@
       etiqueta.append(entrada);
       panel.append(etiqueta);
       return entrada;
+    }
+    if(campos.tipo.value==='cerradura'){
+      const resumen=document.createElement('p');
+      function distancia(){resumen.textContent=ER.experiencias.configValida(config)?'Distancia mínima comprobada: '+ER.experiencias.ruta(config).length+' giros.':'Usa tres números enteros entre 0 y 5.';}
+      for(const [campo,nombre]of [['inicio','Estado inicial (exterior, central, interior; 0–5)'],['objetivos','Posiciones objetivo (exterior, central, interior; 0–5)']]){
+        control(nombre,(config[campo]??[]).join(', '),'text',valor=>{config[campo]=valor.split(',').map(v=>Number(v.trim()));distancia();});
+      }
+      distancia();panel.append(resumen);
     }
     if (campos.tipo.value === 'electrico') {
       const grupo = document.createElement('fieldset');
@@ -443,6 +507,17 @@
     if(!leer(clave('borrador')))guardar(clave('borrador'),datos);
     anunciar('Nueva campaña de mecanismos cargada en un espacio propio. Sus soluciones de referencia están en la configuración de cada reto.');
   });
+  porId('cargar-caja').addEventListener('click',()=>{
+    guardarDia();
+    guardarExperienciaConfig();
+    if(!guardar(clave('borrador'),datos)){anunciar('No se pudo conservar el borrador actual. Exporta un respaldo antes de cambiar de versión.');return;}
+    hayCambios=false;
+    const base=structuredClone(datos);
+    if(!leer(clave('borrador','caja'))&&!abiertos.has('caja'))abiertos.set('caja',{datos:ER.experiencias.campana(base),dia:1});
+    elegirEspacio('caja');
+    guardar(clave('borrador'),datos);
+    anunciar('Versión 4 creada en un espacio separado. Los otros 23 capítulos conservan tus datos.');
+  });
   porId('actualizar-dia-8').addEventListener('click', () => {
     guardarDia();
     datos.capitulos[7] = ER.capitulo(structuredClone(window.CAMPANA_3946.capitulos[7]));
@@ -497,6 +572,7 @@
       ER.vista.renderizar(pruebaVista,reto,{
         ganadas,
         interaccion:estadoPrevio[dia],
+        experiencia:datos.experiencia,
         guardarInteraccion:estado=>{
           estadoPrevio[dia]=estado;
           guardar(clave('previas'),estadoPrevio);
@@ -507,6 +583,9 @@
             ganadas,
             resuelto:true,
             interaccion:estadoPrevio[dia],
+            experiencia:datos.experiencia,
+            desenlace:leer(clave('final-previa')),
+            guardarDesenlace:estado=>guardar(clave('final-previa'),estado),
             evidenciaNueva:ER.evidencias(datos).find(evidencia=>evidencia.dia===dia),
             volverAJugar:reiniciarVista
           });
@@ -554,9 +633,10 @@
         || evento.origin !== (origen === '*' ? 'null' : origen)) return;
     if (evento.data?.tipo === 'escape-listo') {
       marco.contentWindow.postMessage({
-        tipo: 'escape-iniciar', ...sesionPrueba, avance: prueba.avance
+        tipo: 'escape-iniciar', ...sesionPrueba, avance: sesionPrueba.avance??prueba.avance
       }, origen);
     } else if (evento.data?.tipo === 'escape-progreso') {
+      if(sesionPrueba.temporal)return;
       prueba.avance = ER.progreso(evento.data.avance);
       if (!guardar(clave('prueba'), prueba)) anunciar('El navegador no pudo guardar el progreso de prueba.');
     }
@@ -571,25 +651,24 @@
 
   const archivo = porId('archivo-respaldo');
   porId('importar').addEventListener('click', () => archivo.click());
-  archivo.addEventListener('change', async () => {
-    if (!archivo.files.length) return;
+  function importarCopia(contenido,nombreArchivo){
     try {
-      const copia = ER.calendario(JSON.parse(await archivo.files[0].text()));
-      const id = 'copia-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
-      const nombre = 'Copia · ' + archivo.files[0].name;
-      const registro = { id, nombre };
-      const guardado = guardar(clave('borrador', id), copia) && guardar(claveCopias, [...copias, registro]);
-      copias.push(registro);
-      nombres.set(id, nombre);
-      abiertos.set(id, { datos: copia, dia: 1, hayCambios: !guardado });
+      const copia=ER.calendario(JSON.parse(contenido));
+      const id='copia-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
+      const nombre='Copia · '+nombreArchivo,registro={id,nombre};
+      const guardado=guardar(clave('borrador',id),copia)&&guardar(claveCopias,[...copias,registro]);
+      copias.push(registro);nombres.set(id,nombre);abiertos.set(id,{datos:copia,dia:1,hayCambios:!guardado});
       elegirEspacio(id);
-      anunciar(guardado ? 'Respaldo importado como copia separada.' : 'Copia disponible en esta pestaña. Exporta un respaldo para conservarla.');
-    } catch (error) {
-      anunciar(`No se pudo importar el respaldo. ${error.message}`);
-    } finally {
-      archivo.value = '';
-    }
+      anunciar(guardado?'Respaldo importado como copia separada.':'Copia disponible en esta pestaña. Exporta un respaldo para conservarla.');
+    }catch(error){anunciar('No se pudo importar el respaldo. '+error.message);}
+  }
+  archivo.addEventListener('change',async()=>{
+    if(!archivo.files.length)return;
+    const fichero=archivo.files[0];
+    try{importarCopia(await fichero.text(),fichero.name);}catch(error){anunciar('No se pudo leer el archivo. '+error.message);}finally{archivo.value='';}
   });
+  porId('ver-respaldo').addEventListener('click',()=>{guardarDia();guardarExperienciaConfig();porId('texto-respaldo').value=JSON.stringify(datos,null,2);});
+  porId('importar-texto').addEventListener('click',()=>importarCopia(porId('texto-respaldo').value,'respaldo en texto'));
 
   porId('preparar').addEventListener('click', () => {
     guardarDia();

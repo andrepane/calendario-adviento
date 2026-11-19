@@ -6,6 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Editor de Andrea · Diciembre para Cintia</title>
   <link rel="stylesheet" href="./estilos.css">
+  <link rel="stylesheet" href="./experiencias.css">
   <link rel="stylesheet" href="./editor.css">
   <script defer src="./escape-room.js"></script>
   <script defer src="./calendario-publicado.js"></script>
@@ -14,6 +15,7 @@
   <script defer src="./campana-3946.js"></script>
   <script defer src="./retos-avanzados.js"></script>
   <script defer src="./mecanismos.js"></script>
+  <script defer src="./experiencias.js"></script>
   <script defer src="./campana-mecanismos.js"></script>
   <script defer src="./vista-reto.js"></script>
   <script defer src="./editor.js"></script>
@@ -33,11 +35,34 @@
           <button class="control-reto principal" type="button" id="cargar-campana">Cargar escape room de prueba</button>
           <button class="control-reto principal" type="button" id="cargar-3946">Cargar campaña 3946 · versión 2</button>
           <button class="control-reto principal" type="button" id="cargar-mecanismos">Cargar campaña de mecanismos · versión 3</button>
+          <button class="control-reto principal" type="button" id="cargar-caja">Cargar La caja de Adviento · versión 4</button>
           <button class="control-reto" type="button" id="actualizar-dia-8">Aplicar cuadro eléctrico al día 8</button>
           <button class="control-reto" type="button" id="volver-borradores" hidden>Volver a mis borradores</button>
           <button class="control-reto" type="button" id="copiar-dia-uno" hidden>Usar una copia de mi día 1</button>
         </div>
         <label id="selector-copias" hidden>Respaldos importados <select id="copias"></select></label>
+      </section>
+      <section class="panel-editor" id="experiencias-editor">
+        <h2>La caja y el habitante</h2>
+        <p>Estas pruebas usan el borrador abierto y guardan su avance por separado del calendario de Cintia.</p>
+        <form id="formulario-experiencias">
+          <label><input type="checkbox" name="introduccion"> Mostrar la caja al entrar por primera vez</label>
+          <label><input type="checkbox" name="final"> Activar el habitante después del reto del día 24</label>
+          <label>Texto de la nota <textarea name="nota" rows="2"></textarea></label>
+          <label>Pista del escondite <textarea name="pista" rows="2"></textarea></label>
+          <label>Código de confirmación del paquete <input name="codigo" required></label>
+          <label>Mensaje final <input name="mensaje"></label>
+          <label><input type="checkbox" name="permitirNombre"> Permitir poner nombre a la criatura</label>
+          <button class="control-reto" type="submit">Guardar configuración y borrador</button>
+        </form>
+        <div class="acciones-editor">
+          <button class="control-reto" type="button" id="probar-introduccion">Probar introducción</button>
+          <button class="control-reto" type="button" id="probar-dia-1">Probar día 1</button>
+          <label>Inicio del final <select id="inicio-final"><option value="antes">Antes de introducir la combinación</option><option value="despues">Justo después de acertarla</option><option value="paquete">Confirmación del paquete</option></select></label>
+          <button class="control-reto" type="button" id="probar-final">Probar final del día 24</button>
+          <button class="control-reto" type="button" id="reiniciar-experiencia">Reiniciar previsualización</button>
+          <label><input type="checkbox" id="reducir-movimiento-pruebas"> Reducir movimiento en las pruebas</label>
+        </div>
       </section>
       <nav class="dias-editor" aria-label="Elegir capítulo">
         <div id="dias-editor"></div>
@@ -137,6 +162,13 @@
         <details class="detalle-editor" id="revision-publicacion">
           <summary>Revisar capítulos y dependencias</summary>
           <ul id="avisos-publicacion" class="avisos"></ul>
+        </details>
+        <details class="detalle-editor">
+          <summary>Respaldo en texto</summary>
+          <p>También puedes copiar el respaldo o pegar uno para importarlo como copia.</p>
+          <button class="control-reto" type="button" id="ver-respaldo">Mostrar respaldo actual</button>
+          <label>Contenido del respaldo <textarea id="texto-respaldo" rows="6" spellcheck="false"></textarea></label>
+          <button class="control-reto" type="button" id="importar-texto">Importar este texto como copia</button>
         </details>
       </section>
 

@@ -244,39 +244,17 @@ window.CALENDARIO_PUBLICADO = {
       "dependencias": []
     },
     {
-      "titulo": "El cuadro de luces",
-      "instrucciones": "Enciende solo una luz. El cartel de esa luz debe ser el único verdadero. Puedes cambiar tu elección antes de comprobar.",
-      "pregunta": "",
-      "apoyo": "",
-      "imagen": "",
-      "alt": "",
-      "audio": "",
-      "acierto": "Bien visto. Ya tienes lo que necesitas para seguir.",
-      "premio": "",
-      "evidenciaTitulo": "",
-      "evidenciaTexto": "",
-      "combinacion": "",
-      "recursoTipo": "interruptores",
-      "recursoDatos": "",
-      "transcripcion": "",
-      "evidenciaDibujo": "",
-      "evidenciaDatos": "",
-      "configuracion": "",
-      "normalizacion": "",
-      "tipo": "opciones",
       "listo": true,
-      "respuestas": [],
-      "opciones": [
-        "A · C está encendida",
-        "B · B está encendida",
-        "C · A está encendida"
-      ],
-      "correcta": 1,
-      "orden": [],
+      "acierto": "El cuadro está apagado. Ya tienes la llave del día 9.",
+      "titulo": "El cuadro eléctrico",
+      "instrucciones": "El cuadro está averiado. Cada interruptor cambia su propia luz y las que tiene justo arriba, abajo, a izquierda y a derecha. Las diagonales quedan igual. Consigue apagar todo el panel utilizando como máximo cuatro interruptores distintos.",
+      "tipo": "electrico",
+      "configuracion": "{\n  \"inicial\": [\n    3,\n    5,\n    7,\n    9\n  ],\n  \"maximo\": 4\n}",
       "pistas": [
-        "Además de contar los carteles verdaderos, fíjate en qué interruptor tiene ese cartel."
-      ],
-      "dependencias": []
+        "El orden de los interruptores no cambia el resultado. Importa cuáles dejas seleccionados.",
+        "Necesitarás cuatro interruptores. Uno de ellos es el central.",
+        "Dos están en el centro de los bordes superior e izquierdo. El cuarto está en una esquina."
+      ]
     },
     {
       "titulo": "Cerradura de tres cifras",

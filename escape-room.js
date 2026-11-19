@@ -15,7 +15,8 @@
     nonograma: 'Nonograma',
     maquina: 'Máquina lunar',
     perforado: 'Papel perforado',
-    fragmentos: 'Visor de fragmentos'
+    fragmentos: 'Visor de fragmentos',
+    electrico: 'Cuadro eléctrico'
   };
   const texto = valor => typeof valor === 'string' ? valor : '';
   const lista = valor => Array.isArray(valor) ? valor.filter(item => typeof item === 'string') : [];

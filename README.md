@@ -62,3 +62,11 @@ El recorrido y el papel perforado tienen tableros de 8 × 8 con casillas de 44 p
 Esta versión usa la combinación **3946**. En el mensaje cifrado del día 5 se corrigió el primer bloque a **912345** para representar **ANOCHE** con el alfabeto del día 2. Los capítulos de las versiones anteriores se conservan.
 
 Para entregar la campaña, prepara **calendario-publicado.js** desde el editor e incluye también **retos-avanzados.js** junto con los archivos de la vista del jugador. Los SVG siguen en **recursos-reto.js**. Los respaldos conservan las rutas de los medios. Lleva las carpetas multimedia junto al JSON al cambiar de equipo.
+
+## Día 8 · El cuadro eléctrico
+
+El día 8 de la campaña 3946 usa nueve interruptores. El editor permite elegir qué luces empiezan encendidas y cuántos interruptores se pueden seleccionar a la vez. Comprueba las 512 combinaciones posibles e informa de la cantidad de soluciones dentro del límite. Un tablero sin solución muestra un aviso e impide preparar la publicación.
+
+Para actualizar un borrador ya guardado, ábrelo y pulsa **Aplicar cuadro eléctrico al día 8**, seguido de **Guardar borrador**. Este botón sustituye solo el capítulo 8 del espacio abierto. Para volver a jugarlo desde una partida que ya lo había completado, usa **Reiniciar progreso de prueba**. El enunciado y las tres pistas se editan en sus campos habituales.
+
+El cuadro guarda los interruptores seleccionados y calcula las luces a partir de la configuración inicial. Volver a tocar un interruptor deshace su efecto. Al apagar las nueve luces dentro del límite, el reto se completa automáticamente y entrega la llave del día 9. La fecha real o simulada sigue siendo necesaria para abrir esa puerta. El día 8 no entrega una evidencia y la caja final mantiene 3946.

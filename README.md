@@ -91,3 +91,9 @@ Reglas y decisiones de los nuevos mecanismos:
 El editor conserva el progreso de estos mecanismos al cerrar o recargar. La partida de prueba, la vista previa y la partida real usan sus propios guardados. El código final continúa siendo **3946**.
 
 Para instalar una versión preparada para Cintia, incluye **mecanismos.js** junto a **retos-avanzados.js**, **recursos-reto.js** y los demás archivos del jugador. El archivo **campana-mecanismos.js** se usa para cargar el ejemplo desde el editor local. La versión de Cintia se genera como **calendario-publicado.js**.
+
+## Volver a jugar un reto en el editor
+
+Después de resolver una **Previsualización de día**, pulsa **Volver a jugar** para empezar ese reto desde cero. También puedes hacerlo en una ventana ya resuelta de **Jugar campaña**. La repetición de la campaña conserva sus llaves, evidencias y capítulos completados. Si recargas durante una repetición, puedes continuarla desde el estado guardado.
+
+Para reiniciar todos los días de la campaña de prueba sigue disponible **Reiniciar progreso de prueba**.

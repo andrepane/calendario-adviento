@@ -485,24 +485,36 @@
     if (reto.dependencias.length && ganadas.some(item => reto.dependencias.includes(item.id))) {
       porId('dia-vista').textContent += ' · evidencias de ejemplo';
     }
-    ER.vista.renderizar(pruebaVista, reto, {
-      ganadas,
-      interaccion: estadoPrevio[dia],
-      guardarInteraccion: estado => {
-        estadoPrevio[dia] = estado;
-        guardar(clave('previas'), estadoPrevio);
-      },
-      comprobar: respuesta => {
-        if (!ER.acertada(reto, respuesta)) return false;
-        ER.vista.renderizar(pruebaVista, reto, {
-          ganadas,
-          resuelto: true,
-          evidenciaNueva: ER.evidencias(datos).find(evidencia => evidencia.dia === dia)
-        });
-        pruebaVista.querySelector('.resultado-reto').focus();
-        return true;
-      }
-    });
+
+    function reiniciarVista(){
+      delete estadoPrevio[dia];
+      guardar(clave('previas'),estadoPrevio);
+      dibujarVista();
+      vista.scrollTop=0;
+      pruebaVista.querySelector('button:enabled, input, select, summary')?.focus({preventScroll:true});
+    }
+    function dibujarVista(){
+      ER.vista.renderizar(pruebaVista,reto,{
+        ganadas,
+        interaccion:estadoPrevio[dia],
+        guardarInteraccion:estado=>{
+          estadoPrevio[dia]=estado;
+          guardar(clave('previas'),estadoPrevio);
+        },
+        comprobar:respuesta=>{
+          if(!ER.acertada(reto,respuesta))return false;
+          ER.vista.renderizar(pruebaVista,reto,{
+            ganadas,
+            resuelto:true,
+            evidenciaNueva:ER.evidencias(datos).find(evidencia=>evidencia.dia===dia),
+            volverAJugar:reiniciarVista
+          });
+          pruebaVista.querySelector('.resultado-reto').focus();
+          return true;
+        }
+      });
+    }
+    dibujarVista();
     vista.showModal();
     vista.scrollTop = 0;
   });

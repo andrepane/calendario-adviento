@@ -139,6 +139,7 @@
         const cantidad = datos?.pistas?.[dia];
         return Number.isInteger(cantidad) && cantidad > 0 ? [[dia, cantidad]] : [];
       })),
+      repeticiones: Object.fromEntries(cadena.filter(dia=>datos?.repeticiones?.[dia]===true).map(dia=>[dia,true])),
       interacciones: datos?.interacciones && typeof datos.interacciones === 'object'
         && !Array.isArray(datos.interacciones) ? datos.interacciones : {}
     };

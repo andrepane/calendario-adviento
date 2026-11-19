@@ -101,7 +101,8 @@ function prepararTarjeta(dia, recienResuelto = false) {
   const reto = datos.capitulos[dia - 1];
   document.querySelector('#dia').textContent = `${dia} de diciembre`;
   document.querySelector('#titulo').textContent = reto.titulo || 'Capítulo por preparar';
-  const resuelto = avance.resueltos.includes(dia);
+  const repitiendo = enPrueba && avance.repeticiones[dia] === true;
+  const resuelto = avance.resueltos.includes(dia) && !repitiendo;
   const evidencia = ganadas();
   const proximo = dia + 1;
   const fechaLlegada = dia < 24 && hoy() >= ER.fechaPuerta(proximo);
@@ -116,6 +117,15 @@ function prepararTarjeta(dia, recienResuelto = false) {
   ER.vista.renderizar(contenido, reto, {
     ganadas: evidencia,
     resuelto,
+    volverAJugar: enPrueba ? () => {
+      avance.repeticiones[dia] = true;
+      delete avance.interacciones[dia];
+      delete avance.pistas[dia];
+      guardarProgreso();
+      prepararTarjeta(dia);
+      sorpresa.scrollTop = 0;
+      contenido.querySelector('button:enabled, input, select, summary')?.focus({preventScroll:true});
+    } : undefined,
     evidenciaNueva: evidencia.find(item => item.dia === dia),
     pistasVistas: avance.pistas[dia],
     interaccion: avance.interacciones[dia],
@@ -138,6 +148,12 @@ function prepararTarjeta(dia, recienResuelto = false) {
         });
       }
       if (avance.resueltos.includes(dia)) {
+        if (enPrueba && avance.repeticiones[dia]) {
+          if (!['disponible','resuelta'].includes(ER.estado(dia,hoy(),avance)) || !ER.acertada(reto,respuesta)) return false;
+          delete avance.repeticiones[dia];
+          guardarProgreso();
+          actualizarPuertas();
+        }
         prepararTarjeta(dia, true);
         return true;
       }

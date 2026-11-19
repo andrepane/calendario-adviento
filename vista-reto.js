@@ -187,6 +187,7 @@
       if (opciones.mensajeLlave) resultado.append(elemento('p', opciones.mensajeLlave));
       if (opciones.irSiguiente) resultado.append(boton('Abrir la siguiente ventana', opciones.irSiguiente));
       if (reto.premio) resultado.append(elemento('h3', 'El premio'), elemento('p', reto.premio));
+      if (opciones.volverAJugar) resultado.append(boton('Volver a jugar', opciones.volverAJugar));
       padre.append(resultado);
     } else {
       const formulario = elemento('form', '', 'form-reto');

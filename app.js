@@ -10,7 +10,7 @@ const cuaderno = document.querySelector('#cuaderno');
 const abrirCuaderno = document.querySelector('#abrir-cuaderno');
 const tarjetasCuaderno = document.querySelector('#tarjetas-cuaderno');
 const movimientoReducido = window.matchMedia('(prefers-reduced-motion: reduce)');
-const enPrueba = ER.local() && window.parent !== window
+const enPrueba = window.parent !== window
   && new URLSearchParams(location.search).has('prueba');
 const origenLocal = location.protocol === 'file:' ? '*' : location.origin;
 
@@ -21,6 +21,7 @@ let fechaSimulada;
 let ventanaActiva;
 let siguiente;
 let temporizador;
+let diaDePrueba;
 
 function leerProgreso() {
   try {
@@ -230,7 +231,13 @@ function prepararEntrada(){
   entrada=ER.experiencias.introduccion(portada,calendario,datos.experiencia,{
     vista:avance.introduccionVista,
     guardar:()=>{avance.introduccionVista=true;guardarProgreso();},
-    terminar:()=>{document.querySelector('#titulo-calendario').focus({preventScroll:true});programarActualizacion();}
+    terminar:()=>{
+      document.querySelector('#titulo-calendario').focus({preventScroll:true});programarActualizacion();
+      if(enPrueba&&ER.dias.includes(diaDePrueba)){
+        const numero=diaDePrueba;diaDePrueba=undefined;
+        setTimeout(()=>mostrarSorpresa(numero,puertas.children[numero-1]),0);
+      }
+    }
   });
 }
 document.querySelector('#repetir-introduccion').addEventListener('click',()=>entrada.repetir());
@@ -304,6 +311,7 @@ if (enPrueba) {
     datos = ER.calendario(evento.data.datos);
     fechaSimulada = evento.data.fecha;
     avance = ER.progreso(evento.data.avance);
+    diaDePrueba=ER.dias.includes(evento.data.abrirDia)?evento.data.abrirDia:undefined;
     document.documentElement.classList.toggle('movimiento-reducido',evento.data.movimientoReducido===true);
     abrir.disabled = false;
     actualizarPuertas();

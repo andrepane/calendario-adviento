@@ -129,3 +129,9 @@ El estado conserva posiciones, transmisión, vueltas continuas, contador e histo
 Para entregar una copia incluye **cerradura-transmisiones.js** además de los archivos de la versión 4. Los respaldos incluyen la configuración y la solución de referencia. Ejecuta **node tests/cerradura-transmisiones.test.cjs** para verificar la búsqueda independiente, los movimientos, la apertura, la referencia, la exportación y la fecha de la llave.
 
 La cerradura nueva se ha instalado también en el calendario publicado de Vercel, conservando el identificador de partida y los capítulos 2–24. No hace falta preparar ni subir un archivo para ver esta actualización. Una recarga con Ctrl + F5 obtiene los archivos nuevos. Las ediciones posteriores que hagas en tu borrador siguen requiriendo preparar e instalar tu calendario-publicado.js.
+
+## Enlace de prueba online
+
+Abre **prueba.html** en el sitio publicado para jugar con la fecha simulada del **24 de diciembre de 2026**. Usa exactamente **calendario-publicado.js**. El selector permite empezar por cualquier día, otorgando en la simulación las llaves y evidencias anteriores. **Empezar prueba de este día** comienza ese ensayo de nuevo; **Reiniciar prueba completa** vuelve al día 1. La recarga conserva el progreso del ensayo y su desenlace.
+
+El avance se guarda bajo **adviento-prueba-online-…**, separado del progreso real **adviento-escape-2026-…**. La página principal sigue usando la fecha real. El modo simulado requiere estar dentro de un iframe con el parámetro prueba; ambas partes verifican el origen y la ventana que envía los mensajes.

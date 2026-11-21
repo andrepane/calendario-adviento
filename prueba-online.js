@@ -1,6 +1,6 @@
 !function(){
   'use strict';
-  const ER=window.EscapeRoom,datos=ER.calendario(window.CALENDARIO_PUBLICADO),clave='adviento-prueba-online-'+datos.partida;
+  const ER=window.EscapeRoom,datos=ER.cerradura4.campana(ER.experiencias.campana(window.CAMPANA_MECANISMOS)),clave='adviento-prueba-online-'+datos.partida;
   const marco=document.getElementById('partida-prueba'),selector=document.getElementById('dia-prueba'),estado=document.getElementById('estado-prueba');
   const origen=location.protocol==='file:'?'*':location.origin;
   let guardado;try{guardado=JSON.parse(localStorage.getItem(clave));}catch{}

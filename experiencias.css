@@ -82,3 +82,11 @@ html { scrollbar-gutter:stable; }
 .esquema-transmisiones { margin-block:.75rem; }
 .cerradura-transmisiones .controles-ruedas>div { grid-template-columns:4.5rem 1fr 1fr; }
 @media(max-width:360px) { .cerradura-transmisiones .controles-ruedas>div { grid-template-columns:3.8rem 1fr 1fr; } }
+
+@media (max-width:600px) {
+  dialog { width:calc(100% - .5rem); max-height:calc(100% - .5rem); padding-inline:.75rem; }
+  dialog h2 { font-size:1.65rem; line-height:1.1; margin-block:.35rem; }
+  .cerradura-transmisiones > svg { max-height:32dvh; margin:auto; }
+  .cerradura-transmisiones .selector-transmision { margin-block:.3rem; }
+  .cerradura-transmisiones .controles-ruedas { gap:.2rem; margin-bottom:.3rem; }
+}

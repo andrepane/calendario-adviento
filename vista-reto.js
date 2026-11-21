@@ -128,36 +128,43 @@
     limpiar(padre);
     const { ganadas = [], resuelto = false } = opciones;
     padre.replaceChildren();
-    if (reto.instrucciones) padre.append(elemento('p', reto.instrucciones));
-    if (reto.apoyo) padre.append(elemento('p', reto.apoyo, 'apoyo-reto'));
-    const imagen = ER.rutaMultimedia(reto.imagen);
-    const audio = ER.rutaMultimedia(reto.audio);
-    if (imagen) {
-      const foto = elemento('img', '', 'foto-reto');
-      foto.src = imagen;
-      foto.alt = reto.alt;
-      padre.append(foto);
-    }
-    if (audio) {
-      const reproductor = elemento('audio');
-      reproductor.src = audio;
-      reproductor.preload = 'none';
-      reproductor.controls = true;
-      reproductor.setAttribute('aria-label', 'Audio de apoyo');
-      padre.append(reproductor);
-    }
-    if (reto.transcripcion) {
-      const transcripcion = elemento('details');
-      transcripcion.append(elemento('summary', 'Leer transcripción'), elemento('p', reto.transcripcion));
-      padre.append(transcripcion);
-    }
+    if (!resuelto) {
+      if (reto.instrucciones || reto.apoyo) {
+        const instrucciones = elemento('details');
+        instrucciones.append(elemento('summary', 'Instrucciones'));
+        if (reto.instrucciones) instrucciones.append(elemento('p', reto.instrucciones));
+        if (reto.apoyo) instrucciones.append(elemento('p', reto.apoyo));
+        padre.append(instrucciones);
+      }
+      const imagen = ER.rutaMultimedia(reto.imagen);
+      const audio = ER.rutaMultimedia(reto.audio);
+      if (imagen) {
+        const foto = elemento('img', '', 'foto-reto');
+        foto.src = imagen;
+        foto.alt = reto.alt;
+        padre.append(foto);
+      }
+      if (audio) {
+        const reproductor = elemento('audio');
+        reproductor.src = audio;
+        reproductor.preload = 'none';
+        reproductor.controls = true;
+        reproductor.setAttribute('aria-label', 'Audio de apoyo');
+        padre.append(reproductor);
+      }
+      if (reto.transcripcion) {
+        const transcripcion = elemento('details');
+        transcripcion.append(elemento('summary', 'Leer transcripción'), elemento('p', reto.transcripcion));
+        padre.append(transcripcion);
+      }
 
-    if (reto.dependencias.length) {
-      const consulta = elemento('details');
-      consulta.append(elemento('summary', 'Consultar evidencias de este reto'));
-      tarjetas(ganadas.filter(item => reto.dependencias.includes(item.id)), consulta);
-      if (consulta.children.length === 1) consulta.append(elemento('p', 'Todavía no hay evidencias ganadas para este reto.'));
-      padre.append(consulta);
+      if (reto.dependencias.length) {
+        const consulta = elemento('details');
+        consulta.append(elemento('summary', 'Consultar evidencias de este reto'));
+        tarjetas(ganadas.filter(item => reto.dependencias.includes(item.id)), consulta);
+        if (consulta.children.length === 1) consulta.append(elemento('p', 'Todavía no hay evidencias ganadas para este reto.'));
+        padre.append(consulta);
+      }
     }
 
     let ayudaEspecial,obtenerEstado;
@@ -189,10 +196,11 @@
         compartimento.append(tapa,elemento('p','Compartimento abierto'));
         resultado.prepend(compartimento);
       }
-      if (reto.acierto) resultado.append(elemento('p', reto.acierto));
-      if(reto.tipo==='cerradura'){
-        const luz=elemento('div','✦ La casa se ilumina ✦','casa-despierta');
-        luz.setAttribute('role','status');resultado.append(luz);
+      const acierto = opciones.mensajeLlave
+        ? reto.acierto?.replace(/(?:Has ganado|Ya tienes) la llave (?:del día \d+|para seguir)\.?/gi, '').trim()
+        : reto.acierto;
+      if (acierto && !/^Bien visto\.(?: Ya tienes lo que necesitas para seguir\.)?$/.test(acierto)) {
+        resultado.append(elemento('p', acierto));
       }
       if(reto.tipo==='combinacion'&&opciones.experiencia?.final){
         limpiezas.set(padre,ER.experiencias.final(resultado,opciones.experiencia,opciones.desenlace,opciones.guardarDesenlace));
@@ -254,8 +262,8 @@
       padre.append(formulario);
     }
 
-    if (!reto.pistas.length) return;
-    const bloque = elemento('section', '', 'pistas-reto');
+    if (resuelto || !reto.pistas.length) return;
+    const bloque = elemento('details', '', 'pistas-reto');
     const lista = elemento('ol');
     const aviso = elemento('p', '', 'solo-lector');
     aviso.setAttribute('role', 'status');
@@ -272,7 +280,7 @@
       revelar.setAttribute('aria-disabled', String(vistas >= reto.pistas.length));
     });
     // Mantiene el foco al revelar la última pista.
-    bloque.append(elemento('h3', 'Pistas'), lista, aviso);
+    bloque.append(elemento('summary', 'Pistas'), lista, aviso);
     if (vistas < reto.pistas.length) bloque.append(revelar);
     if (ayudaEspecial) {
       const solicitar = boton('Solicitar ayuda avanzada', () => {

@@ -3,6 +3,13 @@
 
   const ER = window.EscapeRoom;
   const limpiezas = new WeakMap();
+  function mensajeAcierto(texto, mensajeLlave) {
+    let mensaje = texto || '';
+    if (mensajeLlave) {
+      mensaje = mensaje.replace(/(?:Has ganado|Ya tienes)\s+(?:la siguiente llave|la llave (?:del día \d+|para seguir))\.?/gi, '').trim();
+    }
+    return /^(?:Bien visto|Mecanismo resuelto|Reto resuelto)\.?(?: Ya tienes lo que necesitas para seguir\.)?$/i.test(mensaje) ? '' : mensaje;
+  }
   function limpiar(padre) {
     limpiezas.get(padre)?.();
     limpiezas.delete(padre);
@@ -196,10 +203,8 @@
         compartimento.append(tapa,elemento('p','Compartimento abierto'));
         resultado.prepend(compartimento);
       }
-      const acierto = opciones.mensajeLlave
-        ? reto.acierto?.replace(/(?:Has ganado|Ya tienes) la llave (?:del día \d+|para seguir)\.?/gi, '').trim()
-        : reto.acierto;
-      if (acierto && !/^Bien visto\.(?: Ya tienes lo que necesitas para seguir\.)?$/.test(acierto)) {
+      const acierto = mensajeAcierto(reto.acierto, opciones.mensajeLlave);
+      if (acierto) {
         resultado.append(elemento('p', acierto));
       }
       if(reto.tipo==='combinacion'&&opciones.experiencia?.final){
@@ -294,5 +299,5 @@
     padre.append(bloque);
   }
 
-  ER.vista = { renderizar, tarjetas, limpiar };
+  ER.vista = { renderizar, tarjetas, limpiar, mensajeAcierto };
 }();

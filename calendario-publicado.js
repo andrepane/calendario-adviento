@@ -102,37 +102,35 @@ window.CALENDARIO_PUBLICADO = {
       "dependencias": []
     },
     {
-      "titulo": "Tres cajas",
-      "instrucciones": "Solo un cartel dice la verdad. Toca la caja donde crees que está la llave.",
+      "titulo": "Las tuberías congeladas",
+      "instrucciones": "Lleva el agua desde la entrada hasta la caldera, pasando por las dos válvulas y evitando la salida rota. Toca una tubería móvil para girarla un cuarto de vuelta. Las piezas con remaches están fijas.",
       "pregunta": "",
       "apoyo": "",
       "imagen": "",
       "alt": "",
       "audio": "",
-      "acierto": "Bien visto. Ya tienes lo que necesitas para seguir.",
+      "acierto": "Mecanismo resuelto. Ya tienes la siguiente llave.",
       "premio": "",
       "evidenciaTitulo": "",
       "evidenciaTexto": "",
       "combinacion": "",
-      "recursoTipo": "cajas",
+      "recursoTipo": "",
       "recursoDatos": "",
       "transcripcion": "",
       "evidenciaDibujo": "",
       "evidenciaDatos": "",
-      "configuracion": "",
+      "configuracion": "{\n  \"lado\": 5,\n  \"piezas\": [\n    {\n      \"id\": \"tubo-0\",\n      \"puertos\": [\n        3,\n        1\n      ],\n      \"fija\": true,\n      \"giro\": 0\n    },\n    {\n      \"id\": \"tubo-1\",\n      \"puertos\": [\n        3,\n        2\n      ],\n      \"fija\": false,\n      \"giro\": 0\n    },\n    {\n      \"id\": \"tubo-2\",\n      \"puertos\": [\n        2,\n        1\n      ],\n      \"fija\": false,\n      \"giro\": 3\n    },\n    {\n      \"id\": \"tubo-3\",\n      \"puertos\": [\n        3,\n        1\n      ],\n      \"fija\": false,\n      \"giro\": 2\n    },\n    {\n      \"id\": \"tubo-4\",\n      \"puertos\": [\n        3,\n        2\n      ],\n      \"fija\": true,\n      \"giro\": 0\n    },\n    {\n      \"id\": \"tubo-5\",\n      \"puertos\": [\n        0,\n        1\n      ],\n      \"fija\": false,\n      \"giro\": 0\n    },\n    {\n      \"id\": \"tubo-6\",\n      \"puertos\": [\n        0,\n        1\n      ],\n      \"fija\": false,\n      \"giro\": 3\n    },\n    {\n      \"id\": \"tubo-7\",\n      \"puertos\": [\n        3,\n        0\n      ],\n      \"fija\": false,\n      \"giro\": 2\n    },\n    {\n      \"id\": \"tubo-8\",\n      \"puertos\": [\n        0,\n        1\n      ],\n      \"fija\": false,\n      \"giro\": 1\n    },\n    {\n      \"id\": \"tubo-9\",\n      \"puertos\": [\n        0,\n        2\n      ],\n      \"fija\": false,\n      \"giro\": 0\n    },\n    {\n      \"id\": \"tubo-10\",\n      \"puertos\": [\n        1,\n        2\n      ],\n      \"fija\": true,\n      \"giro\": 0\n    },\n    {\n      \"id\": \"tubo-11\",\n      \"puertos\": [\n        1,\n        3\n      ],\n      \"fija\": false,\n      \"giro\": 2\n    },\n    {\n      \"id\": \"tubo-12\",\n      \"puertos\": [\n        1,\n        3\n      ],\n      \"fija\": false,\n      \"giro\": 1\n    },\n    {\n      \"id\": \"tubo-13\",\n      \"puertos\": [\n        1,\n        3\n      ],\n      \"fija\": false,\n      \"giro\": 0\n    },\n    {\n      \"id\": \"tubo-14\",\n      \"puertos\": [\n        0,\n        3\n      ],\n      \"fija\": false,\n      \"giro\": 3\n    },\n    {\n      \"id\": \"tubo-15\",\n      \"puertos\": [\n        0,\n        2\n      ],\n      \"fija\": false,\n      \"giro\": 2\n    },\n    {\n      \"id\": \"tubo-16\",\n      \"puertos\": [\n        0,\n        1\n      ],\n      \"fija\": false,\n      \"giro\": 1\n    },\n    {\n      \"id\": \"tubo-17\",\n      \"puertos\": [\n        0,\n        1\n      ],\n      \"fija\": false,\n      \"giro\": 0\n    },\n    {\n      \"id\": \"tubo-18\",\n      \"puertos\": [\n        0,\n        1\n      ],\n      \"fija\": true,\n      \"giro\": 0\n    },\n    {\n      \"id\": \"tubo-19\",\n      \"puertos\": [\n        0,\n        1\n      ],\n      \"fija\": false,\n      \"giro\": 2\n    },\n    {\n      \"id\": \"tubo-20\",\n      \"puertos\": [\n        0,\n        1\n      ],\n      \"fija\": true,\n      \"giro\": 0\n    },\n    {\n      \"id\": \"tubo-21\",\n      \"puertos\": [\n        3,\n        1\n      ],\n      \"fija\": false,\n      \"giro\": 0\n    },\n    {\n      \"id\": \"tubo-22\",\n      \"puertos\": [\n        3,\n        1\n      ],\n      \"fija\": false,\n      \"giro\": 3\n    },\n    {\n      \"id\": \"tubo-23\",\n      \"puertos\": [\n        3,\n        1\n      ],\n      \"fija\": false,\n      \"giro\": 2\n    },\n    {\n      \"id\": \"tubo-24\",\n      \"puertos\": [\n        3,\n        1\n      ],\n      \"fija\": true,\n      \"giro\": 0\n    }\n  ],\n  \"entrada\": 0,\n  \"caldera\": 24,\n  \"valvulas\": [\n    4,\n    20\n  ],\n  \"rota\": 5,\n  \"solucion\": [\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0\n  ]\n}",
       "normalizacion": "",
-      "tipo": "opciones",
+      "tipo": "tuberias",
       "listo": true,
       "respuestas": [],
-      "opciones": [
-        "A · La llave está en B",
-        "B · La llave no está aquí",
-        "C · La llave no está en A"
-      ],
-      "correcta": 0,
+      "opciones": [],
+      "correcta": -1,
       "orden": [],
       "pistas": [
-        "Supón que la llave está en una caja y cuenta cuántos carteles serían ciertos. Repite con las demás."
+        "Sigue el agua desde la entrada. Solo cruza una unión si las dos bocas coinciden.",
+        "La primera válvula está en la esquina superior derecha; la segunda, abajo a la izquierda.",
+        "Al principio, baja por la segunda columna, gira a la derecha y vuelve arriba por la tercera. Después cruza el centro hacia la izquierda y termina por abajo."
       ],
       "dependencias": []
     },
@@ -172,14 +170,14 @@ window.CALENDARIO_PUBLICADO = {
       ]
     },
     {
-      "titulo": "La letra que más se repite",
-      "instrucciones": "En el mensaje descifrado hay una vocal que aparece más veces que las demás. Encuéntrala. Después introduce el número que le corresponde en tu alfabeto.",
+      "titulo": "El ascensor de mantenimiento",
+      "instrucciones": "El mensaje habla de una chimenea: esa es la planta de destino. La placa traduce cada letra con tu alfabeto. Puedes pasar por plantas bloqueadas, pero no detenerte en ellas. Salir del edificio o intentar llegar a una planta bloqueada no consume movimientos. Llega en seis movimientos o menos.",
       "pregunta": "",
       "apoyo": "",
       "imagen": "",
       "alt": "",
       "audio": "",
-      "acierto": "Bien visto. Ya tienes la llave para seguir.",
+      "acierto": "Mecanismo resuelto. Ya tienes la siguiente llave.",
       "premio": "",
       "evidenciaTitulo": "Nochevieja = 9",
       "evidenciaTexto": "Nochevieja = 9.",
@@ -189,18 +187,18 @@ window.CALENDARIO_PUBLICADO = {
       "transcripcion": "",
       "evidenciaDibujo": "reloj",
       "evidenciaDatos": "",
-      "configuracion": "",
+      "configuracion": "{\n  \"minimo\": 0,\n  \"maximo\": 24,\n  \"inicio\": 4,\n  \"destino\": 21,\n  \"limite\": 6,\n  \"bloqueadas\": [\n    12,\n    16,\n    20\n  ],\n  \"botones\": [\n    {\n      \"letra\": \"H\",\n      \"desplaza\": 4\n    },\n    {\n      \"letra\": \"C\",\n      \"desplaza\": -3\n    }\n  ],\n  \"solucion\": [\n    0,\n    1,\n    0,\n    0,\n    0,\n    0\n  ]\n}",
       "normalizacion": "",
-      "tipo": "escrita",
+      "tipo": "mantenimiento",
       "listo": true,
-      "respuestas": [
-        "9"
-      ],
+      "respuestas": [],
       "opciones": [],
       "correcta": -1,
       "orden": [],
       "pistas": [
-        "Primero busca la vocal. Después consulta su número."
+        "H y C se traducen usando la tarjeta del día 2. La flecha indica el sentido.",
+        "Intentar subir siempre te deja ante una planta bloqueada. Necesitas bajar una vez.",
+        "Tras llegar al piso 8, baja tres plantas. Después podrás subir de cuatro en cuatro."
       ],
       "dependencias": [
         "evidencia-2",
@@ -208,50 +206,70 @@ window.CALENDARIO_PUBLICADO = {
       ]
     },
     {
-      "titulo": "El reflejo",
-      "instrucciones": "Al otro lado se lee mejor.",
+      "titulo": "El visor averiado",
+      "instrucciones": "Cada visor perdió los segmentos marcados en su diagnóstico. Esos trazos no se encienden aunque la cifra los necesite. Reconstruye las cuatro cifras originales y escribe el código.",
       "pregunta": "",
       "apoyo": "",
       "imagen": "",
       "alt": "",
       "audio": "",
-      "acierto": "Bien visto. Ya tienes la llave para seguir.",
+      "acierto": "Mecanismo resuelto. Ya tienes la siguiente llave.",
       "premio": "",
       "evidenciaTitulo": "El espejo",
-      "evidenciaTexto": "El espejo vuelve a aparecer más adelante.",
+      "evidenciaTexto": "El espejo abre la tapa de otro mecanismo.",
       "combinacion": "",
-      "recursoTipo": "reflejo",
-      "recursoDatos": "PARA ABRIR ESTA PUERTA ESCRIBE REFLEJO",
+      "recursoTipo": "",
+      "recursoDatos": "",
       "transcripcion": "",
       "evidenciaDibujo": "espejo",
       "evidenciaDatos": "",
-      "configuracion": "",
+      "configuracion": "{\n  \"visores\": [\n    {\n      \"averiados\": \"ac\",\n      \"visibles\": \"bdefg\"\n    },\n    {\n      \"averiados\": \"ab\",\n      \"visibles\": \"cdef\"\n    },\n    {\n      \"averiados\": \"ac\",\n      \"visibles\": \"dfg\"\n    },\n    {\n      \"averiados\": \"ab\",\n      \"visibles\": \"deg\"\n    }\n  ],\n  \"solucion\": \"8052\"\n}",
       "normalizacion": "",
-      "tipo": "escrita",
+      "tipo": "diagnostico",
       "listo": true,
-      "respuestas": [
-        "REFLEJO"
-      ],
+      "respuestas": [],
       "opciones": [],
       "correcta": -1,
       "orden": [],
       "pistas": [
-        "Un espejo puede deshacer lo que hizo otro."
+        "Compara los segmentos que funcionan con la referencia de cifras completas.",
+        "Un trazo apagado que funciona descarta cualquier cifra que lo necesite.",
+        "Las cuatro cifras son 8, 0, 5 y 2, en ese orden."
       ],
       "dependencias": []
     },
     {
-      "listo": true,
-      "acierto": "El cuadro está apagado. Ya tienes la llave del día 9.",
       "titulo": "El cuadro eléctrico",
       "instrucciones": "El cuadro está averiado. Cada interruptor cambia su propia luz y las que tiene justo arriba, abajo, a izquierda y a derecha. Las diagonales quedan igual. Consigue apagar todo el panel utilizando como máximo cuatro interruptores distintos.",
-      "tipo": "electrico",
+      "pregunta": "",
+      "apoyo": "",
+      "imagen": "",
+      "alt": "",
+      "audio": "",
+      "acierto": "El cuadro está apagado. Ya tienes la llave del día 9.",
+      "premio": "",
+      "evidenciaTitulo": "",
+      "evidenciaTexto": "",
+      "combinacion": "",
+      "recursoTipo": "",
+      "recursoDatos": "",
+      "transcripcion": "",
+      "evidenciaDibujo": "",
+      "evidenciaDatos": "",
       "configuracion": "{\n  \"inicial\": [\n    3,\n    5,\n    7,\n    9\n  ],\n  \"maximo\": 4\n}",
+      "normalizacion": "",
+      "tipo": "electrico",
+      "listo": true,
+      "respuestas": [],
+      "opciones": [],
+      "correcta": -1,
+      "orden": [],
       "pistas": [
         "El orden de los interruptores no cambia el resultado. Importa cuáles dejas seleccionados.",
         "Necesitarás cuatro interruptores. Uno de ellos es el central.",
         "Dos están en el centro de los bordes superior e izquierdo. El cuarto está en una esquina."
-      ]
+      ],
+      "dependencias": []
     },
     {
       "titulo": "Cerradura de tres cifras",
@@ -321,73 +339,71 @@ window.CALENDARIO_PUBLICADO = {
       "dependencias": []
     },
     {
-      "titulo": "La grabación",
-      "instrucciones": "Escucha la grabación. Introduce las cifras empezando por la última que oigas.",
-      "pregunta": "",
-      "apoyo": "",
-      "imagen": "",
-      "alt": "",
-      "audio": "./fotos/grabacion-campana.wav",
-      "acierto": "Bien visto. Ya tienes lo que necesitas para seguir.",
-      "premio": "",
-      "evidenciaTitulo": "Nota de la grabación",
-      "evidenciaTexto": "Cuando veas el espejo, lee desde la derecha.",
-      "combinacion": "",
-      "recursoTipo": "",
-      "recursoDatos": "",
-      "transcripcion": "Nueve… cuatro… seis.",
-      "evidenciaDibujo": "",
-      "evidenciaDatos": "",
-      "configuracion": "",
-      "normalizacion": "",
-      "tipo": "escrita",
-      "listo": true,
-      "respuestas": [
-        "649"
-      ],
-      "opciones": [],
-      "correcta": -1,
-      "orden": [],
-      "pistas": [
-        "Anota las tres cifras tal como suenan y después cambia el sentido de lectura."
-      ],
-      "dependencias": []
-    },
-    {
-      "titulo": "La cifra del espejo",
-      "instrucciones": "Lee la tira como indica la nota. ¿Qué cifra lees primero?",
+      "titulo": "El laberinto de los anillos",
+      "instrucciones": "Lleva la bolita del borde al centro. Gira cada anillo con los botones o deslizando sobre él. La bolita viaja con su anillo cuando lo giras y permanece en el mismo pasillo. Avanza por los pasillos claros y entra al siguiente anillo solo cuando sus puertas estén conectadas.",
       "pregunta": "",
       "apoyo": "",
       "imagen": "",
       "alt": "",
       "audio": "",
-      "acierto": "Bien visto. Ya tienes lo que necesitas para seguir.",
+      "acierto": "Mecanismo resuelto. Ya tienes la siguiente llave.",
       "premio": "",
-      "evidenciaTitulo": "Espejo = 3",
-      "evidenciaTexto": "Espejo = 3.",
+      "evidenciaTitulo": "",
+      "evidenciaTexto": "",
       "combinacion": "",
-      "recursoTipo": "espejo",
+      "recursoTipo": "",
       "recursoDatos": "",
       "transcripcion": "",
-      "evidenciaDibujo": "espejo",
+      "evidenciaDibujo": "",
       "evidenciaDatos": "",
-      "configuracion": "",
+      "configuracion": "{\n  \"sectores\": 12,\n  \"entrada\": 0,\n  \"anillos\": [\n    {\n      \"entrada\": 0,\n      \"salida\": 5,\n      \"pasillos\": [\n        [\n          0,\n          1\n        ],\n        [\n          1,\n          2\n        ],\n        [\n          2,\n          3\n        ],\n        [\n          3,\n          4\n        ],\n        [\n          4,\n          5\n        ],\n        [\n          0,\n          11\n        ],\n        [\n          11,\n          10\n        ]\n      ]\n    },\n    {\n      \"entrada\": 2,\n      \"salida\": 8,\n      \"pasillos\": [\n        [\n          2,\n          3\n        ],\n        [\n          3,\n          4\n        ],\n        [\n          4,\n          5\n        ],\n        [\n          5,\n          6\n        ],\n        [\n          6,\n          7\n        ],\n        [\n          7,\n          8\n        ],\n        [\n          2,\n          1\n        ],\n        [\n          1,\n          0\n        ]\n      ]\n    },\n    {\n      \"entrada\": 7,\n      \"salida\": 1,\n      \"pasillos\": [\n        [\n          7,\n          8\n        ],\n        [\n          8,\n          9\n        ],\n        [\n          9,\n          10\n        ],\n        [\n          10,\n          11\n        ],\n        [\n          11,\n          0\n        ],\n        [\n          0,\n          1\n        ],\n        [\n          7,\n          6\n        ],\n        [\n          6,\n          5\n        ]\n      ]\n    },\n    {\n      \"entrada\": 10,\n      \"salida\": 4,\n      \"pasillos\": [\n        [\n          10,\n          11\n        ],\n        [\n          11,\n          0\n        ],\n        [\n          0,\n          1\n        ],\n        [\n          1,\n          2\n        ],\n        [\n          2,\n          3\n        ],\n        [\n          3,\n          4\n        ],\n        [\n          10,\n          9\n        ],\n        [\n          9,\n          8\n        ]\n      ]\n    }\n  ],\n  \"giros\": [\n    3,\n    5,\n    2,\n    7\n  ],\n  \"solucion\": [\n    {\n      \"tipo\": \"girar\",\n      \"anillo\": 0,\n      \"paso\": -1\n    },\n    {\n      \"tipo\": \"girar\",\n      \"anillo\": 0,\n      \"paso\": -1\n    },\n    {\n      \"tipo\": \"girar\",\n      \"anillo\": 0,\n      \"paso\": -1\n    },\n    {\n      \"tipo\": \"entrar\"\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"girar\",\n      \"anillo\": 1,\n      \"paso\": -1\n    },\n    {\n      \"tipo\": \"girar\",\n      \"anillo\": 1,\n      \"paso\": -1\n    },\n    {\n      \"tipo\": \"entrar\"\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"girar\",\n      \"anillo\": 2,\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"girar\",\n      \"anillo\": 2,\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"entrar\"\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"entrar\"\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"andar\",\n      \"paso\": 1\n    },\n    {\n      \"tipo\": \"entrar\"\n    }\n  ]\n}",
       "normalizacion": "",
-      "tipo": "escrita",
+      "tipo": "anillos",
       "listo": true,
-      "respuestas": [
-        "3"
-      ],
+      "respuestas": [],
       "opciones": [],
       "correcta": -1,
       "orden": [],
       "pistas": [
-        "La nota te indica por qué extremo de la tira debes empezar."
+        "Primero alinea la entrada del anillo exterior con la bolita de arriba.",
+        "Recorre el pasillo de tu anillo hasta la puerta interior y alinea la entrada del siguiente. Los ramales cortos terminan en paredes.",
+        "Los pasillos principales avanzan en sentido horario. Ajusta cada anillo interior cuando alcances la salida del anterior."
+      ],
+      "dependencias": []
+    },
+    {
+      "titulo": "El mecanismo del espejo",
+      "instrucciones": "Gira la rueda motriz hasta alinear las tres marcas con sus indicadores fijos. Cada paso mueve un diente: las ruedas vecinas giran en sentidos opuestos. El embrague conecta o libera la tercera rueda. Al liberarla, esa rueda conserva su posición.",
+      "pregunta": "",
+      "apoyo": "",
+      "imagen": "",
+      "alt": "",
+      "audio": "",
+      "acierto": "Mecanismo resuelto. Ya tienes la siguiente llave.",
+      "premio": "",
+      "evidenciaTitulo": "Espejo = 3",
+      "evidenciaTexto": "Espejo = 3.",
+      "combinacion": "",
+      "recursoTipo": "",
+      "recursoDatos": "",
+      "transcripcion": "",
+      "evidenciaDibujo": "espejo",
+      "evidenciaDatos": "",
+      "configuracion": "{\n  \"dientes\": [\n    12,\n    18,\n    24\n  ],\n  \"inicio\": [\n    0,\n    0,\n    0\n  ],\n  \"objetivos\": [\n    3,\n    15,\n    5\n  ],\n  \"solucion\": [\n    1,\n    1,\n    1,\n    1,\n    1,\n    \"embrague\",\n    -1,\n    -1\n  ]\n}",
+      "normalizacion": "",
+      "tipo": "engranajes",
+      "listo": true,
+      "respuestas": [],
+      "opciones": [],
+      "correcta": -1,
+      "orden": [],
+      "pistas": [
+        "Con el embrague conectado, la tercera rueda acumula el movimiento. Al liberarlo puedes corregir las dos primeras.",
+        "La tercera marca necesita cinco pasos; las dos primeras necesitan un total de tres.",
+        "Avanza cinco pasos con el embrague, libéralo y retrocede dos pasos."
       ],
       "dependencias": [
-        "evidencia-7",
-        "evidencia-9",
-        "evidencia-11"
+        "evidencia-7"
       ]
     },
     {
@@ -420,35 +436,35 @@ window.CALENDARIO_PUBLICADO = {
       "dependencias": []
     },
     {
-      "titulo": "El mensaje de cuatro líneas",
-      "instrucciones": "Lee la nota.",
-      "pregunta": "¿Qué palabra esconde la nota?",
+      "titulo": "El vitral lunar",
+      "instrucciones": "Elige dos discos y gíralos sobre la lámpara. Cualquier zona opaca de cualquiera de ellos bloquea la luz. Reproduce y guarda los cuatro modelos de la tarjeta. Los discos A y B son transparentes; C y D tienen media superficie opaca.",
+      "pregunta": "",
       "apoyo": "",
       "imagen": "",
       "alt": "",
       "audio": "",
-      "acierto": "Bien visto. Ya tienes lo que necesitas para seguir.",
+      "acierto": "Mecanismo resuelto. Ya tienes la siguiente llave.",
       "premio": "",
       "evidenciaTitulo": "Las cuatro fases de la luna",
-      "evidenciaTexto": "Conserva las fases en este orden.",
+      "evidenciaTexto": "Nueva → Creciente → Llena → Menguante.",
       "combinacion": "",
-      "recursoTipo": "nota",
-      "recursoDatos": "La puerta sigue cerrada.\nUna copia quedó dentro.\nNadie ha vuelto a buscarla.\nAntes de salir, mira el principio",
+      "recursoTipo": "",
+      "recursoDatos": "",
       "transcripcion": "",
       "evidenciaDibujo": "luna",
       "evidenciaDatos": "Nueva\nCreciente\nLlena\nMenguante",
-      "configuracion": "",
+      "configuracion": "{\n  \"discos\": [\n    {\n      \"nombre\": \"A\",\n      \"opaco\": [\n        0,\n        0,\n        0,\n        0\n      ]\n    },\n    {\n      \"nombre\": \"B\",\n      \"opaco\": [\n        0,\n        0,\n        0,\n        0\n      ]\n    },\n    {\n      \"nombre\": \"C\",\n      \"opaco\": [\n        0,\n        0,\n        1,\n        1\n      ]\n    },\n    {\n      \"nombre\": \"D\",\n      \"opaco\": [\n        1,\n        1,\n        0,\n        0\n      ]\n    }\n  ],\n  \"modelos\": [\n    {\n      \"id\": \"nueva\",\n      \"nombre\": \"Nueva\",\n      \"opaco\": [\n        1,\n        1,\n        1,\n        1\n      ]\n    },\n    {\n      \"id\": \"creciente\",\n      \"nombre\": \"Creciente\",\n      \"opaco\": [\n        0,\n        0,\n        1,\n        1\n      ]\n    },\n    {\n      \"id\": \"llena\",\n      \"nombre\": \"Llena\",\n      \"opaco\": [\n        0,\n        0,\n        0,\n        0\n      ]\n    },\n    {\n      \"id\": \"menguante\",\n      \"nombre\": \"Menguante\",\n      \"opaco\": [\n        1,\n        1,\n        0,\n        0\n      ]\n    }\n  ],\n  \"soluciones\": {\n    \"nueva\": {\n      \"discos\": [\n        2,\n        3\n      ],\n      \"giros\": [\n        0,\n        0,\n        0,\n        0\n      ]\n    },\n    \"creciente\": {\n      \"discos\": [\n        0,\n        2\n      ],\n      \"giros\": [\n        0,\n        0,\n        0,\n        0\n      ]\n    },\n    \"llena\": {\n      \"discos\": [\n        0,\n        1\n      ],\n      \"giros\": [\n        0,\n        0,\n        0,\n        0\n      ]\n    },\n    \"menguante\": {\n      \"discos\": [\n        0,\n        3\n      ],\n      \"giros\": [\n        0,\n        0,\n        0,\n        0\n      ]\n    }\n  }\n}",
       "normalizacion": "",
-      "tipo": "escrita",
+      "tipo": "vitral",
       "listo": true,
-      "respuestas": [
-        "LUNA"
-      ],
+      "respuestas": [],
       "opciones": [],
       "correcta": -1,
       "orden": [],
       "pistas": [
-        "La última línea te dice en qué parte de cada línea fijarte."
+        "Dos zonas opacas nunca se anulan. La luz solo pasa donde los dos discos son transparentes.",
+        "Combina las dos mitades para apagar la lámpara y los dos discos transparentes para iluminarla entera.",
+        "Nueva: C+D sin girar. Creciente: A+C. Llena: A+B. Menguante: A+D."
       ],
       "dependencias": []
     },
@@ -519,14 +535,14 @@ window.CALENDARIO_PUBLICADO = {
       ]
     },
     {
-      "titulo": "El nonograma",
-      "instrucciones": "Pinta las casillas que indican las pistas de filas y columnas.",
+      "titulo": "El nonograma de la casa",
+      "instrucciones": "Completa el dibujo de una casa de invierno. Cada ficha de una pista representa un grupo separado por al menos una casilla vacía. Puedes pintar o marcar los vacíos con las herramientas.",
       "pregunta": "",
       "apoyo": "",
       "imagen": "",
       "alt": "",
       "audio": "",
-      "acierto": "Bien visto. Ya tienes la llave para seguir.",
+      "acierto": "Mecanismo resuelto. Ya tienes la siguiente llave.",
       "premio": "",
       "evidenciaTitulo": "",
       "evidenciaTexto": "",
@@ -536,7 +552,7 @@ window.CALENDARIO_PUBLICADO = {
       "transcripcion": "",
       "evidenciaDibujo": "",
       "evidenciaDatos": "",
-      "configuracion": "{\n  \"solucion\": [\n    \"10001\",\n    \"10001\",\n    \"11111\",\n    \"00001\",\n    \"00001\"\n  ]\n}",
+      "configuracion": "{\n  \"solucion\": [\n    \"00011000\",\n    \"00111100\",\n    \"01100110\",\n    \"11000011\",\n    \"11111111\",\n    \"10100101\",\n    \"10100101\",\n    \"11111111\"\n  ]\n}",
       "normalizacion": "",
       "tipo": "nonograma",
       "listo": true,
@@ -545,7 +561,9 @@ window.CALENDARIO_PUBLICADO = {
       "correcta": -1,
       "orden": [],
       "pistas": [
-        "La fila con un 5 se pinta entera. Después compara las columnas."
+        "Empieza por las filas completas y usa sus cruces para situar los grupos verticales.",
+        "Los grupos 1, 1 se mantienen separados: no equivalen a un 2.",
+        "El dibujo tiene tejado arriba y dos filas de ventanas debajo de una línea completa."
       ],
       "dependencias": []
     },
@@ -654,35 +672,35 @@ window.CALENDARIO_PUBLICADO = {
       "dependencias": []
     },
     {
-      "titulo": "La letra repetida",
-      "instrucciones": "Busca una letra presente en las tres palabras y repetida en una de ellas.",
+      "titulo": "El segundo cuadro eléctrico",
+      "instrucciones": "Apaga el cuadro con seis interruptores seleccionados como máximo. Cada pulsación cambia su luz y las vecinas ortogonales. Los cables unen 1 con 16 y 4 con 13: pulsar un extremo cambia también el otro. Una luz cambia una sola vez en cada pulsación. Tocar de nuevo un interruptor deshace su efecto.",
       "pregunta": "",
       "apoyo": "",
       "imagen": "",
       "alt": "",
       "audio": "",
-      "acierto": "Bien visto. Ya tienes lo que necesitas para seguir.",
+      "acierto": "Mecanismo resuelto. Ya tienes la siguiente llave.",
       "premio": "",
       "evidenciaTitulo": "",
       "evidenciaTexto": "",
       "combinacion": "",
-      "recursoTipo": "tiras",
-      "recursoDatos": "T R U E N O\nN U B E S\nN I E B L I N A",
+      "recursoTipo": "",
+      "recursoDatos": "",
       "transcripcion": "",
       "evidenciaDibujo": "",
       "evidenciaDatos": "",
-      "configuracion": "",
+      "configuracion": "{\n  \"lado\": 4,\n  \"inicial\": [\n    2,\n    3,\n    7,\n    9,\n    10,\n    11,\n    12\n  ],\n  \"maximo\": 6,\n  \"conexiones\": [\n    [\n      1,\n      16\n    ],\n    [\n      4,\n      13\n    ]\n  ],\n  \"solucion\": [\n    3,\n    4,\n    7,\n    10,\n    11,\n    14\n  ]\n}",
       "normalizacion": "",
-      "tipo": "escrita",
+      "tipo": "electrico",
       "listo": true,
-      "respuestas": [
-        "N"
-      ],
+      "respuestas": [],
       "opciones": [],
       "correcta": -1,
       "orden": [],
       "pistas": [
-        "Empieza por la palabra más larga y apunta qué letras se repiten en ella."
+        "Los cables actúan en ambos sentidos. Cuenta sus extremos además de los vecinos.",
+        "El mínimo es seis. Puedes deshacer una selección sin gastar otro interruptor.",
+        "Una solución es 3, 4, 7, 10, 11 y 14."
       ],
       "dependencias": []
     },
@@ -754,7 +772,12 @@ window.CALENDARIO_PUBLICADO = {
       "pistas": [
         "Fija primero el espejo. Nochevieja y la campana deben quedar juntas."
       ],
-      "dependencias": []
+      "dependencias": [
+        "evidencia-6",
+        "evidencia-12",
+        "evidencia-18",
+        "evidencia-22"
+      ]
     },
     {
       "titulo": "La caja fuerte",

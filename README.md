@@ -135,3 +135,13 @@ La cerradura nueva se ha instalado también en el calendario publicado de Vercel
 Abre **prueba.html** en el sitio publicado para jugar con la fecha simulada del **24 de diciembre de 2026**. Usa exactamente **calendario-publicado.js**. El selector permite empezar por cualquier día, otorgando en la simulación las llaves y evidencias anteriores. **Empezar prueba de este día** comienza ese ensayo de nuevo; **Reiniciar prueba completa** vuelve al día 1. La recarga conserva el progreso del ensayo y su desenlace.
 
 El avance se guarda bajo **adviento-prueba-online-…**, separado del progreso real **adviento-escape-2026-…**. La página principal sigue usando la fecha real. El modo simulado requiere estar dentro de un iframe con el parámetro prueba; ambas partes verifican el origen y la ventana que envía los mensajes.
+
+## Publicación de la prueba validada de mejora-movil
+
+La campaña instalada en **calendario-publicado.js** contiene los 24 retos y la configuración del desenlace de la prueba validada en el commit **a52349d** de la PR #14. Se materializó la composición de mecanismos, experiencias y cerradura una sola vez. Tanto **index.html** como **prueba.html** leen ese mismo archivo; la prueba no vuelve a construir ni modifica los retos. El selector solo cambia el acceso, la fecha simulada y su progreso independiente.
+
+Se conserva el identificador real **caja-adviento-v4** para mantener el almacenamiento **adviento-escape-2026-caja-adviento-v4**, incluidos días resueltos, pistas, interacciones, introducción vista y recuerdo del desenlace. No hay que migrar ni borrar la partida. El calendario de Cintia conserva la hora de Madrid, las fechas y la llave del día anterior. La prueba sigue guardando con el prefijo **adviento-prueba-online-**.
+
+Se preservan los mandos compactos, los ajustes móviles y el nacimiento. Las instrucciones y pistas son desplegables mientras el reto está pendiente y se retiran al resolverlo. La entrega de llave aparece una sola vez. **campana-mecanismos.js** se incluye en el despliegue; el editor y las campañas antiguas privadas conservan sus exclusiones.
+
+Ejecuta **node tests/publicacion.test.cjs** para contrastar los 24 retos con la instantánea de validación (solo usada por las pruebas), comprobar la fuente única de campaña, los archivos del despliegue, el progreso compatible, las fechas, las llaves y los mensajes. Las pruebas de la cerradura y las experiencias siguen disponibles en **tests/**.

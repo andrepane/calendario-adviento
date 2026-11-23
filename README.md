@@ -174,3 +174,16 @@ Revisión en navegador: 375, 390 y 440 píxeles, más escritorio a 1440; caja y 
 Se reutilizan los dos PNG aportados. Los originales subidos tenían ambos 1254 × 1254 píxeles; se han reducido, sin cambiar el diseño, a **192 × 192** y **512 × 512**, coincidiendo con el manifiesto.
 
 Para comprobar la instalación en un iPhone real: abre el calendario en Safari, pulsa **Compartir → Añadir a pantalla de inicio**, confirma que el icono es el cierre dorado y el nombre **Adviento**, y comprueba que al tocarlo se abre el calendario real. Esta verificación física en iPhone queda pendiente; la comprobación de archivos y metadatos del despliegue no la sustituye.
+
+
+## Revisión de los días 4, 13 y 14
+
+La campaña publicada, usada también por la prueba online, incorpora estos tres ajustes. El día 4 mantiene sus reglas de agua, dos válvulas y salida rota: ahora tiene 36 piezas en un tablero de 6 × 6. Una búsqueda independiente verifica un único recorrido de 35 casillas, sin atajos, con 31 piezas móviles inicialmente desalineadas. Se mantienen deshacer, reiniciar y guardado.
+
+El día 13 sigue siendo un ahorcado de ocho fallos, con una frase de invierno relacionada con la casa. Las palabras se separan visualmente, los espacios y signos aparecen desde el inicio y las letras repetidas se revelan juntas. También siguen funcionando las palabras de los respaldos anteriores. El editor acepta «Palabra o frase del ahorcado».
+
+El día 14 conserva la superposición física de sombras: solo pasa luz donde ambos cristales son transparentes. Se sustituyen los dos discos transparentes idénticos por cuatro cristales distintos, ocho posiciones y cuatro patrones de calibración. Cada patrón tiene una única pareja y orientación, comprobada enumerando las 384 combinaciones. Los patrones se comparan junto a la lámpara; no pretenden ser las siluetas de las fases. Completar la calibración libera la misma tarjeta Nueva → Creciente → Llena → Menguante que necesita el día 16. La combinación final sigue siendo 3946.
+
+En un borrador existente del editor, «Actualizar días 4, 13 y 14 al nuevo diseño» reemplaza solo esos capítulos; después hay que guardar el borrador. Los nuevos juegos guardan una firma de su configuración para no reutilizar tableros incompletos incompatibles. No se borra la cadena de días resueltos ni se cambia el identificador de partida.
+
+Validación: node tests/retos-41314.test.cjs, más las pruebas de publicación, historia, experiencias y cerradura. Se han recorrido en navegador las tres soluciones, el reinicio del ahorcado, deshacer en tuberías y la persistencia de giros, letras y modelos registrados.

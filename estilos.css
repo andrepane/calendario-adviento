@@ -722,6 +722,10 @@ details .evidencia { margin-top: .5rem; }
 .huecos-anagrama button { background: #e6d1ab; }
 .palabra-ahorcado { display: flex; flex-wrap: wrap; gap: .2rem; }
 .palabra-ahorcado span { width: 1.55rem; min-height: 2rem; display: grid; place-items: center; border-bottom: 2px solid #997b59; font-weight: 700; }
+.palabra-ahorcado { gap:.65rem .8rem; }
+.palabra-ahorcado .grupo-ahorcado { display:flex; flex-wrap:wrap; gap:.15rem; width:max-content; max-width:100%; min-height:0; border:0; }
+.letra-ahorcado { display:grid; place-items:center; width:1.25rem; min-height:2rem; border-bottom:2px solid #997b59; font-style:normal; font-weight:700; }
+.letra-ahorcado.signo-ahorcado { width:.5rem; border:0; }
 .teclado-letras { display: grid; grid-template-columns: repeat(auto-fit,minmax(44px,1fr)); gap: .25rem; }
 .teclado-letras button { padding: .25rem; }
 .luces-ahorcado { display: flex; flex-wrap: wrap; gap: .35rem; color: #926222; font-size: 1.4rem; }
@@ -866,6 +870,21 @@ details .evidencia { margin-top: .5rem; }
 .modelos-vitral button { width:100%; font-size:.83rem; }
 .lampara-vitral { padding:.6rem; border:2px solid #ad8b52; background:#e9d5a9; text-align:center; }
 .lampara-vitral .disco-vitral { width:8rem; }
+.comparacion-vitral { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.5rem; }
+.comparacion-vitral>div { padding:.4rem; border:1px solid #ad8b52; text-align:center; background:#e9d5a9; font-size:.8rem; }
+.comparacion-vitral .disco-vitral { width:min(100%,5rem); margin:.15rem auto; }
+.mecanismo-vitral .discos-vitral { margin-top:.5rem; }
+.mecanismo-vitral .discos-vitral .disco-vitral { width:3.5rem; margin:0 auto; }
+.marco-disco { position:relative; padding-top:5px; }
+.marco-disco::before { content:'▾'; position:absolute; top:-6px; left:calc(50% - .25rem); z-index:1; color:#5e4325; }
+.posicion-disco,.contador-vitral { display:block; font-size:.8rem; text-align:center; }
+.mecanismo-vitral label { display:grid; gap:.3rem; margin-bottom:.4rem; }
+.mecanismo-vitral select { width:100%; min-height:44px; font:inherit; padding:.4rem; background:#fff5de; color:#263b30; border:1px solid #9b825b; }
+.mecanismo-vitral .ficha-vitral { display:grid; grid-template-columns:2.4rem minmax(0,1fr); align-items:center; gap:.15rem; padding:.3rem; }
+.ficha-vitral>button,.ficha-vitral>.posicion-disco { grid-column:1 / -1; }
+.mecanismo-vitral .ficha-vitral .disco-vitral { width:2.4rem; }
+.ficha-vitral .giro-disco { gap:2px; }
+.ficha-vitral .giro-disco button { padding:.2rem; }
 .nonograma { grid-template-rows:minmax(var(--alto-pistas,44px),auto); }
 .nonograma .pista-nonograma { display:flex; gap:3px; padding:3px; align-items:center; justify-content:center; }
 .nonograma .columna-pistas { flex-direction:column; justify-content:end; }

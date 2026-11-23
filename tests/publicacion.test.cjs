@@ -2,8 +2,10 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const root=path.resolve(__dirname,'..');global.window=global;
 for(const file of ['escape-room.js','calendario-publicado.js','recursos-reto.js','retos-avanzados.js','mecanismos.js','experiencias.js','cerradura-transmisiones.js','vista-reto.js'])vm.runInThisContext(fs.readFileSync(path.join(root,file),'utf8'),{filename:file});
 const ER=EscapeRoom,actual=ER.calendario(CALENDARIO_PUBLICADO),validada=JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures/campana-validada-a52349d.json'),'utf8'));
-// La historia añade metadatos; todos los campos previos siguen exactamente iguales.
-for(let i=0;i<24;i++)for(const campo of Object.keys(validada.capitulos[i]))assert.deepEqual(actual.capitulos[i][campo],validada.capitulos[i][campo],'Día '+(i+1)+' conserva '+campo);
+// Los días 4, 13 y 14 se revisan expresamente; el resto conserva todos sus campos.
+const camposRevisados={3:new Set(['instrucciones','configuracion','pistas']),12:new Set(['titulo','instrucciones','configuracion','pistas']),13:new Set(['instrucciones','configuracion','pistas'])};
+
+for(let i=0;i<24;i++)for(const campo of Object.keys(validada.capitulos[i]))if(!camposRevisados[i]?.has(campo))assert.deepEqual(actual.capitulos[i][campo],validada.capitulos[i][campo],'Día '+(i+1)+' conserva '+campo);
 for(const campo of Object.keys(validada.experiencia))assert.deepEqual(actual.experiencia[campo],validada.experiencia[campo],'El desenlace conserva '+campo);
 assert.equal(actual.partida,'caja-adviento-v4','Se conserva la clave de progreso real ya publicada');
 assert.equal(actual.capitulos[3].titulo,'Las tuberías congeladas');assert.equal(actual.capitulos[3].tipo,'tuberias');
@@ -39,4 +41,4 @@ for(const reto of actual.capitulos.slice(0,23)){
 }
 assert.equal(ER.vista.mensajeAcierto('Mecanismo resuelto. Ya tienes la siguiente llave.','Has ganado la llave del día 5.'),'');
 assert.equal(ER.vista.mensajeAcierto('La casa despierta. Has ganado la llave del día 2.','Llave del día 2.'),'La casa despierta.');
-console.log('PASS: 24 retos idénticos a la prueba validada, fuente única real/prueba, tuberías y cerradura, recursos incluidos, fechas/llaves, progreso anterior compatible y éxito sin duplicados.');
+console.log('PASS: 21 retos conservados y revisiones de los días 4, 13 y 14 válidas; fuente única real/prueba, recursos, fechas, llaves y progreso compatibles.');

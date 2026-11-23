@@ -82,10 +82,12 @@
         || !reto.respuestas.some(r => compactar(r).split('').sort().join('') === c.fichas.map(letras).sort().join('')))) {
       fallos.push('las fichas deben formar una de las respuestas válidas');
     }
-    if (reto.tipo === 'ahorcado' && (typeof c.palabra !== 'string' || !/^[A-ZÑ]+$/.test(letras(c.palabra))
+    if (reto.tipo === 'ahorcado' && (typeof c.palabra !== 'string' || !/^[A-ZÑ\s.,;:!?¡¿'’—–-]+$/.test(letras(c.palabra))
+        || !/[A-ZÑ]/.test(letras(c.palabra)) || c.palabra.length > 100
         || !Number.isInteger(c.fallos) || c.fallos < 1 || c.fallos > 20
-        || !Number.isInteger(c.inicial) || c.inicial < 0 || c.inicial >= c.palabra.length)) {
-      fallos.push('configura una palabra, de 1 a 20 fallos y el índice de la posición inicial revelada (desde 0)');
+        || !Number.isInteger(c.inicial) || c.inicial < 0 || c.inicial >= c.palabra.length
+        || !/^[A-ZÑ]$/.test(letras(c.palabra)[c.inicial]??''))) {
+      fallos.push('configura una palabra o frase de hasta 100 caracteres, de 1 a 20 fallos y una posición inicial que contenga una letra (desde 0)');
     }
     if (['recorrido','perforado'].includes(reto.tipo) && !matriz(c.filas)) {
       fallos.push('configura filas de cuadrícula rectangulares, entre 2 y 12');
@@ -144,7 +146,7 @@
     const palabra = letras(c.palabra);
     const elegidas = [...new Set(usadas.filter(l => /^[A-ZÑ]$/.test(l)))];
     const fallos = elegidas.filter(l => !palabra.includes(l)).length;
-    const descubiertas = [...palabra].map((l,i) => i === c.inicial || elegidas.includes(l));
+    const descubiertas = [...palabra].map((l,i) => !/^[A-ZÑ]$/.test(l) || i === c.inicial || elegidas.includes(l));
     return { elegidas, fallos, descubiertas, ganada: descubiertas.every(Boolean), perdida: fallos >= c.fallos };
   }
 
@@ -393,7 +395,10 @@
       bloque.prepend(el('p','Toca las fichas para colocarlas. Toca una ficha colocada para retirarla.'),huecos,fichas);
       dibujar();
     } else if (reto.tipo === 'ahorcado') {
-      let usadas = Array.isArray(estado.usadas) ? estado.usadas : [];
+      const firma=JSON.stringify(c);
+      const compatible=estado.ahorcadoConfiguracion===firma || (!estado.ahorcadoConfiguracion&&c.version!==2);
+      let usadas = compatible&&Array.isArray(estado.usadas) ? estado.usadas : [];
+      estado.ahorcadoConfiguracion=firma;
       const palabra = el('div','','palabra-ahorcado');
       const luces = el('div','','luces-ahorcado');
       const cuenta = el('p');
@@ -404,9 +409,17 @@
       function actualizar() {
         const a = estadoAhorcado(c,usadas);
         usadas = a.elegidas;
-        palabra.replaceChildren(...[...letras(c.palabra)].map((l,i) => el('span',a.descubiertas[i] ? l : '·')));
+        palabra.replaceChildren();
+        let indice=0,numero=0;
+        for(const fragmento of letras(c.palabra).split(/(\s+)/)){
+          if(!fragmento)continue;
+          if(/^\s+$/.test(fragmento)){indice+=fragmento.length;continue;}
+          const grupo=el('span','','grupo-ahorcado');grupo.setAttribute('role','group');grupo.setAttribute('aria-label','Palabra '+(++numero));
+          for(const l of fragmento){const letra=el('i',a.descubiertas[indice++]?l:'·','letra-ahorcado');if(!/^[A-ZÑ]$/.test(l))letra.classList.add('signo-ahorcado');grupo.append(letra);}
+          palabra.append(grupo);
+        }
         luces.replaceChildren(...Array.from({length:c.fallos},(_,i)=>el('span',i<a.fallos ? '○' : '●')));
-        cuenta.textContent = a.perdida ? 'Sin intentos. Puedes reiniciar el reto.' : a.ganada ? 'Palabra completa. Pulsa Comprobar.' : `${c.fallos-a.fallos} fallos disponibles`;
+        cuenta.textContent = a.perdida ? 'Sin intentos. Puedes reiniciar el reto.' : a.ganada ? 'Texto completo. Pulsa Comprobar.' : `${c.fallos-a.fallos} fallos disponibles`;
         usadasTexto.textContent = 'Letras utilizadas: ' + (usadas.join(' · ') || 'ninguna');
         teclado.replaceChildren(...[...'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'].map(letra => {
           const b = boton(letra,() => {

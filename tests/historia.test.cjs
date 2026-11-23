@@ -10,8 +10,9 @@ assert.equal(ER.progreso({introduccionVista:true,resueltos:[1,2]}).historiaVista
 assert.equal(ER.progreso({historiaVista:true}).historiaVista,true);
 assert.deepEqual(ER.calendario(JSON.parse(JSON.stringify(datos))),datos,'Los textos sobreviven al respaldo y a la importación');
 assert.equal(datos.partida,anterior.partida,'El almacenamiento de Cintia no cambia');
+const camposRevisados={3:new Set(['instrucciones','configuracion','pistas']),12:new Set(['titulo','instrucciones','configuracion','pistas']),13:new Set(['instrucciones','configuracion','pistas'])};
 for(const [i,c]of datos.capitulos.entries()){
-  for(const campo of Object.keys(anterior.capitulos[i]))assert.deepEqual(c[campo],anterior.capitulos[i][campo],'Se conserva día '+(i+1)+': '+campo);
+  for(const campo of Object.keys(anterior.capitulos[i]))if(!camposRevisados[i]?.has(campo))assert.deepEqual(c[campo],anterior.capitulos[i][campo],'Se conserva día '+(i+1)+': '+campo);
   assert(c.contexto&&c.transicion,'Todos los días tienen contexto y transición');
   assert(!/llave|Tamagotchi/i.test(c.transicion+c.descubrimientoTexto),'El relato no duplica llaves ni anticipa el regalo');
   assert(c.transicion.split(/(?<=[.!?])\s+/).length<=2,'Transiciones de una o dos frases');

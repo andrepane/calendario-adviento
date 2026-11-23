@@ -221,18 +221,16 @@
     const dialogo=el('dialog','','historia-entrada');
     dialogo.setAttribute('aria-labelledby','titulo-historia');
     const cabecera=el('header','','cabecera-historia');
-    const cerrar=btn('×',()=>dialogo.close());cerrar.classList.add('cerrar-historia');cerrar.setAttribute('aria-label','Volver al calendario');
-    cabecera.append(el('p','ARCHIVO DE LA CASA · DICIEMBRE','sello-historia'),cerrar);
+    cabecera.append(el('p','ARCHIVO DE LA CASA · DICIEMBRE','sello-historia'));
     const dibujo=el('div','','pedestal-historia');
     dibujo.setAttribute('role','img');dibujo.setAttribute('aria-label','Un pedestal vacío, con la huella ovalada que dejó el huevo y una nota al lado');
     dibujo.innerHTML='<svg viewBox="0 0 360 128" aria-hidden="true"><defs><linearGradient id="piedra-historia" x2="0" y2="1"><stop stop-color="#776e60"/><stop offset="1" stop-color="#313e40"/></linearGradient></defs><path d="M110 58h140l-13 61H123z" fill="url(#piedra-historia)" stroke="#c7a574"/><ellipse cx="180" cy="58" rx="73" ry="24" fill="#384747" stroke="#c7a574"/><ellipse cx="180" cy="56" rx="23" ry="15" fill="#18282d" stroke="#efd6a1" stroke-dasharray="3 4"/><path d="M273 71l43-8 8 37-43 8z" fill="#ecd5a9"/><path d="M283 78l22-4m-20 11 22-4m-20 11 15-3" stroke="#866341"/><path d="M71 31v10m-5-5h10m211-13v8m-4-4h8" stroke="#f0c78e"/></svg>';
     const titulo=el('h2',config.historiaTitulo);titulo.id='titulo-historia';titulo.tabIndex=-1;
     const nota=el('div','','texto-historia');
     for(const parrafo of config.historiaTexto.split(/\n\s*\n/).filter(Boolean))nota.append(el(parrafo.startsWith('«')?'blockquote':'p',parrafo));
-    let examinar=false;
-    const pie=el('footer'),empezar=btn(config.historiaBoton||'Examinar la cerradura',()=>{examinar=true;guardar();dialogo.close();});
+    const pie=el('footer'),empezar=btn(config.historiaBoton||'Examinar la casa',()=>{guardar();dialogo.close();});
     pie.append(empezar);dialogo.append(cabecera,dibujo,titulo,nota,pie);document.body.append(dialogo);
-    dialogo.addEventListener('close',()=>{dialogo.remove();terminar(examinar);},{once:true});
+    dialogo.addEventListener('close',()=>{dialogo.remove();terminar();},{once:true});
     dialogo.showModal();dialogo.scrollTop=0;titulo.focus({preventScroll:true});
     return {limpiar:()=>{dialogo.remove();}};
   }

@@ -245,14 +245,12 @@ function verHistoria(){
   if(sorpresa.open)sorpresa.close();
   if(cuaderno.open)cuaderno.close();
   relato?.limpiar();
-  // Releer no cambia el progreso. El botón solo abre la cerradura si su fecha permite jugar.
+  // Cerrar o releer la historia devuelve a la casa sin abrir ninguna ventana.
   relato=ER.experiencias.historia(datos.experiencia,{
     guardar:()=>{avance.historiaVista=true;guardarProgreso();},
-    terminar:examinar=>{
+    terminar:()=>{
       diaDePrueba=undefined;
       continuarEntrada();
-      if(examinar&&['disponible','resuelta'].includes(ER.estado(1,hoy(),avance)))
-        setTimeout(()=>mostrarSorpresa(1,puertas.children[0]),0);
     }
   });
 }

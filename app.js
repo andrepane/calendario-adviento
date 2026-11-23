@@ -47,7 +47,8 @@ function guardarProgreso() {
       resueltos: [...guardado.resueltos, ...avance.resueltos],
       pistas,
       interacciones: { ...guardado.interacciones, ...avance.interacciones },
-      introduccionVista:avance.introduccionVista||guardado.introduccionVista,desenlace:avance.desenlace
+      introduccionVista:avance.introduccionVista||guardado.introduccionVista,
+      historiaVista:avance.historiaVista||guardado.historiaVista,desenlace:avance.desenlace
     });
     localStorage.setItem(claveProgreso, JSON.stringify(avance));
   } catch {
@@ -151,7 +152,7 @@ function prepararTarjeta(dia, recienResuelto = false) {
           resueltos: [...avance.resueltos, ...guardado.resueltos],
           pistas: avance.pistas,
           interacciones: avance.interacciones,
-          introduccionVista:avance.introduccionVista,desenlace:avance.desenlace
+          introduccionVista:avance.introduccionVista,historiaVista:avance.historiaVista,desenlace:avance.desenlace
         });
       }
       if (avance.resueltos.includes(dia)) {
@@ -225,18 +226,44 @@ crearPuertas();
 actualizarPuertas();
 
 /* La introducción mueve la casa real entre la caja y su posición en el calendario. */
-let entrada;
+let entrada, relato;
+function continuarEntrada(){
+  document.querySelector('#titulo-calendario').focus({preventScroll:true});programarActualizacion();
+  if(enPrueba&&ER.dias.includes(diaDePrueba)){
+    const numero=diaDePrueba;diaDePrueba=undefined;
+    setTimeout(()=>mostrarSorpresa(numero,puertas.children[numero-1]),0);
+  }
+}
+function verHistoria(){
+  if(!datos.experiencia.historiaActiva)return;
+  if(calendario.hidden){
+    portada.querySelector('.saltar-introduccion')?.click();
+    // Saltar termina la caja y vuelve a entrar aquí cuando la historia aún no se ha visto.
+    if(!avance.historiaVista)return;
+  }
+  if(sorpresa.open)sorpresa.close();
+  if(cuaderno.open)cuaderno.close();
+  relato?.limpiar();
+  // Releer no cambia el progreso. El botón solo abre la cerradura si su fecha permite jugar.
+  relato=ER.experiencias.historia(datos.experiencia,{
+    guardar:()=>{avance.historiaVista=true;guardarProgreso();},
+    terminar:examinar=>{
+      diaDePrueba=undefined;
+      continuarEntrada();
+      if(examinar&&['disponible','resuelta'].includes(ER.estado(1,hoy(),avance)))
+        setTimeout(()=>mostrarSorpresa(1,puertas.children[0]),0);
+    }
+  });
+}
 function prepararEntrada(){
+  relato?.limpiar();
   entrada?.limpiar();
   entrada=ER.experiencias.introduccion(portada,calendario,datos.experiencia,{
     vista:avance.introduccionVista,
     guardar:()=>{avance.introduccionVista=true;guardarProgreso();},
     terminar:()=>{
-      document.querySelector('#titulo-calendario').focus({preventScroll:true});programarActualizacion();
-      if(enPrueba&&ER.dias.includes(diaDePrueba)){
-        const numero=diaDePrueba;diaDePrueba=undefined;
-        setTimeout(()=>mostrarSorpresa(numero,puertas.children[numero-1]),0);
-      }
+      if(datos.experiencia.historiaActiva&&!avance.historiaVista)verHistoria();
+      else continuarEntrada();
     }
   });
 }
@@ -245,9 +272,25 @@ if(!enPrueba)prepararEntrada();
 
 abrirCuaderno.addEventListener('click', () => {
   tarjetasCuaderno.replaceChildren();
+  if(datos.experiencia.historiaActiva){
+    const releer=document.createElement('button');releer.type='button';releer.className='control-reto releer-historia';
+    releer.textContent='Volver a leer la introducción';releer.addEventListener('click',verHistoria);tarjetasCuaderno.append(releer);
+    const diario=document.createElement('section');diario.className='diario-historia';
+    const titulo=document.createElement('h3');titulo.textContent='La búsqueda del huevo';diario.append(titulo);
+    const hallazgos=ER.descubrimientos(datos,avance);
+    if(!hallazgos.length){const p=document.createElement('p');p.textContent='Aquí se guardarán tus descubrimientos al resolver los retos.';diario.append(p);}
+    for(const item of hallazgos){
+      const nota=document.createElement('article');nota.className='hallazgo-historia';
+      const h=document.createElement('h4');h.textContent=`Día ${item.dia} · ${item.titulo}`;nota.append(h);
+      for(const texto of [item.transicion,item.texto].filter(Boolean)){const p=document.createElement('p');p.textContent=texto;nota.append(p);}
+      diario.append(nota);
+    }
+    tarjetasCuaderno.append(diario);
+  }
   const evidencias = ganadas();
+  if(evidencias.length){const titulo=document.createElement('h3');titulo.textContent='Evidencias de los mecanismos';tarjetasCuaderno.append(titulo);}
   ER.vista.tarjetas(evidencias, tarjetasCuaderno);
-  if (!evidencias.length) tarjetasCuaderno.textContent = 'Aquí aparecerán las evidencias que consigas al resolver retos.';
+  if (!evidencias.length&&!datos.experiencia.historiaActiva) tarjetasCuaderno.textContent = 'Aquí aparecerán las evidencias que consigas al resolver retos.';
   if(avance.desenlace.confirmado&&avance.desenlace.nombre){
     const recuerdo=document.createElement('article');recuerdo.className='evidencia';
     const titulo=document.createElement('h3');titulo.textContent='El habitante de la casa';
@@ -306,8 +349,9 @@ sorpresa.addEventListener('close', () => {
 if (enPrueba) {
   abrir.disabled = true;
   window.addEventListener('message', evento => {
-    if (evento.source !== window.parent || evento.origin !== (origenLocal === '*' ? 'null' : origenLocal)
-        || evento.data?.tipo !== 'escape-iniciar' || !/^\d{4}-\d{2}-\d{2}$/.test(evento.data.fecha)) return;
+    if (evento.source !== window.parent || evento.origin !== (origenLocal === '*' ? 'null' : origenLocal)) return;
+    if(evento.data?.tipo==='escape-historia'){verHistoria();return;}
+    if(evento.data?.tipo !== 'escape-iniciar' || !/^\d{4}-\d{2}-\d{2}$/.test(evento.data.fecha)) return;
     datos = ER.calendario(evento.data.datos);
     fechaSimulada = evento.data.fecha;
     avance = ER.progreso(evento.data.avance);

@@ -136,9 +136,10 @@
     const { ganadas = [], resuelto = false } = opciones;
     padre.replaceChildren();
     if (!resuelto) {
-      if (reto.instrucciones || reto.apoyo) {
+      if (reto.instrucciones || reto.apoyo || reto.contexto) {
         const instrucciones = elemento('details');
         instrucciones.append(elemento('summary', 'Instrucciones'));
+        if (reto.contexto) instrucciones.append(elemento('p', reto.contexto, 'contexto-historia'));
         if (reto.instrucciones) instrucciones.append(elemento('p', reto.instrucciones));
         if (reto.apoyo) instrucciones.append(elemento('p', reto.apoyo));
         padre.append(instrucciones);
@@ -204,8 +205,15 @@
         resultado.prepend(compartimento);
       }
       const acierto = mensajeAcierto(reto.acierto, opciones.mensajeLlave);
-      if (acierto) {
+      if (reto.transicion) resultado.append(elemento('p', reto.transicion, 'transicion-historia'));
+      else if (acierto) {
         resultado.append(elemento('p', acierto));
+      }
+      if (reto.descubrimientoTexto) {
+        const nota = elemento('article', '', 'hallazgo-historia');
+        if (reto.descubrimientoTitulo) nota.append(elemento('h4', reto.descubrimientoTitulo));
+        nota.append(elemento('p', reto.descubrimientoTexto));
+        resultado.append(nota);
       }
       if(reto.tipo==='combinacion'&&opciones.experiencia?.final){
         limpiezas.set(padre,ER.experiencias.final(resultado,opciones.experiencia,opciones.desenlace,opciones.guardarDesenlace));

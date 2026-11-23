@@ -30,6 +30,7 @@
     ['mecanismos', 'Campaña de mecanismos · versión 3'],
     ['caja', 'La caja de Adviento · versión 4'],
     ['transmisiones', 'Cerradura de transmisiones · versión 5'],
+    ['historia', 'La búsqueda del huevo · campaña actual'],
     ...copias.map(copia => [copia.id, copia.nombre])]);
   const abiertos = new Map();
   let espacio = leer(claveEspacio);
@@ -100,6 +101,7 @@
   function leerBorrador(id = espacio) {
     try { return ER.calendario(leer(clave('borrador', id))); }
     catch {
+      if(id==='historia')return ER.calendario(window.CALENDARIO_PUBLICADO);
       if(id==='transmisiones')return ER.cerradura4.campana(abiertos.get('caja')?.datos??leer(clave('borrador','caja'))??window.CALENDARIO_PUBLICADO);
       if(id==='caja')return ER.experiencias.campana(abiertos.get('mecanismos')?.datos??leer(clave('borrador','mecanismos'))??window.CAMPANA_MECANISMOS);
       if(id==='mecanismos'){
@@ -188,6 +190,7 @@
     porId('cargar-mecanismos').hidden=id==='mecanismos';
     porId('cargar-caja').hidden=id==='caja';
     porId('cargar-transmisiones').hidden=id==='transmisiones';
+    porId('cargar-historia').hidden=id==='historia';
     mostrarExperienciaConfig();
     porId('volver-borradores').hidden = id === 'original';
     const original = (abiertos.get('original')?.datos ?? leerBorrador('original')).capitulos[0];
@@ -513,6 +516,12 @@
     hayCambios = !guardado;
     anunciar(guardado ? `Borrador guardado. Puedes continuar desde el día ${dia}.`
       : 'El navegador bloqueó el guardado. Exporta un respaldo para conservar los cambios.');
+  });
+
+  porId('cargar-historia').addEventListener('click',()=>{
+    elegirEspacio('historia');
+    if(!leer(clave('borrador')))guardar(clave('borrador'),datos);
+    anunciar('Historia actual cargada en su propio borrador. Tus otros borradores siguen disponibles.');
   });
 
   porId('cargar-campana').addEventListener('click', () => {

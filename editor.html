@@ -33,6 +33,7 @@
       <section class="panel-editor">
         <h2 id="espacio-activo">Mis borradores</h2>
         <div class="acciones-editor">
+          <button class="control-reto principal" type="button" id="cargar-historia">Cargar historia del huevo · campaña actual</button>
           <button class="control-reto principal" type="button" id="cargar-campana">Cargar escape room de prueba</button>
           <button class="control-reto principal" type="button" id="cargar-3946">Cargar campaña 3946 · versión 2</button>
           <button class="control-reto principal" type="button" id="cargar-mecanismos">Cargar campaña de mecanismos · versión 3</button>
@@ -48,6 +49,15 @@
         <h2>La caja y el habitante</h2>
         <p>Estas pruebas usan el borrador abierto y guardan su avance por separado del calendario de Cintia.</p>
         <form id="formulario-experiencias">
+          <fieldset>
+            <legend>La búsqueda del huevo</legend>
+            <label><input type="checkbox" name="historiaActiva"> Mostrar la historia al entrar por primera vez</label>
+            <label>Título de la introducción <input name="historiaTitulo"></label>
+            <label>Texto de la introducción <textarea name="historiaTexto" rows="9"></textarea></label>
+            <p class="ayuda">Separa los párrafos con una línea en blanco. La introducción puede releerse sin borrar los retos.</p>
+            <label>Botón de la introducción <input name="historiaBoton"></label>
+            <label>Revelación tras confirmar el paquete <textarea name="revelacion" rows="2"></textarea></label>
+          </fieldset>
           <label><input type="checkbox" name="introduccion"> Mostrar la caja al entrar por primera vez</label>
           <label><input type="checkbox" name="final"> Activar el habitante después del reto del día 24</label>
           <label>Texto de la nota <textarea name="nota" rows="2"></textarea></label>
@@ -132,6 +142,14 @@
             </fieldset>
           </details>
           <label>Mensaje de acierto <textarea name="acierto" rows="2"></textarea></label>
+          <details class="detalle-editor">
+            <summary>Historia de este día</summary>
+            <label>Contexto previo (en las instrucciones) <textarea name="contexto" rows="2"></textarea></label>
+            <label>Transición al resolver <textarea name="transicion" rows="3"></textarea></label>
+            <label>Título del descubrimiento importante (opcional) <input name="descubrimientoTitulo"></label>
+            <label>Nota del descubrimiento (opcional) <textarea name="descubrimientoTexto" rows="4"></textarea></label>
+            <p class="ayuda">La transición sustituye al mensaje de acierto; la llave y la evidencia se presentan una sola vez. El cuaderno guarda la transición y la nota, en orden por día.</p>
+          </details>
           <label id="campo-premio" hidden>Premio o escondite <textarea name="premio" rows="3"></textarea></label>
           <ul id="avisos-dia" class="avisos"></ul>
           <div class="acciones-editor">

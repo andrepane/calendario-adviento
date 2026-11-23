@@ -127,6 +127,7 @@
         form.addEventListener('submit',e=>{e.preventDefault();const normal=v=>v.normalize('NFD').replace(/\p{M}/gu,'').trim().toLocaleUpperCase('es');if(normal(input.value)!==normal(config.codigo)){error.textContent='Ese código no coincide. Mira dentro del paquete.';return;}s.confirmado=true;revalidando=false;persistir();dibujar();});acciones.append(form);
       }
       if(etapa===6&&s.confirmado&&!revalidando){
+        if(config.revelacion)acciones.append(el('p',config.revelacion,'revelacion-historia'));
         acciones.append(el('p',config.mensaje,'mision-final'));
         if(config.permitirNombre){const form=el('form'),label=el('label','Nombre de tu criatura (opcional)'),input=el('input'),aviso=el('p');input.name='nombre-criatura';input.maxLength=40;input.value=s.nombre;label.append(input);aviso.setAttribute('role','status');const guardarNombre=el('button','Guardar nombre','control-reto');guardarNombre.type='submit';form.append(label,guardarNombre,aviso);form.addEventListener('submit',e=>{e.preventDefault();s.nombre=input.value.trim();persistir();pantalla.querySelector('.nombre-pixel')?.remove();if(s.nombre)pantalla.append(el('span',s.nombre,'nombre-pixel'));aviso.textContent=s.nombre?'Nombre guardado: '+s.nombre:'Nombre borrado.';});acciones.append(form);}
         acciones.append(btn('Introducir el código de nuevo',()=>{revalidando=true;dibujar();}));
@@ -180,5 +181,24 @@
     if(vista||config.introduccion===false)finalizar(true);else colocar();
     return {repetir,limpiar:()=>{observador.disconnect();clearTimeout(timer);animacion?.cancel();fundido?.cancel();portada.style.cssText='';escena.style.cssText='';if(!calendario.contains(escena))ancla.after(escena);ancla.remove();}};
   }
-  ER.experiencias={girar,ruta,alineada,configValida,campana,final,estadoFinal,introduccion};
+  function historia(config,{guardar=()=>{},terminar=()=>{}}={}){
+    const dialogo=el('dialog','','historia-entrada');
+    dialogo.setAttribute('aria-labelledby','titulo-historia');
+    const cabecera=el('header','','cabecera-historia');
+    const cerrar=btn('×',()=>dialogo.close());cerrar.classList.add('cerrar-historia');cerrar.setAttribute('aria-label','Volver al calendario');
+    cabecera.append(el('p','ARCHIVO DE LA CASA · DICIEMBRE','sello-historia'),cerrar);
+    const dibujo=el('div','','pedestal-historia');
+    dibujo.setAttribute('role','img');dibujo.setAttribute('aria-label','Un pedestal vacío, con la huella ovalada que dejó el huevo y una nota al lado');
+    dibujo.innerHTML='<svg viewBox="0 0 360 128" aria-hidden="true"><defs><linearGradient id="piedra-historia" x2="0" y2="1"><stop stop-color="#776e60"/><stop offset="1" stop-color="#313e40"/></linearGradient></defs><path d="M110 58h140l-13 61H123z" fill="url(#piedra-historia)" stroke="#c7a574"/><ellipse cx="180" cy="58" rx="73" ry="24" fill="#384747" stroke="#c7a574"/><ellipse cx="180" cy="56" rx="23" ry="15" fill="#18282d" stroke="#efd6a1" stroke-dasharray="3 4"/><path d="M273 71l43-8 8 37-43 8z" fill="#ecd5a9"/><path d="M283 78l22-4m-20 11 22-4m-20 11 15-3" stroke="#866341"/><path d="M71 31v10m-5-5h10m211-13v8m-4-4h8" stroke="#f0c78e"/></svg>';
+    const titulo=el('h2',config.historiaTitulo);titulo.id='titulo-historia';titulo.tabIndex=-1;
+    const nota=el('div','','texto-historia');
+    for(const parrafo of config.historiaTexto.split(/\n\s*\n/).filter(Boolean))nota.append(el(parrafo.startsWith('«')?'blockquote':'p',parrafo));
+    let examinar=false;
+    const pie=el('footer'),empezar=btn(config.historiaBoton||'Examinar la cerradura',()=>{examinar=true;guardar();dialogo.close();});
+    pie.append(empezar);dialogo.append(cabecera,dibujo,titulo,nota,pie);document.body.append(dialogo);
+    dialogo.addEventListener('close',()=>{dialogo.remove();terminar(examinar);},{once:true});
+    dialogo.showModal();dialogo.scrollTop=0;titulo.focus({preventScroll:true});
+    return {limpiar:()=>{dialogo.remove();}};
+  }
+  ER.experiencias={girar,ruta,alineada,configValida,campana,final,estadoFinal,introduccion,historia};
 }();

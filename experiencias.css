@@ -167,4 +167,50 @@ html { scrollbar-gutter:stable; }
 .acciones-cerradura { display: flex; justify-content: center; gap: .3rem; }
 .acciones-cerradura button { border-color: transparent; background: transparent; font-size: .8rem; }
 
+/* El archivo de la casa acompaña a la caja existente; no añade recursos externos. */
+.historia-entrada {
+  width: min(650px, calc(100% - 24px));
+  max-height: 92svh;
+  margin: auto;
+  padding: 1.4rem 2rem 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: var(--marfil);
+  border: 1px solid #b89a6f;
+  border-radius: 8px;
+  background: radial-gradient(ellipse at 50% 15%, #41524e, transparent 55%), #1b2c32;
+  box-shadow: 0 20px 100px #0009;
+  animation: llegada-historia .35s ease-out;
+}
+.historia-entrada::backdrop { background: #08151bd9; backdrop-filter: blur(5px); }
+html:has(.historia-entrada[open]) { overflow: hidden; }
+.cabecera-historia { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sello-historia { color: var(--ambar); font: 600 .68rem/1.5 var(--sans); letter-spacing: .14em; }
+.cerrar-historia { min-width: 44px; min-height: 44px; padding: 0; background: transparent; color: var(--marfil); border: 1px solid #bc9d6e80; border-radius: 50%; font-size: 1.4rem; cursor: pointer; }
+.pedestal-historia { max-width: 360px; margin: -.5rem auto 0; }
+.pedestal-historia svg { display: block; width: 100%; height: auto; }
+.historia-entrada h2 { margin: .3rem 0 1rem; color: #f3d3a0; font: 400 clamp(2.3rem, 7vw, 3.5rem)/1.02 var(--serif); text-wrap: balance; }
+.texto-historia { font-size: .96rem; line-height: 1.55; }
+.texto-historia p { margin: 0 0 .85rem; white-space: pre-line; }
+.texto-historia blockquote { margin: .5rem 0 1rem; padding: .8rem 1rem; border-left: 2px solid #d0ad77; background: #f5dcac0c; color: #f3d3a0; font: 400 1.6rem/1.15 var(--serif); }
+.historia-entrada footer { position: sticky; bottom: 0; margin: 1rem -2rem 0; padding: .85rem 2rem max(.85rem, env(safe-area-inset-bottom)); background: #1b2c32f5; border-top: 1px solid #b89a6f40; }
+.historia-entrada footer button { width: 100%; min-height: 48px; }
+.diario-historia { grid-column: 1 / -1; }
+.hallazgo-historia { margin: .8rem 0; padding: .8rem 1rem; border-left: 2px solid #9b713e; background: #6d4c1a0a; }
+.hallazgo-historia h4 { margin: 0 0 .4rem; font: 650 .95rem/1.4 var(--sans); }
+.hallazgo-historia p { margin: .4rem 0; white-space: pre-line; }
+.transicion-historia { font-size: 1.05rem; white-space: pre-line; }
+.releer-historia { grid-column: 1 / -1; justify-self: start; }
+.contexto-historia { font-style: italic; }
+.revelacion-historia { padding: .8rem; border: 1px solid #9b713e; }
+@keyframes llegada-historia { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (max-width: 430px) {
+  .historia-entrada { padding: .8rem 1.1rem 0; max-height: 94svh; }
+  .historia-entrada footer { margin-inline: -1.1rem; padding-inline: 1.1rem; }
+  .pedestal-historia { max-width: 270px; }
+  .texto-historia { font-size: .9rem; }
+}
+@media (prefers-reduced-motion: reduce) { .historia-entrada { animation: none; } }
+.movimiento-reducido .historia-entrada { animation: none; }
+
 .esquema-transmisiones { font-size: .88rem; }

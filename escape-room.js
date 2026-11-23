@@ -36,7 +36,7 @@
     const campos = ['titulo', 'instrucciones', 'pregunta', 'apoyo', 'imagen', 'alt', 'audio',
       'acierto', 'premio', 'evidenciaTitulo', 'evidenciaTexto', 'combinacion',
       'recursoTipo', 'recursoDatos', 'transcripcion', 'evidenciaDibujo', 'evidenciaDatos',
-      'configuracion', 'normalizacion'];
+      'configuracion', 'normalizacion', 'contexto', 'transicion', 'descubrimientoTitulo', 'descubrimientoTexto'];
     return {
       ...Object.fromEntries(campos.map(campo => [campo, texto(entrada[campo])])),
       tipo: Object.hasOwn(tipos, entrada.tipo) ? entrada.tipo : 'escrita',
@@ -61,6 +61,11 @@
         ? datos.partida : 'demo-2026',
       capitulos: datos.capitulos.map(capitulo),
       experiencia: {
+        historiaActiva: datos.experiencia?.historiaActiva === true,
+        historiaTitulo: texto(datos.experiencia?.historiaTitulo),
+        historiaTexto: texto(datos.experiencia?.historiaTexto),
+        historiaBoton: texto(datos.experiencia?.historiaBoton) || 'Examinar la cerradura',
+        revelacion: texto(datos.experiencia?.revelacion),
         introduccion: datos.experiencia?.introduccion !== false,
         final: datos.experiencia?.final === true,
         nota: texto(datos.experiencia?.nota) || 'Alguien acaba de llegar a la casa. Te está esperando fuera de esta pantalla.',
@@ -151,6 +156,7 @@
       })),
       repeticiones: Object.fromEntries(cadena.filter(dia=>datos?.repeticiones?.[dia]===true).map(dia=>[dia,true])),
       introduccionVista: datos?.introduccionVista === true,
+      historiaVista: datos?.historiaVista === true,
       desenlace: {
         etapa: Math.max(0, Math.min(6, Number.isInteger(datos?.desenlace?.etapa) ? datos.desenlace.etapa : 0)),
         confirmado: datos?.desenlace?.confirmado === true,
@@ -166,6 +172,16 @@
     if (avance.resueltos.includes(dia)) return 'resuelta';
     if (dia > 1 && !avance.resueltos.includes(dia - 1)) return 'sin-llave';
     return 'disponible';
+  }
+
+  // Se deriva del progreso existente: no duplica ni modifica las evidencias de los acertijos.
+  function descubrimientos(datos, avance) {
+    return dias.filter(dia => avance.resueltos.includes(dia)).flatMap(dia => {
+      const reto = datos.capitulos[dia - 1];
+      return reto.transicion || reto.descubrimientoTexto ? [{dia,
+        titulo: reto.descubrimientoTitulo || reto.titulo,
+        transicion: reto.transicion, texto: reto.descubrimientoTexto}] : [];
+    });
   }
 
   function acertada(reto, respuesta) {
@@ -192,6 +208,6 @@
 
   window.EscapeRoom = {
     dias, tipos, capitulo, calendario, idEvidencia, evidencias, rutaMultimedia, errores,
-    progreso, estado, acertada, fechaPuerta, local, hoy: () => relojMadrid.format(new Date())
+    progreso, estado, descubrimientos, acertada, fechaPuerta, local, hoy: () => relojMadrid.format(new Date())
   };
 }();

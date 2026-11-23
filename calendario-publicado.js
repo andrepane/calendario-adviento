@@ -33,7 +33,11 @@ window.CALENDARIO_PUBLICADO = {
         "La rueda exterior puede quedar alineada mientras sigues ajustando las otras.",
         "Orientación calculada desde el estado actual."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "La cerradura es el primer acceso al interior de la casa.",
+      "transicion": "El pestillo cede y la casa vuelve a ponerse en marcha. Desde el pedestal vacío llega un chasquido: algo sigue conectado ahí abajo.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "El anagrama",
@@ -66,7 +70,11 @@ window.CALENDARIO_PUBLICADO = {
       "pistas": [
         "La palabra nombra una celebración."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "En el vestíbulo, unas fichas custodian el archivo de mantenimiento.",
+      "transicion": "El cajón de las letras contiene un alfabeto de sustitución. Aquí hasta las notas de mantenimiento necesitan traducción.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "El archivo protegido",
@@ -99,7 +107,11 @@ window.CALENDARIO_PUBLICADO = {
       "pistas": [
         "Empieza probando valores para la última cifra. Las otras dos se calculan a partir de ella."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "El archivador junto al pedestal tiene un cierre de tres cifras.",
+      "transicion": "Dentro del archivador aparece una ficha del pedestal: su base tiene un conducto de servicio. El huevo pudo salir sin pasar por la puerta.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "Las tuberías congeladas",
@@ -132,7 +144,11 @@ window.CALENDARIO_PUBLICADO = {
         "La primera válvula está en la esquina superior derecha; la segunda, abajo a la izquierda.",
         "Al principio, baja por la segunda columna, gira a la derecha y vuelve arriba por la tercera. Después cruza el centro hacia la izquierda y termina por abajo."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "La caldera está parada; el circuito de servicio necesita volver a funcionar.",
+      "transicion": "El agua alcanza la caldera y el conducto bajo el pedestal deja de estar helado. La ruta de servicio continúa hacia la chimenea.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "El mensaje cifrado",
@@ -167,7 +183,11 @@ window.CALENDARIO_PUBLICADO = {
       ],
       "dependencias": [
         "evidencia-2"
-      ]
+      ],
+      "contexto": "Una nota cifrada quedó entre los papeles del archivador.",
+      "transicion": "El mensaje menciona a un viejo junto a la chimenea. Es la primera referencia a alguien que estuvo cerca del conducto; conviene comprobarla.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "El ascensor de mantenimiento",
@@ -203,7 +223,11 @@ window.CALENDARIO_PUBLICADO = {
       "dependencias": [
         "evidencia-2",
         "evidencia-5"
-      ]
+      ],
+      "contexto": "El ascensor de servicio permite seguir la pista de la chimenea.",
+      "transicion": "En la planta de la chimenea encuentras una copia de la orden de traslado. El destino está borrado, igual que en el registro del pedestal.",
+      "descubrimientoTitulo": "Una orden sin destino",
+      "descubrimientoTexto": "La copia confirma que hubo un traslado a las 00:24, no una simple desaparición. El viejo del mensaje figura como encargado de mantenimiento junto a la chimenea; no aparece como autor de la orden. Sigue faltando quién la emitió y adónde envió el huevo."
     },
     {
       "titulo": "El visor averiado",
@@ -236,7 +260,11 @@ window.CALENDARIO_PUBLICADO = {
         "Un trazo apagado que funciona descarta cualquier cifra que lo necesite.",
         "Las cuatro cifras son 8, 0, 5 y 2, en ese orden."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "El visor controla el acceso a los registros del turno nocturno.",
+      "transicion": "El registro que abre el visor conserva el estado de las puertas a las 00:24: todas cerradas. En el compartimento hay también una referencia al espejo.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "El cuadro eléctrico",
@@ -269,7 +297,11 @@ window.CALENDARIO_PUBLICADO = {
         "Necesitarás cuatro interruptores. Uno de ellos es el central.",
         "Dos están en el centro de los bordes superior e izquierdo. El cuarto está en una esquina."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "Una línea de alarma impide leer el resto del registro.",
+      "transicion": "Al apagar el cuadro desaparece la alarma y queda visible una conexión entre el pedestal y el interior de la casa. La puerta principal no forma parte del circuito.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "Cerradura de tres cifras",
@@ -302,7 +334,11 @@ window.CALENDARIO_PUBLICADO = {
       "pistas": [
         "Empieza por descartar las cifras del primer intento."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "La siguiente sección del archivo está protegida por otra cerradura.",
+      "transicion": "La cerradura libera una tira de cifras y el informe del cierre: no hubo ninguna apertura durante el traslado. Empieza a sobrar la hipótesis del ladrón.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "El recorrido navideño",
@@ -336,7 +372,11 @@ window.CALENDARIO_PUBLICADO = {
       "pistas": [
         "Anota la casilla de salida y después una sola letra por cada orden."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "El archivo incluye un itinerario entre los controles de la casa.",
+      "transicion": "El recorrido termina con una felicitación navideña. No explica dónde está el huevo, pero permite seguir hacia el mecanismo de distribución.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "El laberinto de los anillos",
@@ -369,7 +409,11 @@ window.CALENDARIO_PUBLICADO = {
         "Recorre el pasillo de tu anillo hasta la puerta interior y alinea la entrada del siguiente. Los ramales cortos terminan en paredes.",
         "Los pasillos principales avanzan en sentido horario. Ajusta cada anillo interior cuando alcances la salida del anterior."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "Los anillos regulan el paso hacia el núcleo de distribución.",
+      "transicion": "La bolita alcanza el centro y el distribuidor deja libre el acceso al espejo. Los conductos del pedestal convergen en este mismo núcleo.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "El mecanismo del espejo",
@@ -404,7 +448,11 @@ window.CALENDARIO_PUBLICADO = {
       ],
       "dependencias": [
         "evidencia-7"
-      ]
+      ],
+      "contexto": "La referencia del visor permite abrir la tapa del mecanismo del espejo.",
+      "transicion": "Con las marcas alineadas, el espejo deja ver la placa de mando del traslado. La orden salió de la propia casa.",
+      "descubrimientoTitulo": "La casa hizo el traslado",
+      "descubrimientoTexto": "La placa une la orden de las 00:24 con el conducto del pedestal y el núcleo de distribución. Las puertas siguieron cerradas porque el huevo viajó por dentro. No hubo un intruso: la casa es una máquina, y movió aquello que estaba construida para custodiar."
     },
     {
       "titulo": "Ahorcado",
@@ -433,7 +481,11 @@ window.CALENDARIO_PUBLICADO = {
       "correcta": -1,
       "orden": [],
       "pistas": [],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "La placa de mando conduce al archivo de observación, protegido por una palabra desmesurada.",
+      "transicion": "La palabra devuelve el acceso al archivo de observación. La casa protege sus informes con bastante más vocabulario del necesario.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "El vitral lunar",
@@ -466,7 +518,11 @@ window.CALENDARIO_PUBLICADO = {
         "Combina las dos mitades para apagar la lámpara y los dos discos transparentes para iluminarla entera.",
         "Nueva: C+D sin girar. Creciente: A+C. Llena: A+B. Menguante: A+D."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "El vitral sirve para calibrar la lectura del registro de observación.",
+      "transicion": "Los cuatro modelos quedan registrados y permiten interpretar las fases del archivo lunar. Hay una entrada marcada justo antes del traslado.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "El ascensor averiado",
@@ -499,7 +555,11 @@ window.CALENDARIO_PUBLICADO = {
       "pistas": [
         "La campana marca las órdenes 3, 6, 9 y 12. Conserva las dos cifras de cada resultado."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "El ascensor conecta las estaciones de observación del interior.",
+      "transicion": "Las campanas señalan las estaciones correctas y el ascensor llega al archivo. La señal que puso en marcha la casa se registró aquí.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "El registro lunar",
@@ -532,7 +592,11 @@ window.CALENDARIO_PUBLICADO = {
       ],
       "dependencias": [
         "evidencia-14"
-      ]
+      ],
+      "contexto": "El registro lunar conserva la lectura de los sensores del pedestal.",
+      "transicion": "Al reconstruir los valores aparece el origen de la señal: el interior del huevo. El registro no menciona golpes en la puerta ni pasos en la cámara.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "El nonograma de la casa",
@@ -565,7 +629,11 @@ window.CALENDARIO_PUBLICADO = {
         "Los grupos 1, 1 se mantienen separados: no equivalen a un 2.",
         "El dibujo tiene tejado arriba y dos filas de ventanas debajo de una línea completa."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "El archivo guarda un esquema de la casa trazado en casillas.",
+      "transicion": "El dibujo completo muestra una casa cerrada sobre sí misma. El recorrido del huevo permaneció dentro de ella, entre el pedestal y una cámara de reserva.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "La máquina lunar",
@@ -598,7 +666,11 @@ window.CALENDARIO_PUBLICADO = {
       ],
       "dependencias": [
         "evidencia-16"
-      ]
+      ],
+      "contexto": "La máquina lunar interpreta la señal conservada en el registro.",
+      "transicion": "La máquina recupera el motivo del traslado: algo se movió dentro del huevo. La casa lo llevó a la cámara de reserva para protegerlo.",
+      "descubrimientoTitulo": "Protocolo de protección",
+      "descubrimientoTexto": "El registro distingue una vibración exterior de un movimiento dentro del huevo. Fue este último el que activó la protección y el traslado automático a la cámara de reserva. El destino quedó incompleto cuando se interrumpió el registro; el huevo no salió de la casa. Falta encontrar la cámara y abrirla."
     },
     {
       "titulo": "Las cuatro fichas",
@@ -634,7 +706,11 @@ window.CALENDARIO_PUBLICADO = {
       "pistas": [
         "Coloca la campana y la luna como pareja. Después prueba los dos extremos para el espejo."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "Las cuatro fichas abren el paso a la galería de la cámara de reserva.",
+      "transicion": "La galería queda accesible; desde aquí solo falta localizar su puerta. Este orden pertenece al paso de la galería, no a la cerradura final.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "El papel perforado",
@@ -669,7 +745,11 @@ window.CALENDARIO_PUBLICADO = {
         "Busca cada agujero en la misma fila y columna de la cuadrícula.",
         "Puedes solicitar la superposición para comprobar la alineación."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "Una plantilla oculta la indicación que dejaron para encontrar la cámara.",
+      "transicion": "Las letras sitúan la entrada bajo la luz de la luna. Allí hay una puerta sin picaporte y un último circuito de protección.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "El segundo cuadro eléctrico",
@@ -702,7 +782,11 @@ window.CALENDARIO_PUBLICADO = {
         "El mínimo es seis. Puedes deshacer una selección sin gastar otro interruptor.",
         "Una solución es 3, 4, 7, 10, 11 y 14."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "El circuito de la puerta mantiene aislada la cámara de reserva.",
+      "transicion": "El segundo cuadro queda apagado y la puerta deja de estar aislada. Su cierre aún necesita las cifras que la casa repartió entre sus mecanismos.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "Tres cifras en fragmentos",
@@ -736,7 +820,11 @@ window.CALENDARIO_PUBLICADO = {
         "Reúne por separado los trazos I, II y III.",
         "Puedes consultar los fotogramas de uno en uno con la ayuda manual."
       ],
-      "dependencias": []
+      "dependencias": [],
+      "contexto": "El visor de la puerta conserva una parte de la identificación del cierre.",
+      "transicion": "Al reunir los fragmentos recuperas el valor de la campana. Con él ya tienes las cuatro cifras, aunque todavía falta saber en qué orden usarlas.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "La nota sobre el orden",
@@ -777,7 +865,11 @@ window.CALENDARIO_PUBLICADO = {
         "evidencia-12",
         "evidencia-18",
         "evidencia-22"
-      ]
+      ],
+      "contexto": "La última nota explica cómo leer las cuatro evidencias del cierre.",
+      "transicion": "La nota fija el orden de los objetos y permite reconstruir la combinación. La puerta bajo la luz de la luna es la cámara segura que buscabas.",
+      "descubrimientoTitulo": "",
+      "descubrimientoTexto": ""
     },
     {
       "titulo": "La caja fuerte",
@@ -814,7 +906,11 @@ window.CALENDARIO_PUBLICADO = {
         "evidencia-18",
         "evidencia-22",
         "evidencia-23"
-      ]
+      ],
+      "contexto": "La caja fuerte es el cierre de la cámara segura.",
+      "transicion": "La cámara se abre y encuentras la pantalla que vigila el huevo del pedestal. El traslado terminó aquí.",
+      "descubrimientoTitulo": "Cambio de guardia",
+      "descubrimientoTexto": "La casa mantuvo el huevo a salvo mientras sus mecanismos esperaban a alguien capaz de entenderlos. Cintia ha seguido sus señales hasta la cámara segura. El registro puede cerrarse: destino encontrado, cuidadora presente. La pantalla espera a que la enciendas."
     }
   ],
   "experiencia": {
@@ -824,6 +920,11 @@ window.CALENDARIO_PUBLICADO = {
     "pista": "Busca el paquete bajo la manta del sofá",
     "codigo": "NACIMIENTO",
     "mensaje": "Misión 25: que llegue vivo a Nochevieja",
-    "permitirNombre": true
+    "permitirNombre": true,
+    "historiaActiva": true,
+    "historiaTitulo": "El huevo ha desaparecido.",
+    "historiaTexto": "Ayer estaba aquí. Esta mañana, el pedestal estaba vacío y todos los mecanismos de la casa habían cambiado de posición.\n\nLa puerta seguía cerrada por dentro.\n\nEn el registro solo queda una anotación de las 00:24:\n\n«Traslado completado. Destino…»\n\nEl resto es ilegible.\n\nTienes hasta el 24 de diciembre para averiguar dónde ha acabado. Empieza por la cerradura. Y guarda lo que encuentres. La casa tiene una forma bastante peculiar de recordar las cosas.",
+    "historiaBoton": "Examinar la cerradura",
+    "revelacion": "El huevo ya tiene a alguien capaz de cuidarlo. Tu Tamagotchi te espera: la casa puede dar por terminado su turno."
   }
 };

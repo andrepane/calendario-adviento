@@ -2,7 +2,9 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const root=path.resolve(__dirname,'..');global.window=global;
 for(const file of ['escape-room.js','calendario-publicado.js','recursos-reto.js','retos-avanzados.js','mecanismos.js','experiencias.js','cerradura-transmisiones.js','vista-reto.js'])vm.runInThisContext(fs.readFileSync(path.join(root,file),'utf8'),{filename:file});
 const ER=EscapeRoom,actual=ER.calendario(CALENDARIO_PUBLICADO),validada=JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures/campana-validada-a52349d.json'),'utf8'));
-assert.deepEqual(actual,validada,'Los 24 retos y el desenlace deben coincidir con la prueba validada a52349d');
+// La historia añade metadatos; todos los campos previos siguen exactamente iguales.
+for(let i=0;i<24;i++)for(const campo of Object.keys(validada.capitulos[i]))assert.deepEqual(actual.capitulos[i][campo],validada.capitulos[i][campo],'Día '+(i+1)+' conserva '+campo);
+for(const campo of Object.keys(validada.experiencia))assert.deepEqual(actual.experiencia[campo],validada.experiencia[campo],'El desenlace conserva '+campo);
 assert.equal(actual.partida,'caja-adviento-v4','Se conserva la clave de progreso real ya publicada');
 assert.equal(actual.capitulos[3].titulo,'Las tuberías congeladas');assert.equal(actual.capitulos[3].tipo,'tuberias');
 assert.equal(actual.capitulos[23].combinacion,'3946');assert(actual.experiencia.final);

@@ -145,3 +145,23 @@ Se conserva el identificador real **caja-adviento-v4** para mantener el almacena
 Se preservan los mandos compactos, los ajustes móviles y el nacimiento. Las instrucciones y pistas son desplegables mientras el reto está pendiente y se retiran al resolverlo. La entrega de llave aparece una sola vez. **campana-mecanismos.js** se incluye en el despliegue; el editor y las campañas antiguas privadas conservan sus exclusiones.
 
 Ejecuta **node tests/publicacion.test.cjs** para contrastar los 24 retos con la instantánea de validación (solo usada por las pruebas), comprobar la fuente única de campaña, los archivos del despliegue, el progreso compatible, las fechas, las llaves y los mensajes. Las pruebas de la cerradura y las experiencias siguen disponibles en **tests/**.
+
+## La búsqueda del huevo
+
+La historia comparte **calendario-publicado.js** con el calendario real y su prueba. Añade una entrada con el pedestal vacío, contexto dentro de las instrucciones, una transición por día y cuatro notas principales (6, 12, 18 y 24). Las reglas, respuestas, pistas, configuraciones y evidencias anteriores permanecen intactas. La secuencia de pantalla, huevo, criatura, nota y paquete se conserva; la referencia al Tamagotchi aparece después de confirmar el código del paquete.
+
+La introducción de la historia se guarda con **historiaVista**, independiente de la caja ya vista. Las partidas anteriores mantienen la misma clave **caja-adviento-v4**, sus mecanismos, días y desenlace. El cuaderno reconstruye el diario a partir de los días resueltos, también para partidas anteriores; no cambia los identificadores de las evidencias. **Volver a leer la introducción**, en el cuaderno, y **Volver a ver la introducción**, en las herramientas de prueba, no borran ningún avance. El botón de la historia respeta la fecha del día 1 en el calendario real.
+
+En el editor local, pulsa **Cargar historia del huevo · campaña actual** para abrir esta campaña en un borrador separado de los anteriores. En **La caja y el habitante → La búsqueda del huevo** puedes editar título, párrafos, botón y revelación final. En **Historia de este día** puedes editar contexto, transición y nota del cuaderno. La transición sustituye al mensaje de acierto cuando está escrita; la evidencia y la llave siguen apareciendo una vez. Los campos vacíos y la historia desactivada por defecto permiten importar respaldos anteriores. Guardar borrador continúa siendo local; preparar la versión incluye todos estos campos.
+
+Verificación: **node tests/historia.test.cjs**, **node tests/publicacion.test.cjs**, **node tests/experiencias.test.cjs** y **node tests/cerradura-transmisiones.test.cjs**. La instantánea anterior se usa para contrastar todos sus campos originales; solo se añaden metadatos narrativos.
+
+## Prueba estética · casa de mecanismos
+
+La capa **acabado.css**, cargada después de las hojas existentes, unifica abeto, nogal, latón e iluminación ámbar. Conserva la arquitectura y las 24 ventanas; las marcas de estado complementan los colores. No introduce imágenes externas ni animación ambiental continua. Incluye esta hoja al entregar una copia local del calendario o del editor.
+
+La entrada utiliza la misma casa interactiva dentro de la caja. El cierre se libera, la tapa gira sobre el borde de las bisagras y el interior se ilumina durante 1,8 segundos. Un acercamiento de 0,7 segundos devuelve ese mismo elemento a su posición en el calendario; después continúa la historia existente. Solo se animan transformaciones y opacidad. La entrada guarda su inicio: recargar durante el movimiento lleva a la casa y a la historia pendiente. Si se oculta la página durante la secuencia, esta termina de inmediato. Saltar y movimiento reducido usan el mismo punto de llegada. La apertura no altera días, llaves ni progreso del juego.
+
+En **prueba.html → Prueba · Cambiar día**, **Momento de la apertura** permite reproducirla o verla detenida al inicio, con el cierre liberado, durante el giro y con el interior abierto. **Movimiento reducido** permite revisar esa variante. Estas herramientas usan la entrada real y conservan el avance de los retos. Tocar el cierre desde una imagen en pausa reproduce la apertura completa.
+
+Revisión en navegador: 375, 390 y 440 píxeles, más escritorio a 1440; caja y tapa sin recortes, sin desplazamiento horizontal y 24 ventanas con áreas táctiles de al menos 44 × 48. Se comprobó la apertura completa, primera visita, recarga durante el giro, visitas posteriores, movimiento reducido, los estados de ventana, el cuaderno y la resolución del cuadro eléctrico con una única entrega de llave. Las cuatro pruebas existentes siguen contrastando la campaña, la historia, las fechas y las mecánicas.

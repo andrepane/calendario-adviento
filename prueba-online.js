@@ -9,7 +9,17 @@
   function guardar(){try{localStorage.setItem(clave,JSON.stringify({dia,avance}));estado.textContent='Día '+dia+' · progreso de prueba guardado en este navegador.';}catch{estado.textContent='El navegador no permite guardar. Puedes seguir probando durante esta visita.';}}
   function cargar(){document.getElementById('ajustes').open=false;guardar();marco.src='./index.html?prueba=online';}
   document.getElementById('empezar-dia').addEventListener('click',()=>{
-    dia=Number(selector.value);avance=ER.progreso({resueltos:ER.dias.filter(n=>n<dia),introduccionVista:dia>1});cargar();
+    dia=Number(selector.value);avance=ER.progreso({resueltos:ER.dias.filter(n=>n<dia),introduccionVista:dia>1,historiaVista:avance.historiaVista||dia>1});cargar();
+  });
+  document.getElementById('repetir-historia').addEventListener('click',()=>{
+    document.getElementById('ajustes').open=false;
+    marco.contentWindow.postMessage({tipo:'escape-historia'},origen);
+  });
+  document.getElementById('revisar-apertura').addEventListener('click',()=>{
+    const valor=document.getElementById('momento-apertura').value;
+    const reducido=document.getElementById('movimiento-apertura').checked;
+    document.getElementById('ajustes').open=false;
+    marco.contentWindow.postMessage({tipo:'escape-caja',momento:valor==='reproducir'?null:Number(valor),reducido},origen);
   });
   document.getElementById('reiniciar-online').addEventListener('click',()=>{dia=1;selector.value='1';avance=ER.progreso();cargar();});
   window.addEventListener('message',evento=>{

@@ -119,12 +119,12 @@
     const pestillo=svg('rect',{x:260,y:134,width:58,height:12,rx:2,fill:'#e2c58c',stroke:'#76613c','stroke-width':2});dibujo.append(pestillo);
     const estado=el('p','','estado-cerradura');estado.setAttribute('role','status');
     const selector=el('div','','selector-transmision');selector.setAttribute('role','group');selector.setAttribute('aria-label','Elegir transmisión');
-    const selectores=transmisiones.map(t=>boton('Transmisión '+t,()=>{if(s.transmision!==t)actuar(aplicar(c,s,{tipo:'transmision',transmision:t}));}));selector.append(...selectores);
-    const activas=el('div'),controlesUI=el('div','','controles-ruedas'),controlBotones=[];
+    const selectores=transmisiones.map(t=>boton(t,()=>{if(s.transmision!==t)actuar(aplicar(c,s,{tipo:'transmision',transmision:t}));}));selectores.forEach((b,i)=>b.setAttribute('aria-label','Transmisión '+transmisiones[i]));selector.append(...selectores);
+    const controlesUI=el('div','','controles-ruedas'),controlBotones=[];
     let focoControl;
     function resaltar(control){focoControl=control;ruedas.forEach((n,i)=>n.classList.toggle('rueda-afectada',Boolean(control&&conexiones[s.transmision][control][i])));}
     for(const control of controles){const fila=el('div');fila.append(el('span',control==='exterior'?'Exterior':'Interior'));
-      for(const sentido of [-1,1]){const b=boton(sentido===1?'↷ +1':'↶ −1',()=>actuar(girar(s,control,sentido)));b.setAttribute('aria-label','Girar '+control+' a la '+(sentido===1?'derecha':'izquierda'));b.addEventListener('focus',()=>resaltar(control));b.addEventListener('blur',()=>resaltar());b.addEventListener('pointerdown',()=>resaltar(control));b.addEventListener('pointerup',()=>{if(document.activeElement!==b)resaltar();});b.addEventListener('pointercancel',()=>resaltar());fila.append(b);controlBotones.push(b);}
+      for(const sentido of [-1,1]){const b=boton(sentido===1?'↻':'↺',()=>actuar(girar(s,control,sentido)));b.setAttribute('aria-label','Girar '+control+' a la '+(sentido===1?'derecha':'izquierda'));b.addEventListener('focus',()=>resaltar(control));b.addEventListener('blur',()=>resaltar());b.addEventListener('pointerdown',()=>resaltar(control));b.addEventListener('pointerup',()=>{if(document.activeElement!==b)resaltar();});b.addEventListener('pointercancel',()=>resaltar());fila.append(b);controlBotones.push(b);}
       controlesUI.append(fila);
     }
     const deslizar=boton('Deslizar pestillo ←',abrir);deslizar.classList.add('pestillo-control');deslizar.setAttribute('aria-label','Deslizar pestillo: arrastra a la izquierda o pulsa para abrir');
@@ -136,7 +136,14 @@
     const deshacer=boton('Deshacer',()=>{detenerDemo();clearTimeout(timer);if(historial.length){s=historial.pop();actualizar();}});
     const reiniciar=boton('Reiniciar',()=>{detenerDemo();actuar(inicial(c));});
     const ayuda=el('details','','esquema-transmisiones');ayuda.append(el('summary','Cómo se conectan las ruedas'));for(const t of transmisiones)ayuda.append(el('h4','Transmisión '+t),esquema(t));
-    caja.append(dibujo,el('p','Ruedas 1 a 4: del exterior al interior.','ayuda'),selector,activas,estado,controlesUI,deslizar,el('p','Arrastra el pestillo a la izquierda o púlsalo. Con teclado, usa Tab y después Intro o Espacio. Cambiar de transmisión no cuenta como giro.','ayuda'),deshacer,reiniciar,ayuda);
+    ayuda.insertBefore(el('p','Ruedas 1 a 4, del exterior al interior.'),ayuda.children[1]);
+    const panel=el('div','','panel-cerradura');
+    const modos=el('div','','modos-cerradura');
+    modos.append(el('span','Transmisión'),selector);
+    const acciones=el('div','','acciones-cerradura');
+    acciones.append(deshacer,reiniciar);
+    panel.append(modos,controlesUI,deslizar,estado,acciones);
+    caja.append(dibujo,panel,ayuda);
     const demoPanel=el('div','','demostracion-cerradura'),estadoDemo=el('p'),avanzar=boton('Avanzar un paso',()=>{
       if(!demo||pasoDemo>=demo.length)return;
       const paso=demo[pasoDemo++];if(paso.tipo==='abrir')abrir();else actuar(aplicar(c,s,paso),true);
@@ -147,9 +154,9 @@
     padre.append(caja);
     function actualizar(){
       ruedas.forEach((g,i)=>g.style.transform=`rotate(${(s.giros[i]-c.objetivos[i])*45}deg)`);
-      selectores.forEach((b,i)=>b.setAttribute('aria-pressed',String(s.transmision===transmisiones[i])));activas.replaceChildren(esquema(s.transmision));resaltar(focoControl);
+      selectores.forEach((b,i)=>b.setAttribute('aria-pressed',String(s.transmision===transmisiones[i])));resaltar(focoControl);
       const listo=alineada(c,s);caja.classList.toggle('alineada',listo);pestillo.setAttribute('x',s.abierta?160:260);pestillo.setAttribute('width',s.abierta?158:58);
-      estado.textContent='Transmisión '+s.transmision+'. Giros realizados: '+(s.movimientos??0)+'. '+(listo?'Las cuatro muescas están alineadas. Acciona el pestillo.':'Aún hay muescas sin alinear.');
+      estado.textContent=listo?'Muescas alineadas. Desliza el pestillo.':'';
       deshacer.disabled=!historial.length;opciones.guardarInteraccion?.({version:2,configuracion:firma,actual:structuredClone(s),historial:structuredClone(historial)});
       controlBotones.forEach(b=>b.disabled=s.abierta);selectores.forEach(b=>b.disabled=s.abierta);
     }

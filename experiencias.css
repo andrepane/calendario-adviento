@@ -82,3 +82,89 @@ html { scrollbar-gutter:stable; }
 .esquema-transmisiones { margin-block:.75rem; }
 .cerradura-transmisiones .controles-ruedas>div { grid-template-columns:4.5rem 1fr 1fr; }
 @media(max-width:360px) { .cerradura-transmisiones .controles-ruedas>div { grid-template-columns:3.8rem 1fr 1fr; } }
+
+@media (max-width:600px) {
+  dialog { width:calc(100% - .5rem); max-height:calc(100% - .5rem); padding-inline:.75rem; }
+  dialog h2 { font-size:1.65rem; line-height:1.1; margin-block:.35rem; }
+  .cerradura-transmisiones > svg { max-height:32dvh; margin:auto; }
+  .cerradura-transmisiones .selector-transmision { margin-block:.3rem; }
+  .cerradura-transmisiones .controles-ruedas { gap:.2rem; margin-bottom:.3rem; }
+}
+
+.panel-cerradura {
+  display: grid;
+  gap: .3rem;
+  width: min(100%, 22rem);
+  margin: .35rem auto 0;
+  padding: .35rem .65rem;
+  background: #faefd9aa;
+  border: 1px solid #9a795738;
+  border-radius: 1rem;
+}
+
+.modos-cerradura {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 650;
+  font-size: .88rem;
+}
+
+.cerradura-transmisiones .selector-transmision {
+  gap: 0;
+  margin: 0;
+  padding: 2px;
+  border-radius: 99px;
+  background: #54402b14;
+}
+
+.selector-transmision .control-reto {
+  min-height: 44px;
+  padding: 0 .4rem;
+  border: 0;
+  border-radius: 99px;
+  background: transparent;
+}
+
+.selector-transmision .control-reto[aria-pressed='true'] { outline: none; }
+.selector-transmision .control-reto:focus-visible { outline: 2px solid #793d34; outline-offset: -2px; }
+
+.cerradura-transmisiones .controles-ruedas {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .35rem;
+  margin: 0;
+}
+
+.cerradura-transmisiones .controles-ruedas > div {
+  grid-template-columns: repeat(2, 44px);
+  justify-content: center;
+  column-gap: .3rem;
+  row-gap: 0;
+  text-align: center;
+}
+
+.cerradura-transmisiones .controles-ruedas span {
+  grid-column: 1 / -1;
+  font-size: .78rem;
+}
+
+.cerradura-transmisiones .controles-ruedas button {
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.panel-cerradura .pestillo-control {
+  width: fit-content;
+  min-height: 44px;
+  justify-self: center;
+  border-radius: 99px;
+}
+
+.panel-cerradura .estado-cerradura { margin: 0; font-size: .85rem; text-align: center; }
+.panel-cerradura .estado-cerradura:empty { display: none; }
+.acciones-cerradura { display: flex; justify-content: center; gap: .3rem; }
+.acciones-cerradura button { border-color: transparent; background: transparent; font-size: .8rem; }
+
+.esquema-transmisiones { font-size: .88rem; }

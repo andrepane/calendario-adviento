@@ -7,7 +7,7 @@
   let dia=ER.dias.includes(guardado?.dia)?guardado.dia:1,avance=ER.progreso(guardado?.avance);
   for(const n of ER.dias)selector.add(new Option('Día '+n,n));selector.value=String(dia);
   function guardar(){try{localStorage.setItem(clave,JSON.stringify({dia,avance}));estado.textContent='Día '+dia+' · progreso de prueba guardado en este navegador.';}catch{estado.textContent='El navegador no permite guardar. Puedes seguir probando durante esta visita.';}}
-  function cargar(){guardar();marco.src='./index.html?prueba=online';}
+  function cargar(){document.getElementById('ajustes').open=false;guardar();marco.src='./index.html?prueba=online';}
   document.getElementById('empezar-dia').addEventListener('click',()=>{
     dia=Number(selector.value);avance=ER.progreso({resueltos:ER.dias.filter(n=>n<dia),introduccionVista:dia>1});cargar();
   });

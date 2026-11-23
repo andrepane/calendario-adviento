@@ -118,7 +118,7 @@ function prepararTarjeta(dia, recienResuelto = false) {
 
   ER.vista.renderizar(contenido, reto, {
     ganadas: evidencia,
-    esEditor:enPrueba,
+    esEditor:enPrueba && ER.local(),
     resuelto,
     experiencia:datos.experiencia,
     desenlace:avance.desenlace,

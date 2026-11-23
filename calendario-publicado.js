@@ -924,7 +924,7 @@ window.CALENDARIO_PUBLICADO = {
     "historiaActiva": true,
     "historiaTitulo": "El huevo ha desaparecido.",
     "historiaTexto": "Ayer estaba aquí. Esta mañana, el pedestal estaba vacío y todos los mecanismos de la casa habían cambiado de posición.\n\nLa puerta seguía cerrada por dentro.\n\nEn el registro solo queda una anotación de las 00:24:\n\n«Traslado completado. Destino…»\n\nEl resto es ilegible.\n\nTienes hasta el 24 de diciembre para averiguar dónde ha acabado. Empieza por la cerradura. Y guarda lo que encuentres. La casa tiene una forma bastante peculiar de recordar las cosas.",
-    "historiaBoton": "Examinar la cerradura",
+    "historiaBoton": "Examinar la casa",
     "revelacion": "El huevo ya tiene a alguien capaz de cuidarlo. Tu Tamagotchi te espera: la casa puede dar por terminado su turno."
   }
 };

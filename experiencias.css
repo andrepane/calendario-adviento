@@ -186,7 +186,6 @@ html { scrollbar-gutter:stable; }
 html:has(.historia-entrada[open]) { overflow: hidden; }
 .cabecera-historia { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .sello-historia { color: var(--ambar); font: 600 .68rem/1.5 var(--sans); letter-spacing: .14em; }
-.cerrar-historia { min-width: 44px; min-height: 44px; padding: 0; background: transparent; color: var(--marfil); border: 1px solid #bc9d6e80; border-radius: 50%; font-size: 1.4rem; cursor: pointer; }
 .pedestal-historia { max-width: 360px; margin: -.5rem auto 0; }
 .pedestal-historia svg { display: block; width: 100%; height: auto; }
 .historia-entrada h2 { margin: .3rem 0 1rem; color: #f3d3a0; font: 400 clamp(2.3rem, 7vw, 3.5rem)/1.02 var(--serif); text-wrap: balance; }

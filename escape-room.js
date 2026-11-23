@@ -64,7 +64,7 @@
         historiaActiva: datos.experiencia?.historiaActiva === true,
         historiaTitulo: texto(datos.experiencia?.historiaTitulo),
         historiaTexto: texto(datos.experiencia?.historiaTexto),
-        historiaBoton: texto(datos.experiencia?.historiaBoton) || 'Examinar la cerradura',
+        historiaBoton: texto(datos.experiencia?.historiaBoton) || 'Examinar la casa',
         revelacion: texto(datos.experiencia?.revelacion),
         introduccion: datos.experiencia?.introduccion !== false,
         final: datos.experiencia?.final === true,

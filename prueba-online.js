@@ -15,6 +15,12 @@
     document.getElementById('ajustes').open=false;
     marco.contentWindow.postMessage({tipo:'escape-historia'},origen);
   });
+  document.getElementById('revisar-apertura').addEventListener('click',()=>{
+    const valor=document.getElementById('momento-apertura').value;
+    const reducido=document.getElementById('movimiento-apertura').checked;
+    document.getElementById('ajustes').open=false;
+    marco.contentWindow.postMessage({tipo:'escape-caja',momento:valor==='reproducir'?null:Number(valor),reducido},origen);
+  });
   document.getElementById('reiniciar-online').addEventListener('click',()=>{dia=1;selector.value='1';avance=ER.progreso();cargar();});
   window.addEventListener('message',evento=>{
     if(evento.source!==marco.contentWindow||evento.origin!==(origen==='*'?'null':origen))return;

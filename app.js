@@ -22,6 +22,7 @@ let ventanaActiva;
 let siguiente;
 let temporizador;
 let diaDePrueba;
+let temporizadorVentana;
 
 function leerProgreso() {
   try {
@@ -212,7 +213,7 @@ function mostrarSorpresa(dia, boton) {
   };
 
   if (movimientoReducido.matches) mostrar();
-  else window.setTimeout(mostrar, dia === 24 ? 230 : 160);
+  else temporizadorVentana=window.setTimeout(mostrar, dia === 24 ? 230 : 160);
 }
 
 function programarActualizacion() {
@@ -350,6 +351,14 @@ if (enPrueba) {
   abrir.disabled = true;
   window.addEventListener('message', evento => {
     if (evento.source !== window.parent || evento.origin !== (origenLocal === '*' ? 'null' : origenLocal)) return;
+    if(evento.data?.tipo==='escape-caja'){
+      clearTimeout(temporizadorVentana);
+      if(!sorpresa.open){ventanaActiva?.classList.remove('girada');ventanaActiva=undefined;}
+      if(sorpresa.open)sorpresa.close();if(cuaderno.open)cuaderno.close();relato?.limpiar();diaDePrueba=undefined;
+      document.documentElement.classList.toggle('movimiento-reducido',evento.data.reducido===true);
+      if(Number.isFinite(evento.data.momento))entrada?.revisar(evento.data.momento);else entrada?.reproducir();
+      return;
+    }
     if(evento.data?.tipo==='escape-historia'){verHistoria();return;}
     if(evento.data?.tipo !== 'escape-iniciar' || !/^\d{4}-\d{2}-\d{2}$/.test(evento.data.fecha)) return;
     datos = ER.calendario(evento.data.datos);

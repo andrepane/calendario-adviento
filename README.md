@@ -165,3 +165,12 @@ La entrada utiliza la misma casa interactiva dentro de la caja. El cierre se lib
 En **prueba.html → Prueba · Cambiar día**, **Momento de la apertura** permite reproducirla o verla detenida al inicio, con el cierre liberado, durante el giro y con el interior abierto. **Movimiento reducido** permite revisar esa variante. Estas herramientas usan la entrada real y conservan el avance de los retos. Tocar el cierre desde una imagen en pausa reproduce la apertura completa.
 
 Revisión en navegador: 375, 390 y 440 píxeles, más escritorio a 1440; caja y tapa sin recortes, sin desplazamiento horizontal y 24 ventanas con áreas táctiles de al menos 44 × 48. Se comprobó la apertura completa, primera visita, recarga durante el giro, visitas posteriores, movimiento reducido, los estados de ventana, el cuaderno y la resolución del cuadro eléctrico con una única entrega de llave. Las cuatro pruebas existentes siguen contrastando la campaña, la historia, las fechas y las mecánicas.
+
+
+## Icono y nombre de la app instalada
+
+**index.html** enlaza **manifest.webmanifest** y usa **fotos/icono-192.png** como apple-touch-icon. Tanto name como short_name y apple-mobile-web-app-title son **Adviento**. El modo instalado es standalone, con inicio, ámbito e identificador en **/**: abre el calendario real, sin parámetros de simulación. El título del documento y el título visible del calendario se conservan, al igual que las claves del progreso. No se añade caché sin conexión.
+
+Se reutilizan los dos PNG aportados. Los originales subidos tenían ambos 1254 × 1254 píxeles; se han reducido, sin cambiar el diseño, a **192 × 192** y **512 × 512**, coincidiendo con el manifiesto.
+
+Para comprobar la instalación en un iPhone real: abre el calendario en Safari, pulsa **Compartir → Añadir a pantalla de inicio**, confirma que el icono es el cierre dorado y el nombre **Adviento**, y comprueba que al tocarlo se abre el calendario real. Esta verificación física en iPhone queda pendiente; la comprobación de archivos y metadatos del despliegue no la sustituye.

@@ -104,9 +104,19 @@
   }
 
   function superponer(c,s) {
-    const elegidos=s.discos;
-    if(!Array.isArray(elegidos)||elegidos.length!==2||new Set(elegidos).size!==2)return null;
-    return Array.from({length:4},(_,i)=>elegidos.some(id=>c.discos[id]?.opaco[mod(i-(s.giros[id]??0),4)]===1)?1:0);
+    const elegidos=s?.discos,n=c.sectores??4;
+    if(!Array.isArray(elegidos)||elegidos.length!==2||new Set(elegidos).size!==2
+      ||elegidos.some(id=>!Number.isInteger(id)||!c.discos[id]||!Number.isInteger(s.giros?.[id]??0)))return null;
+    return Array.from({length:n},(_,i)=>elegidos.some(id=>c.discos[id].opaco[mod(i-(s.giros?.[id]??0),n)]===1)?1:0);
+  }
+
+  function solucionesVitral(c,objetivo){
+    const soluciones=[],n=c.sectores??4;
+    for(let a=0;a<c.discos.length;a++)for(let b=a+1;b<c.discos.length;b++)for(let x=0;x<n;x++)for(let y=0;y<n;y++){
+      const s={discos:[a,b],giros:c.discos.map((_,i)=>i===a?x:i===b?y:0)};
+      if(igual(superponer(c,s),objetivo))soluciones.push(s);
+    }
+    return soluciones;
   }
 
   function resolverNonograma(filas, limite=2) {
@@ -214,9 +224,13 @@
         if(!completa(tipo,c,s))return ['la secuencia de referencia no alinea los engranajes'];
       }
       if(tipo==='vitral'){
-        if(c.discos.length!==4||c.discos.some(d=>d.opaco.length!==4||d.opaco.some(v=>![0,1].includes(v))))return ['configura cuatro discos con cuatro cuadrantes opacos o transparentes'];
+        const n=c.sectores??4;
+        if(![4,8].includes(n)||c.discos.length!==4||c.discos.some(d=>d.opaco.length!==n||d.opaco.some(v=>![0,1].includes(v))))return ['configura cuatro discos de cuatro u ocho sectores opacos o transparentes'];
+        if(!Array.isArray(c.modelos)||c.modelos.length!==4||new Set(c.modelos.map(m=>m.id)).size!==4)return ['configura cuatro modelos con identificadores distintos'];
         for(const m of c.modelos){
+          if(!Array.isArray(m.opaco)||m.opaco.length!==n||m.opaco.some(v=>![0,1].includes(v)))return ['los modelos deben tener el mismo número de sectores que los discos'];
           if(!c.soluciones[m.id]||!igual(superponer(c,c.soluciones[m.id]),m.opaco))return ['cada fase necesita una superposición de referencia válida'];
+          if(c.version===2&&solucionesVitral(c,m.opaco).length!==1)return ['cada modelo del vitral nuevo debe tener una solución única'];
         }
       }
       return [];
@@ -224,7 +238,7 @@
   }
 
   ER.mecanismos={tipos,digitos,mod,flujo,moverAscensor,rutaAscensor,candidatasVisor,moverAnillos,girarEngranajes,
-    superponer,resolverNonograma,inicial,completa,errores,marcasEngranajes};
+    superponer,solucionesVitral,resolverNonograma,inicial,completa,errores,marcasEngranajes};
 }();
 
 !function(){
@@ -245,12 +259,15 @@
   }
   function disco(opacos,clase=''){
     const dibujo=svg('svg',{viewBox:'0 0 100 100',class:'disco-vitral '+clase});
-    dibujo.append(svg('circle',{cx:50,cy:50,r:45,fill:'#ffe6a4'}));
-    for(let i=0;i<4;i++){
-      const puntos=[[50,5],[95,50],[50,95],[5,50],[50,5]];
-      if(opacos[i])dibujo.append(svg('path',{d:`M50 50L${puntos[i][0]} ${puntos[i][1]}A45 45 0 0 1 ${puntos[i+1][0]} ${puntos[i+1][1]}Z`,fill:'#344343'}));
+    const n=opacos.length;
+    dibujo.append(svg('circle',{cx:50,cy:50,r:42,fill:'#ffe6a4'}));
+    for(let i=0;i<n;i++){
+      const a=(i/n*2-.5)*Math.PI,b=((i+1)/n*2-.5)*Math.PI;
+      const x=50+42*Math.cos(a),y=50+42*Math.sin(a),xx=50+42*Math.cos(b),yy=50+42*Math.sin(b);
+      dibujo.append(svg('path',{d:`M50 50L${x} ${y}A42 42 0 0 1 ${xx} ${yy}Z`,fill:opacos[i]?'#263c38':'#ffe6a4',stroke:'#9a845b','stroke-width':.6}));
     }
-    dibujo.append(svg('circle',{cx:50,cy:50,r:45,fill:'none',stroke:'#8b704e','stroke-width':3}));
+    dibujo.append(svg('circle',{cx:50,cy:50,r:43,fill:'none',stroke:'#8b704e','stroke-width':3}));
+    dibujo.setAttribute('role','img');dibujo.setAttribute('aria-label',opacos.map((v,i)=>`${i+1} ${v?'oscuro':'claro'}`).join(', '));
     return dibujo;
   }
 
@@ -323,10 +340,12 @@
     const controles=el('div','','controles-mecanismo');
     const aviso=el('p','','aviso-mecanismo');aviso.setAttribute('role','status');
     const guardado=opciones.interaccion;
-    let s=guardado?.actual&&typeof guardado.actual==='object'?structuredClone(guardado.actual):M.inicial(tipo,c);
-    let historial=Array.isArray(guardado?.historial)?guardado.historial.slice(-200):[];
+    const firma=JSON.stringify(c),compatible=guardado?.actual&&(!guardado.configuracion||guardado.configuracion===firma)
+      &&(c.version!==2||guardado.configuracion===firma);
+    let s=compatible?structuredClone(guardado.actual):M.inicial(tipo,c);
+    let historial=compatible&&Array.isArray(guardado?.historial)?guardado.historial.slice(-200):[];
     let finalizada=false;
-    const persistir=()=>opciones.guardarInteraccion?.({actual:structuredClone(s),historial:structuredClone(historial)});
+    const persistir=()=>opciones.guardarInteraccion?.({configuracion:firma,actual:structuredClone(s),historial:structuredClone(historial)});
     const deshacer=boton('Deshacer',()=>{
       if(!historial.length)return;
       s=historial.pop();aviso.textContent='Última acción deshecha.';actualizar();
@@ -531,49 +550,41 @@
         estado.textContent='Marcas alineadas: '+marcas.filter(m=>m.alineada).length+'/3. La tercera rueda está '+(s.embrague?'conectada.':'libre.');
       };
     }else if(tipo==='vitral'){
-      const discos=el('div','','discos-vitral');
-      const controlesDiscos=[];
+      const n=c.sectores??4,selector=el('select');selector.setAttribute('aria-label','Modelo del vitral');
+      for(const m of c.modelos){const op=el('option',m.nombre);op.value=m.id;selector.append(op);}
+      selector.addEventListener('change',()=>actuar(actual=>{actual.objetivo=selector.value;return actual;}));
+      const etiqueta=el('label','Modelo que quieres reconstruir');etiqueta.append(selector);
+      const comparacion=el('div','','comparacion-vitral'),objetivo=el('div','','modelo-objetivo'),lampara=el('div','','lampara-vitral');comparacion.append(objetivo,lampara);
+      const contador=el('p','','contador-vitral');contador.setAttribute('role','status');
+      const guardarModelo=boton('Registrar modelo',()=>actuar(actual=>{
+        const m=c.modelos.find(m=>m.id===selector.value);
+        if(JSON.stringify(M.superponer(c,actual))!==JSON.stringify(m.opaco)){aviso.textContent='La luz y las sombras aún no coinciden con el modelo.';return null;}
+        actual.modelos[m.id]={discos:[...actual.discos],giros:[...actual.giros]};aviso.textContent=m.nombre+' registrado.';return actual;
+      }));
+      const discos=el('div','','discos-vitral'),controlesDiscos=[];
       c.discos.forEach((d,i)=>{
-        const ficha=el('div');
+        const ficha=el('div','','ficha-vitral');
         const elegir=boton('Disco '+d.nombre,()=>actuar(actual=>{
           const pos=actual.discos.indexOf(i);
           if(pos>=0)actual.discos.splice(pos,1);
           else if(actual.discos.length<2)actual.discos.push(i);
           else{aviso.textContent='Retira un disco antes de colocar otro.';return null;}
           aviso.textContent='';return actual;
-        }));
-        const dibujo=disco(d.opaco);
-        const fila=el('div','','giro-disco');
-        fila.append(boton('↶',()=>girar(i,-1)),boton('↷',()=>girar(i,1)));
-        fila.children[0].setAttribute('aria-label','Girar disco '+d.nombre+' a la izquierda');
-        fila.children[1].setAttribute('aria-label','Girar disco '+d.nombre+' a la derecha');
-        ficha.append(elegir,dibujo,fila);discos.append(ficha);controlesDiscos.push({elegir,dibujo});
+        }));elegir.setAttribute('aria-label','Disco '+d.nombre);
+        const marco=el('div','','marco-disco'),dibujo=disco(d.opaco);marco.append(dibujo);
+        const fila=el('div','','giro-disco');fila.append(boton('↶',()=>girar(i,-1)),boton('↷',()=>girar(i,1)));
+        fila.children[0].setAttribute('aria-label','Girar disco '+d.nombre+' a la izquierda');fila.children[1].setAttribute('aria-label','Girar disco '+d.nombre+' a la derecha');
+        const posicion=el('span','','posicion-disco');ficha.append(elegir,marco,fila,posicion);discos.append(ficha);controlesDiscos.push({elegir,dibujo,posicion});
       });
-      function girar(i,paso){actuar(actual=>{
-        actual.angulos=[...(actual.angulos??actual.giros)];actual.angulos[i]+=paso;
-        actual.giros[i]=M.mod(actual.giros[i]+paso,4);return actual;
-      });}
-      const lampara=el('div','','lampara-vitral');
-      const modelos=el('div','','modelos-vitral');
-      const botonesModelo=c.modelos.map(m=>{
-        const ficha=el('div');ficha.append(disco(m.opaco),el('p',m.nombre));
-        const guardarModelo=boton('Guardar '+m.nombre,()=>actuar(actual=>{
-          if(JSON.stringify(M.superponer(c,actual))!==JSON.stringify(m.opaco)){aviso.textContent='La lámpara no coincide con ese modelo.';return null;}
-          actual.modelos[m.id]={discos:[...actual.discos],giros:[...actual.giros]};aviso.textContent=m.nombre+' guardada.';return actual;
-        }));
-        ficha.append(guardarModelo);modelos.append(ficha);return {b:guardarModelo,m};
-      });
-      pantalla.append(el('p','Coloca dos discos sobre la lámpara.'),discos,lampara,modelos);
+      function girar(i,paso){actuar(actual=>{actual.angulos=[...(actual.angulos??actual.giros)];actual.angulos[i]+=paso;actual.giros[i]=M.mod(actual.giros[i]+paso,n);return actual;});}
+      pantalla.append(etiqueta,comparacion,guardarModelo,contador,discos);
       dibujar=()=>{
-        controlesDiscos.forEach(({elegir,dibujo},i)=>{
-          elegir.setAttribute('aria-pressed',String(s.discos.includes(i)));
-          dibujo.style.transform=`rotate(${(s.angulos??s.giros)[i]*90}deg)`;
-        });
-        const resultado=M.superponer(c,s);
-        lampara.replaceChildren(el('p','Lámpara · resultado actual'));
-        if(resultado)lampara.append(disco(resultado));
-        else lampara.append(el('p','Selecciona dos discos.'));
-        botonesModelo.forEach(({b,m})=>{b.textContent=s.modelos[m.id]?'✓ '+m.nombre+' guardada':'Guardar '+m.nombre;});
+        const m=c.modelos.find(m=>m.id===s.objetivo)??c.modelos[0];selector.value=m.id;objetivo.replaceChildren(el('p','Objetivo · '+m.nombre),disco(m.opaco));
+        controlesDiscos.forEach(({elegir,dibujo,posicion},i)=>{const elegido=s.discos.includes(i);elegir.setAttribute('aria-pressed',String(elegido));elegir.textContent='Disco '+c.discos[i].nombre+(elegido?' ✓':'');dibujo.style.transform='rotate('+((s.angulos??s.giros)[i]*360/n)+'deg)';dibujo.setAttribute('aria-label',c.discos[i].opaco.map((_,j)=>(j+1)+' '+(c.discos[i].opaco[M.mod(j-s.giros[i],n)]?'oscuro':'claro')).join(', '));posicion.textContent='Posición '+(s.giros[i]+1)+'/'+n;});
+        const resultado=M.superponer(c,s);lampara.replaceChildren(el('p','Lámpara actual'));if(resultado)lampara.append(disco(resultado));else lampara.append(el('p','Coloca dos discos.'));
+        const listo=Boolean(s.modelos[m.id]);guardarModelo.textContent=listo?'✓ Modelo registrado':'Registrar '+m.nombre;guardarModelo.disabled=listo;
+        contador.textContent='Modelos registrados: '+c.modelos.filter(m=>s.modelos[m.id]).length+'/'+c.modelos.length;
+        for(const op of selector.options)op.textContent=(s.modelos[op.value]?'✓ ':'')+c.modelos.find(m=>m.id===op.value).nombre;
       };
     }
     const herramientas=el('div','','herramientas-mecanismo');herramientas.append(deshacer,reiniciar);

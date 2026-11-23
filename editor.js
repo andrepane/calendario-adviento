@@ -350,7 +350,7 @@
       informar();
     }
     if (campos.tipo.value === 'ahorcado') {
-      control('Palabra del ahorcado', config.palabra, 'text', valor => { config.palabra = valor.toUpperCase(); });
+      control('Palabra o frase del ahorcado', config.palabra, 'text', valor => { config.palabra = valor.toUpperCase(); });
       const fallos = control('Fallos permitidos', config.fallos, 'number', valor => { config.fallos = Number(valor); });
       fallos.min = 1;
       fallos.max = 20;
@@ -522,6 +522,12 @@
     elegirEspacio('historia');
     if(!leer(clave('borrador')))guardar(clave('borrador'),datos);
     anunciar('Historia actual cargada en su propio borrador. Tus otros borradores siguen disponibles.');
+  });
+  porId('actualizar-retos-41314').addEventListener('click',()=>{
+    guardarDia();
+    for(const numero of [4,13,14])datos.capitulos[numero-1]=ER.capitulo(window.CALENDARIO_PUBLICADO.capitulos[numero-1]);
+    hayCambios=true;hayRespaldo=false;mostrarDia();
+    anunciar('Días 4, 13 y 14 actualizados en este borrador. Los demás capítulos se conservan. Guarda el borrador para mantenerlos.');
   });
 
   porId('cargar-campana').addEventListener('click', () => {
